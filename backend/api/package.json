@@ -1,12 +1,18 @@
 {
   "name": "api",
   "version": "1.0.0",
-  "main": "index.js",
   "keywords": [],
   "author": "Andrea Fiorani",
   "license": "ISC",
   "description": "Project to make api inference for neural network",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "start": "ts-node ./src/index.ts",
+    "build": "tsc"
+  },
   "dependencies": {
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "pg": "^8.11.5",
     "pg-hstore": "^2.3.4",
@@ -17,7 +23,7 @@
     "@types/express": "^4.17.21",
     "@types/node": "^20.12.12",
     "@types/sequelize": "^4.28.20",
-    "ts-node-dev": "^2.0.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   }
 }
