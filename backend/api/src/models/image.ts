@@ -1,5 +1,5 @@
 import { DataTypes, Model } from 'sequelize';
-import {SequelizeConnection} from '../db/SequelizeConnection.js';
+import {SequelizeConnection} from '../db/SequelizeConnection';
 
 export default class Image extends Model {
   declare id: number;
@@ -9,10 +9,6 @@ export default class Image extends Model {
   declare path: string;
   
   declare description: string;
-
-  declare lastUpdate: Date;
-
-  declare creationDate: Date;
 }
 
 const sequelizeConnection = SequelizeConnection.getInstance();
@@ -44,20 +40,12 @@ Image.init(
     description: {
       type: DataTypes.STRING(300)
     },
-    lastUpdate: {
-      type: DataTypes.DATE,
-      allowNull: false
-    },
-    creationDate: {
-      type: DataTypes.DATE,
-      allowNull: false
-    }
   },
   {
     sequelize: sequelizeConnection,
     modelName: "Image",
     tableName: "images",
-    timestamps: false
+    timestamps: true
   },
 );
 
@@ -72,7 +60,7 @@ Dataset.hasMany(Image, {
   as: 'dataset',
 });
 
-// Will create the table automatically if it's not found
+// todo handle error
 Image.sync().then(() => {
   console.log('Image table has been synchronized.');
 }).catch(err => {
