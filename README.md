@@ -29,7 +29,7 @@ The main goal of IntelliInfer is to provide an API for loading datasets, managin
 | Yes | upload a file on a dataset                        | user   |
 | Yes | perform inference operation                       | user   |
 | Yes | check the state of the current inference operation| user   |
-| Yes | show the inference results                        | user   |
+| Yes | show inference results                        | user   |
 | Yes | check user’s remaining credit                     | user   |
 | Yes | save inference results                            | system |
 | No  | check if the service is online                    | all    |
@@ -48,9 +48,9 @@ The main goal of IntelliInfer is to provide an API for loading datasets, managin
 | DELETE| /dataset/{datasetId}/delete                      |
 | POST  | /dataset/{datasetId}/upload  (zip & img)         |
 | POST  | /inference/{datasetId}/{aiId}/                   |
-| GET   | /inference/state/{resoultId}                     |
-| GET   | /inference/result/{resoultId}                    |
-| POST  | /inference/result/{resoultId}  (callback)        |
+| GET   | /inference/state/{resultId}                     |
+| GET   | /inference/result/{resultId}                    |
+| POST  | /inference/result/{resultId}  (callback)        |
 | GET   | /check/healt                                     |
 
 
