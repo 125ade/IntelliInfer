@@ -23,7 +23,7 @@ export default class Dataset extends Model {
 
 }
 
-const sequelizeConnection = SequelizeConnection.getInstance();
+const sequelize = SequelizeConnection.getInstance().sequelize;
 
 
 Dataset.init(
@@ -63,7 +63,7 @@ Dataset.init(
     },
   },
   {
-    sequelize: sequelizeConnection,
+    sequelize,
     modelName: "Dataset",
     tableName: "datasets",
     timestamps: true

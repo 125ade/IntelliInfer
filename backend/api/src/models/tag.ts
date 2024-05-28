@@ -10,7 +10,7 @@ export default class Tag extends Model {
 
 }
 
-const sequelizeConnection = SequelizeConnection.getInstance();
+const sequelize = SequelizeConnection.getInstance().sequelize;
 
 Tag.init(
   {
@@ -21,7 +21,7 @@ Tag.init(
     },
   },
   {
-    sequelize: sequelizeConnection,
+    sequelize,
     modelName: "Tag",
     tableName: "Tags",
     timestamps: true

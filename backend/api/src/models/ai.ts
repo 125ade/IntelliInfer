@@ -17,7 +17,7 @@ export default class Ai extends Model {
 
 }
 
-const sequelizeConnection = SequelizeConnection.getInstance();
+const sequelize = SequelizeConnection.getInstance().sequelize;
 
 Ai.init(
   {
@@ -39,7 +39,7 @@ Ai.init(
     },
   },
   {
-    sequelize: sequelizeConnection,
+    sequelize,
     modelName: "Ai",
     tableName: "Ai",
     timestamps: true

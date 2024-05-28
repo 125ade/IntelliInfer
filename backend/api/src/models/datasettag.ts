@@ -12,7 +12,7 @@ export default class DatasetTag extends Model {
 
 }
 
-const sequelizeConnection = SequelizeConnection.getInstance();
+const sequelize = SequelizeConnection.getInstance().sequelize;
 
 DatasetTag.init(
   {
@@ -36,7 +36,7 @@ DatasetTag.init(
     }
   },
   {
-    sequelize: sequelizeConnection,
+    sequelize,
     modelName: "DatasetTag",
     tableName: "datasetstags",
     timestamps: true
@@ -49,3 +49,4 @@ DatasetTag.sync().then(() => {
 }).catch(err => {
   console.error('Unable to synchronize the DatasetTag table:', err);
 });
+
