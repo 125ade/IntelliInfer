@@ -32,6 +32,7 @@ The main goal of IntelliInfer is to provide an API for loading datasets, managin
 | Yes | show the inference results                        | user   |
 | Yes | check user’s remaining credit                     | user   |
 | Yes | save inference results                            | system |
+| No  | check if the service is online                    | all    |
 
 
 | Type  | Rotta                                            |
@@ -50,6 +51,7 @@ The main goal of IntelliInfer is to provide an API for loading datasets, managin
 | GET   | /inference/state/{resoultId}                     |
 | GET   | /inference/result/{resoultId}                    |
 | POST  | /inference/result/{resoultId}  (callback)        |
+| GET   | /check/healt                                     |
 
 
 ## Uses Case Diagram
