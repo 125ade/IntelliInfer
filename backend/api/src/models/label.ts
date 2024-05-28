@@ -15,7 +15,7 @@ export default class Label extends Model {
   declare description: string;
 }
 
-const sequelizeConnection = SequelizeConnection.getInstance();
+const sequelize = SequelizeConnection.getInstance().sequelize;
 
 /**
  * Initialize model, define sequelize connection, the name of the table, 
@@ -54,7 +54,7 @@ Label.init(
     }
   },
   {
-    sequelize: sequelizeConnection,
+    sequelize,
     modelName: "Label",
     tableName: "labels",
     timestamps: true

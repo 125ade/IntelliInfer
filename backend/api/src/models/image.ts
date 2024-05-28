@@ -12,7 +12,7 @@ export default class Image extends Model {
   declare description: string;
 }
 
-const sequelizeConnection = SequelizeConnection.getInstance();
+const sequelize = SequelizeConnection.getInstance().sequelize;
 
 /**
  * Initialize model, define sequelize connection, the name of the table, 
@@ -43,7 +43,7 @@ Image.init(
     },
   },
   {
-    sequelize: sequelizeConnection,
+    sequelize,
     modelName: "Image",
     tableName: "images",
     timestamps: true

@@ -16,7 +16,7 @@ export default class Result extends Model {
 
 }
 
-const sequelizeConnection = SequelizeConnection.getInstance();
+const sequelize = SequelizeConnection.getInstance().sequelize;
 
 /**
  * Initialize model, define sequelize connection, the name of the table, 
@@ -56,7 +56,7 @@ Result.init(
     },
   },
   {
-    sequelize: sequelizeConnection,
+    sequelize,
     modelName: "Result",
     tableName: "results",
     timestamps: true
