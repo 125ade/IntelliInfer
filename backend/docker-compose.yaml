@@ -1,0 +1,69 @@
+version: '3.7'
+
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: "api"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "3000:3000"
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    networks:
+      - private-ntwk
+    depends_on:
+      - database
+      - redis
+
+
+  database:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    container_name: "database"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - private-ntwk
+
+  redis:
+    build:
+      context: ./redis
+      dockerfile: Dockerfile.redis
+    container_name: "redis"
+    volumes:
+      - redis_data:/data
+    networks:
+      - private-ntwk
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  yolo:
+    build:
+      context: ./neural_network/yolo
+      dockerfile: Dockerfile
+
+  rcnn:
+    build:
+      context: ./neural_network/rcnn
+      dockerfile: Dockerfile
+
+  test_inference:
+    build:
+      context: ./neural_network/test_inference
+      dockerfile: Dockerfile
+
+networks:
+  private-ntwk:
+    driver: bridge
+    name: private-ntwk
+
+volumes:
+  redis_data:
+  postgres_data:

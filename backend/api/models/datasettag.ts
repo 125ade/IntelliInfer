@@ -1,7 +1,7 @@
 import { DataTypes, Model } from 'sequelize';
 import { SequelizeConnection } from '../db/SequelizeConnection';
 import Dataset from './dataset';
-import Tag from  './tag';
+import Tag from './tag';
 
 
 export default class DatasetTag extends Model {
