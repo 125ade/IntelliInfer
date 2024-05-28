@@ -11,9 +11,9 @@ export default class Ai extends Model {
 
     declare pathWeights: string;
 
-    declare updatedAt: Date;
+    declare readonly createdAt: Date;
 
-    declare createdAt: Date;
+    declare readonly updatedAt: Date;
 
 }
 
@@ -41,7 +41,7 @@ Ai.init(
   {
     sequelize,
     modelName: "Ai",
-    tableName: "Ai",
+    tableName: "ai",
     timestamps: true
   },
 );

@@ -1,6 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
 import { SequelizeConnection } from '../db/SequelizeConnection';
-import Image from './image'; // Assuming you have an Image model
+import Image from './image';
 import Ai from './ai'; 
 
 export default class Result extends Model {
@@ -13,6 +13,10 @@ export default class Result extends Model {
   declare data: object;
 
   declare requestId: number;
+
+  declare readonly createdAt: Date;
+
+  declare readonly updatedAt: Date;
 
 }
 
@@ -54,6 +58,16 @@ Result.init(
       type: DataTypes.INTEGER,
       allowNull: false
     },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
   },
   {
     sequelize,
@@ -76,13 +90,13 @@ Result.belongsTo(Ai, {
 Image.hasMany(Result, {
     sourceKey: 'id',
     foreignKey: 'imageId',
-    as: 'image',
+    as: 'results',
 });
 
 Ai.hasMany(Result, {
     sourceKey: 'id',
     foreignKey: 'aiId',
-    as: 'ai',
+    as: 'results',
 });
 
 // todo handle error

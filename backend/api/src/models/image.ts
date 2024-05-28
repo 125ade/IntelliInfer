@@ -10,6 +10,11 @@ export default class Image extends Model {
   declare path: string;
   
   declare description: string;
+
+  declare readonly createdAt: Date;
+
+  declare readonly updatedAt: Date;
+
 }
 
 const sequelize = SequelizeConnection.getInstance().sequelize;
@@ -41,6 +46,16 @@ Image.init(
     description: {
       type: DataTypes.STRING(300)
     },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
   },
   {
     sequelize,
@@ -58,7 +73,7 @@ Image.belongsTo(Dataset, {
 Dataset.hasMany(Image, {
   sourceKey: 'id',
   foreignKey: 'datasetId',
-  as: 'dataset',
+  as: 'images',
 });
 
 // todo handle error
