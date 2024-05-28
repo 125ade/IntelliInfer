@@ -7,15 +7,21 @@ import { Sequelize } from 'sequelize';
 export class SequelizeConnection {
   
   // Connection instance
-  private static instance: Sequelize;
+  private static instance: SequelizeConnection;
+  public sequelize!: Sequelize;
 
   /**
    * The Singleton's constructor should always be private to prevent direct
    * construction calls with the `new` operator.
    */
-  private constructor() {
-    // Initialize connection
-    SequelizeConnection.instance = new Sequelize({
+  private constructor() {}
+  
+  // Initialize connection
+  private static InitializeConnection(): SequelizeConnection {
+    
+    const newInstance = new SequelizeConnection();
+
+    newInstance.sequelize = new Sequelize({
       dialect: 'postgres',
       host: process.env.POSTGRES_HOST,
       port: Number(process.env.POSTGRES_PORT),  // Convert string to number
@@ -24,21 +30,15 @@ export class SequelizeConnection {
       database: process.env.POSTGRES_DB
     });
 
-    // Test connection
-    SequelizeConnection.instance.authenticate().then(() => {
-      console.log('Sequelize connected');
-    }).catch(err => {
-      console.error('Unable to connect to the database:', err);
-    });
+    return newInstance;
   }
 
   /**
-   * The static method that controls the access to the singleton instance.
+   * static method that controls the access to the singleton instance.
    */
-  public static getInstance(): Sequelize {
-    if (!SequelizeConnection.instance) {
-      new SequelizeConnection();
-    }
-    return SequelizeConnection.instance;
+  public static getInstance(): SequelizeConnection {
+    if (this.instance === undefined) this.instance = this.InitializeConnection();
+
+    return this.instance;
   }
 }
