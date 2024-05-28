@@ -10,6 +10,10 @@ export default class DatasetTag extends Model {
 
     declare tagId: number;
 
+    declare readonly createdAt: Date;
+
+    declare readonly updatedAt: Date;
+
 }
 
 const sequelize = SequelizeConnection.getInstance().sequelize;
@@ -33,6 +37,16 @@ DatasetTag.init(
         model: Tag,
         key: 'id'
       }
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
     }
   },
   {

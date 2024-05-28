@@ -2,16 +2,22 @@ import { DataTypes, Model } from 'sequelize';
 import { SequelizeConnection } from '../db/SequelizeConnection';
 
 export default class User extends Model {
+
   declare id: number;
   
   declare username: string;
   
   declare email: string;
 
-  declare password: string;
+  declare token: number;
+
+  declare readonly createdAt: Date;
+
+  declare readonly updatedAt: Date;
+
 }
 
-const sequelizeConnection = SequelizeConnection.getInstance();
+const sequelize = SequelizeConnection.getInstance().sequelize;
 
 /**
  * Initialize model, define sequelize connection, the name of the table, 
@@ -22,6 +28,7 @@ User.init(
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
+      allowNull: false,
       autoIncrement: true
     },
     username: {
@@ -32,13 +39,13 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    password: {
-      type: DataTypes.STRING,
+    token: {
+      type: DataTypes.DECIMAL,
       allowNull: false
     }
   },
   {
-    sequelize: sequelizeConnection,
+    sequelize,
     modelName: "User",
     tableName: "users",
     timestamps: true,

@@ -8,6 +8,10 @@ export default class Tag extends Model {
 
   declare name: string;
 
+  declare readonly createdAt: Date;
+
+  declare readonly updatedAt: Date;
+
 }
 
 const sequelize = SequelizeConnection.getInstance().sequelize;
@@ -19,16 +23,26 @@ Tag.init(
       primaryKey: true,
       allowNull: false
     },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
   },
   {
     sequelize,
     modelName: "Tag",
-    tableName: "Tags",
+    tableName: "tags",
     timestamps: true
   },
 );
 
-Tag.belongsToMany(Dataset, { through: DatasetTag });
+Tag.belongsToMany(Dataset, { through: DatasetTag, foreignKey: 'tagId', as: 'datasets' });
 
 // todo handle log
 Tag.sync().then(() => {

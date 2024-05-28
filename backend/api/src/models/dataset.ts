@@ -19,7 +19,13 @@ export default class Dataset extends Model {
 
   declare countClasses: number;
 
-  declare description: string;
+  declare description: string | null;
+
+  declare readonly createdAt: Date;
+
+  declare readonly updatedAt: Date;
+
+  declare deletedAt: Date | null;
 
 }
 
@@ -59,29 +65,45 @@ Dataset.init(
       allowNull: false
     },
     description: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    deletedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
     },
   },
   {
     sequelize,
     modelName: "Dataset",
     tableName: "datasets",
+    paranoid: true,
     timestamps: true
   },
 );
 
 Dataset.belongsTo(User, {
-  foreignKey: 'user_id',
+  foreignKey: 'userId',
   as: 'user',
 });
 
 User.hasMany(Dataset, {
   sourceKey: 'id',
-  foreignKey: 'user_id',
-  as: 'dataset',
+  foreignKey: 'userId',
+  as: 'datasets',
 });
 
-Dataset.belongsToMany(Tag, { through: DatasetTag });
+Dataset.belongsToMany(Tag, { through: DatasetTag, foreignKey: 'datasetId', as: 'tags' });
 
 // todo handle log
 Dataset.sync().then(() => {

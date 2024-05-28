@@ -7,7 +7,7 @@ CREATE TABLE users (
     updated_at DATETIME NOT NULL
 );
 
-CREATE TABLE Ai (
+CREATE TABLE ai (
     id INTEGER PRIMARY KEY,
     name CHAR(200) NOT NULL,
     description CHAR(300),
@@ -63,7 +63,7 @@ CREATE TABLE results (
     FOREIGN KEY (ai_id) REFERENCES Ai(id)
 );
 
-CREATE TABLE Tags (
+CREATE TABLE tags (
     name VARCHAR(255) PRIMARY KEY NOT NULL,
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL
