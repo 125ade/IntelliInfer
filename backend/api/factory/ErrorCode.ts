@@ -44,11 +44,6 @@ export class ServerError extends ErrorCode {
     setFailedConnection(): ErrorCode {
         return this.set("There was an error connecting to the database.")
     }
-    
-    // errore: richiesta dello stato di un'operazione di inferenza non in corso
-    setNonExistentInference(): ErrorCode {
-        return this.set("There was an error. The inference process required is not existent. Unable to find its state.")
-    }
 }
 
 /**
@@ -125,7 +120,7 @@ export class BadRequestError extends ErrorCode {
     }
     
     // Immagine non valida (controllo mimetype?)
-    setNotValidImages(): ErrorCode {
+    setInvalidImages(): ErrorCode {
         return this.set("There was an error. Images not valid.");
       }
     
@@ -220,5 +215,10 @@ export class NotFound extends ErrorCode {
 
     setNoEmail(email: string): ErrorCode {
         return this.set(`user with email ${email} doesn't exist`);
+    }
+
+    // errore: richiesta dello stato di un'operazione di inferenza non in corso
+    setNonExistentInference(): ErrorCode {
+        return this.set("There was an error. The inference process required is not existent. Unable to find its state.")
     }
 }
