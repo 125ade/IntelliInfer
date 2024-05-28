@@ -5,10 +5,10 @@
   "author": "Andrea Fiorani",
   "license": "ISC",
   "description": "Project to make api inference for neural network",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/app.js",
+  "types": "dist/app.d.ts",
   "scripts": {
-    "start": "ts-node ./src/index.ts",
+    "start": "ts-node ./src/app.ts",
     "build": "tsc"
   },
   "dependencies": {
