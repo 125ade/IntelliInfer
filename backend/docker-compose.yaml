@@ -8,6 +8,8 @@ services:
     container_name: "api"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "3000:3000"
     environment:
       - DOCKER_HOST=unix:///var/run/docker.sock
     networks:

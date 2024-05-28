@@ -12,7 +12,7 @@ app.get('/check/health', (req: Request, res: Response) => {
 
 
 
-// Avvia il server
+// todo handle log
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
