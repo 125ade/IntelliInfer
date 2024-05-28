@@ -13,6 +13,45 @@ The main goal of IntelliInfer is to provide an API for loading datasets, managin
 
 # Design
 
+## Rotte
+
+| Token | Funzione                                          | Ruolo  |
+|-----|---------------------------------------------------|--------|
+| Yes | recharge user credit                              | admin  |
+| Yes | update neural network model weights               | admin  |
+| Yes | list neural networks’ models                      | user   |
+| Yes | show a specific neural network’s model            | user   |
+| Yes | create a new dataset                              | user   |
+| Yes | delete a dataset                                  | user   |
+| Yes | list all datasets                                 | user   |
+| Yes | show a specific dataset                           | user   |
+| Yes | update a dataset                                  | user   |
+| Yes | upload a file on a dataset                        | user   |
+| Yes | perform inference operation                       | user   |
+| Yes | check the state of the current inference operation| user   |
+| Yes | show the inference results                        | user   |
+| Yes | check user’s remaining credit                     | user   |
+| Yes | save inference results                            | system |
+
+
+| Type  | Rotta                                            |
+|-------|--------------------------------------------------|
+| PUT   | /credit/recharge/{userId}                        |
+| PUT   | /model/{aiId}/change/weights                     |
+| GET   | /model/list                                      |
+| GET   | /model/{modelId}                                 |
+| GET   | /dataset/list                                    |
+| GET   | /dataset/{datasetId}                             |
+| POST  | /dataset/create                                  |
+| PUT   | /dataset/{datasetId}/update                      |
+| DELETE| /dataset/{datasetId}/delete                      |
+| POST  | /dataset/{datasetId}/upload  (zip & img)         |
+| POST  | /inference/{datasetId}/{aiId}/                   |
+| GET   | /inference/state/{resoultId}                     |
+| GET   | /inference/result/{resoultId}                    |
+| POST  | /inference/result/{resoultId}  (callback)        |
+
+
 ## Uses Case Diagram
 <div style="text-align: center;">
   <img src="documents/UsesCaseDiagram.png" alt="Uses Case Diagram" style="max-width: 256 px; height: auto;">
