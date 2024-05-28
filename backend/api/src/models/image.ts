@@ -1,5 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
 import {SequelizeConnection} from '../db/SequelizeConnection';
+import Dataset from './dataset';
 
 export default class Image extends Model {
   declare id: number;

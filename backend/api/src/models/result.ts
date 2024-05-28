@@ -1,7 +1,7 @@
 import { DataTypes, Model } from 'sequelize';
 import { SequelizeConnection } from '../db/SequelizeConnection';
 import Image from './image'; // Assuming you have an Image model
-import { Ai } from './ai'; 
+import Ai from './ai'; 
 
 export default class Result extends Model {
   declare id: number;
