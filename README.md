@@ -9,6 +9,9 @@
 # Design
 
 ## Uses Case Diagram
+<div style="text-align: center;">
+  <img src="documents/UsesCaseDiagram.png" alt="Uses Case Diagram" style="max-width: 256 px; height: auto;">
+</div>
 
 # db design
 
@@ -19,5 +22,5 @@
 
 ## Database Schema
 <div style="text-align: center;">
-  <img src="documents/DatabaseSchema.png" alt="ER schema" style="max-width: 256 px; height: auto;">
+  <img src="documents/DatabaseSchema.png" alt="Database Schema" style="max-width: 256 px; height: auto;">
 </div>
