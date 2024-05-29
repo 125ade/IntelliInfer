@@ -8,15 +8,25 @@ services:
     container_name: "api"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    expose:
+      - "${API_PORT}"
     ports:
-      - "3000:3000"
+      - "${API_PORT}:${API_PORT}"
+    restart: unless-stopped
     environment:
-      - DOCKER_HOST=unix:///var/run/docker.sock
+      - DOCKER_HOST=${DOCKER_HOST}
     networks:
       - private-ntwk
     depends_on:
-      - database
-      - redis
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+#    healthcheck:
+#      test: [ "CMD", "curl", "-v", "--fail", "--silent", "--show-error", "http://${API_HOST}:${API_PORT}/check/health" ]
+#      interval: 10s
+#      timeout: 3s
+#      retries: 3
 
 
   database:
@@ -24,16 +34,37 @@ services:
       context: ./database
       dockerfile: Dockerfile
     container_name: "database"
+    restart: always
+    expose:
+      - "${POSTGRES_PORT}"
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     networks:
       - private-ntwk
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_DB}" ]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+
 
   redis:
     build:
       context: ./redis
       dockerfile: Dockerfile.redis
     container_name: "redis"
+    restart: always
+    expose:
+      - "${REDIS_PORT}"
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
     volumes:
       - redis_data:/data
     networks:
@@ -41,28 +72,34 @@ services:
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
-      timeout: 3s
+      timeout: 5s
       retries: 3
 
-  yolo:
-    build:
-      context: ./neural_network/yolo
-      dockerfile: Dockerfile
 
-  rcnn:
-    build:
-      context: ./neural_network/rcnn
-      dockerfile: Dockerfile
+
+#  yolo:
+#    build:
+#      context: ./neural_network/yolo
+#      dockerfile: Dockerfile
+#
+#  rcnn:
+#    build:
+#      context: ./neural_network/rcnn
+#      dockerfile: Dockerfile
+
 
   test_inference:
     build:
       context: ./neural_network/test_inference
       dockerfile: Dockerfile
+    container_name: "test_inference"
+
 
 networks:
   private-ntwk:
     driver: bridge
     name: private-ntwk
+
 
 volumes:
   redis_data:
