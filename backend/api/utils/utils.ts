@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import * as unzipper from 'unzipper'; // NB da mettere nelle dipendenze
+import * as unzipper from 'unzipper';
 
 // Function to control if a file is an image
 export function isImage(fileName: string): boolean {

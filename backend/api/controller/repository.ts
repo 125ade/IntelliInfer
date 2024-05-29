@@ -172,7 +172,7 @@ class Repository implements IRepository {
         return { updatedUser: user };
     }
 }
-// NB: to do: methods to update model weights
+// todo: methods to update model weights
 
 
 

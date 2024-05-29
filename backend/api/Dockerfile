@@ -2,16 +2,25 @@ FROM node:lts-slim
 
 WORKDIR /app
 
-COPY app.ts .
+RUN apt-get update && apt-get install -y curl
+
+COPY openapi.json ./dist/openapi.json
 COPY package.json .
 COPY tsconfig.json .
-COPY openapi.json .
-
-RUN apt install
 
 RUN npm install
 RUN npm install typescript -g
-RUN tsc
+
+COPY ./controller ./controller
+COPY ./db ./db
+COPY ./factory ./factory
+COPY ./models ./models
+COPY ./queues ./queues
+COPY ./utils ./utils
+COPY app.ts .
 
 
-CMD ["npm", "start"]
+RUN npm run build
+
+
+CMD ["node", "dist/app.js"]
