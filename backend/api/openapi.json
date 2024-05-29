@@ -1,0 +1,39 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Express API with Swagger",
+    "version": "1.0.0",
+    "description": "A simple Express API application with Swagger documentation"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "paths": {
+    "/check/health": {
+      "get": {
+        "summary": "Health Check",
+        "description": "Returns the health status of the system",
+        "responses": {
+          "200": {
+            "description": "System is online",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "system": {
+                      "type": "string",
+                      "example": "online"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
