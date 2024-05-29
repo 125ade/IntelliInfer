@@ -28,7 +28,11 @@ export class RedisConnection {
     newInstance.port = parseInt(process.env.REDIS_PORT || "6379");
     newInstance.host = process.env.REDIS_HOST || 'localhost';
 
-    newInstance.redis = new IORedis(newInstance.port, newInstance.host);
+    newInstance.redis = new IORedis({
+      host: newInstance.host,
+      port: newInstance.port,
+      maxRetriesPerRequest: null,
+    });
 
     return newInstance;
   }

@@ -4,21 +4,61 @@ import swaggerUi from "swagger-ui-express";
 import fs from 'fs';
 import path from 'path';
 require('dotenv').config();
-// import {createBullBoard} from '@bull-board/api';
-// import {BullMQAdapter} from '@bull-board/api/bullMQAdapter';
+import {createBullBoard} from '@bull-board/api';
+import {BullMQAdapter} from '@bull-board/api/bullMQAdapter';
 import { ExpressAdapter } from "@bull-board/express";
 
-// Create an Express application
+import {Queue} from "./queues/Queue";
+import {RedisConnection} from "./queues/RedisConnection";
+
+
 const app = express();
-const port = process.env.API_PORT || 3000;
-const host = process.env.API_HOST || "localhost";
+const port = parseInt(process.env.API_PORT || "3000");
+const host = "localhost";//process.env.API_HOST ||
+
+const redis_port = parseInt(process.env.REDIS_PORT || "6379");
+const redis_host = process.env.REDIS_HOST || 'localhost';
+const redisUrl = `redis://${redis_host}:${redis_port}/0`;
+const QUEUE_TASK_DOCKER = process.env.DOKER_QUEUE_NAME || 'dockerTaskQueue';
+
 
 try {
+  // Ottieni la connessione Redis dalla classe singleton
+  const connection = RedisConnection.getInstance().redis;
+
+  // Inizializza la coda con la connessione
+  const dockerTaskQueue = new Queue(QUEUE_TASK_DOCKER);
+
+  // Definizione del worker
+  dockerTaskQueue.process(1, async (job) => {
+    await job.log("[log] inizio work");
+    await job.updateProgress(1);
+
+    await job.updateProgress(40);
+
+    try {
+      await job.updateProgress(50);
+    } catch (err) {
+      await job.log(`[log] Errore: ${err}`);
+    }
+
+    await job.updateProgress(100);
+    await job.log("[log] fine work");
+  });
+
+  // Configura Bull Board per gestire le code
   const serverAdapter = new ExpressAdapter();
   serverAdapter.setBasePath('/admin/queues');
+
+  const bullBoard = createBullBoard({
+    queues: [new BullMQAdapter(dockerTaskQueue['queue'])], // Passa la proprietà queue della classe Queue
+    serverAdapter: serverAdapter
+  });
+
   app.use('/admin/queues', serverAdapter.getRouter());
-}catch (err){
-  // todo handle log
+
+} catch (err) {
+  // Gestisci l'errore
   console.error(err);
 }
 
@@ -44,7 +84,7 @@ app.get('/check/health', (req: Request, res: Response) => {
 app.listen(port, () => {
   console.log('------------------------------------------------------\n|\n|\n|');
   console.log(`| For add job, open http://${host}:${port}/check/health`);
-  console.log(`| For the UI, open http://${host}:${port}/admin/queues`);
-  console.log(`| For API documentation, open http://${host}:${port}/admin/docs`);
+  console.log(`| For the queue, open http://${host}:${port}/admin/queues/queue/${QUEUE_TASK_DOCKER}`);
+  console.log(`| For the API doc, open http://${host}:${port}/admin/docs`);
   console.log('|\n|\n|\n|------------------------------------------------------');
 });
