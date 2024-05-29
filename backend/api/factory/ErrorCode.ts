@@ -188,7 +188,7 @@ export class ForbiddenError extends ErrorCode {
 /**
  * Not Found Error Class
  */
-export class NotFound extends ErrorCode {
+export class NotFoundError extends ErrorCode {
     private message!: Object;
   
     set(message: string): ErrorCode {
