@@ -20,23 +20,28 @@ export function isValidImageMimetype(mimetype: string): boolean {
 
 
 // Function to unzip a file of images
-export async function unzipImages(stream: any): Promise<Buffer[]> {
+export async function unzipImages(zipFilePath: string): Promise<Buffer[]> {
     let bufferList: Buffer[] = [];
+
+    // Leggi il file zip nel buffer
+    const zipBuffer = fs.readFileSync(zipFilePath);
   
     // from a stream retrieves all the file entries
-    return await new Promise((resolve, reject) => {
-      stream
-        .pipe(unzipper.Parse())
-        .on("entry", async (entry: unzipper.Entry) => {
-          const TYPE = entry.type; // 'Directory' or 'File'
-          if (TYPE === "File") {
-            bufferList.push(await entry.buffer());
-          } else entry.autodrain();
-        })
-        .on("close", () => {
-          resolve(bufferList);
-        })
-        .on("error", (error: any) => reject(error));
+    return new Promise((resolve, reject) => {
+      const zipStream = unzipper.Open.buffer(zipBuffer);
+
+      zipStream.then((directory: any) => {
+        directory.files.forEach(async (file: any) => {
+            const fileBuffer = await file.buffer();
+            bufferList.push(fileBuffer);
+        });
+
+        resolve(bufferList);
+      })
     });
 }
 
+
+
+
+      
