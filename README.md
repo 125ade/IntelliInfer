@@ -15,7 +15,7 @@ The main goal of IntelliInfer is to provide an API for loading datasets, managin
 
 ## Rotte
 
-| Token | Function                                          | Role  |
+| Auth | Function                                          | Role  |
 |-----|---------------------------------------------------|--------|
 | Yes | recharge user credit                              | admin  |
 | Yes | update neural network model weights               | admin  |
@@ -32,25 +32,27 @@ The main goal of IntelliInfer is to provide an API for loading datasets, managin
 | Yes | show inference results                            | user   |
 | Yes | check user’s remaining credit                     | user   |
 | Yes | save inference results                            | system |
+| No  | generate auth token                               | all    |
 | No  | check if the service is online                    | all    |
 
 
-| Type  | Rotta                                            |
+| Type  | Route                                            |
 |-------|--------------------------------------------------|
-| PUT   | /credit/recharge/{userId}                        |
-| PUT   | /model/{aiId}/change/weights                     |
+| PUT   | /credit/recharge/:userId                         |
+| PUT   | /model/:aiId/change/weights                      |
 | GET   | /model/list                                      |
-| GET   | /model/{modelId}                                 |
+| GET   | /model/:modelId                                  |
 | GET   | /dataset/list                                    |
-| GET   | /dataset/{datasetId}                             |
+| GET   | /dataset/:datasetId                              |
 | POST  | /dataset/create                                  |
-| PUT   | /dataset/{datasetId}/update                      |
-| DELETE| /dataset/{datasetId}/delete                      |
-| POST  | /dataset/{datasetId}/upload  (zip & img)         |
-| POST  | /inference/{datasetId}/{aiId}/                   |
-| GET   | /inference/state/{resultId}                      |
-| GET   | /inference/result/{resultId}                     |
-| POST  | /inference/result/{resultId}  (callback)         |
+| PUT   | /dataset/:datasetId/update                       |
+| DELETE| /dataset/:datasetId/delete                       |
+| POST  | /dataset/:datasetId/upload  (zip & img)          |
+| POST  | /inference/:datasetId/:aiId/                     |
+| GET   | /inference/state/:resultId                       |
+| GET   | /inference/result/:resultId                      |
+| POST  | /inference/result/:resultId  (callback)          |
+| GET   | /generate/token/:userId                          |
 | GET   | /check/health                                    |
 
 
