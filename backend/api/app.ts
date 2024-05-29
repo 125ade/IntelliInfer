@@ -82,9 +82,7 @@ app.get('/check/health', (req: Request, res: Response) => {
 // Start the server
 // todo handel log
 app.listen(port, () => {
-  console.log('------------------------------------------------------\n|\n|\n|');
-  console.log(`| For add job, open http://${host}:${port}/check/health`);
-  console.log(`| For the queue, open http://${host}:${port}/admin/queues/queue/${QUEUE_TASK_DOCKER}`);
-  console.log(`| For the API doc, open http://${host}:${port}/admin/docs`);
-  console.log('|\n|\n|\n|------------------------------------------------------');
+  console.log(`\n\tFor see health of the service: \n\t\t open http://${host}:${port}/check/health \n`);
+  console.log(`\tFor the queue UI: \n\t\t open http://${host}:${port}/admin/queues/queue/${QUEUE_TASK_DOCKER} \n`);
+  console.log(`\tFor the API doc: \n\t\t open http://${host}:${port}/admin/docs \n\n`);
 });
