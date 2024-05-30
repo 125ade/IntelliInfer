@@ -1,16 +1,32 @@
 import fs from 'fs';
 import path from 'path';
 import morgan from 'morgan';
-import { Express} from 'express'; // Request, Response, NextFunction,
+import { Express, Request, Response, NextFunction } from 'express';
+import * as rfs from 'rotating-file-stream';
 
-const logDirectory = path.resolve(__dirname, '../../logs');
+require('dotenv').config();
 
-// Assicurati che la directory dei log esista
+const logDirectory = path.resolve(process.env.LOG_PATH || '/app/logs');
 fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory);
 
-// Configura i flussi di scrittura per i log dei file e della console
-const accessLogStream = fs.createWriteStream(
-    path.join(logDirectory, 'access.log'), { flags: 'a' });
+const accessLogDirectory = path.join(logDirectory, process.env.LOG_ACCESS_DIR || 'access');
+fs.existsSync(accessLogDirectory) || fs.mkdirSync(accessLogDirectory);
+
+const errorLogDirectory = path.join(logDirectory, process.env.LOG_ERRORS_DIR || 'errors');
+fs.existsSync(errorLogDirectory) || fs.mkdirSync(errorLogDirectory);
+
+
+// Create a rotating write stream for access logs
+const accessLogStream = rfs.createStream('access.log', {
+  interval: '1d', // rotate daily
+  path: accessLogDirectory,
+});
+
+// Create a rotating write stream for error logs
+const errorLogStream = rfs.createStream('error.log', {
+  interval: '1d', // rotate daily
+  path: errorLogDirectory,
+});
 
 const getLogFormat = () => {
   const env = process.env.NODE_ENV || 'development';
@@ -31,7 +47,7 @@ const getMorganMiddleware = () => {
     default:
       return morgan(logFormat, {
         stream: {
-          write: (message:string) => {
+          write: (message: string) => {
             accessLogStream.write(message);
             process.stdout.write(message);
           },
@@ -40,6 +56,15 @@ const getMorganMiddleware = () => {
   }
 };
 
-export const setupLogging = (app: Express) => {
+const setupLogging = (app: Express) => {
   app.use(getMorganMiddleware());
+
+  // Error logging middleware
+  app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+    const errorLog = `${new Date().toISOString()} - ${req.method} ${req.url} - ${err.stack || err.message}\n`;
+    errorLogStream.write(errorLog);
+    next(err);
+  });
 };
+
+export { setupLogging };

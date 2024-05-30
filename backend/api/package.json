@@ -20,11 +20,14 @@
     "morgan": "^1.10.0",
     "pg": "^8.11.5",
     "pg-hstore": "^2.3.4",
+    "rotating-file-stream": "^3.2.1",
     "sequelize": "^6.37.3",
     "sequelize-cli": "^6.6.2",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
-    "unzipper": "^0.10.11"
+    "unzipper": "^0.10.11",
+    "winston": "^3.13.0",
+    "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
