@@ -20,6 +20,8 @@ export interface ErrorCreator {
 }
   
 export class ConcreteErrorCreator implements ErrorCreator {
+    constructor() {};
+    
     createAuthenticationError(): AuthenticationError {
       return new AuthenticationError();
     }

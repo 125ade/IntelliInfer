@@ -37,7 +37,15 @@ export class ServerError extends ErrorCode {
     
     // errore nell'aggiornamento dei token 
     setUpdatingToken(): ErrorCode {
-      return this.set("error on updating token");
+      return this.set("Error on updating token");
+    }
+
+    setFailedCreationItem(): ErrorCode {
+      return this.set("Error on creating item");
+    }
+
+    setFailedUpdatingItem(): ErrorCode {
+      return this.set("Error on updating item");
     }
 
     // errore nella connessione al database
@@ -209,13 +217,17 @@ export class NotFoundError extends ErrorCode {
         return this.set(`The requested dataset could not be found.`);
     }
   
-    setAbstentResults(): ErrorCode{
+    setAbsentResults(): ErrorCode{
         return this.set(`The requested results could not be found.`);
     }
 
     setNoEmail(email: string): ErrorCode {
         return this.set(`user with email ${email} doesn't exist`);
     }
+
+    setAbsentItems(): ErrorCode {
+      return this.set(`Impossible to find the required items.`);
+  }
 
     // errore: richiesta dello stato di un'operazione di inferenza non in corso
     setNonExistentInference(): ErrorCode {
