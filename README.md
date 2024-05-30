@@ -61,7 +61,11 @@ The main goal of IntelliInfer is to provide an API for loading datasets, managin
   <img src="documents/UsesCaseDiagram.png" alt="Uses Case Diagram" style="max-width: 256 px; height: auto;">
 </div>
 
-# db design
+# Database
+Let's now look at the structure of our database and the patterns we used to manage it.
+
+This project uses PostgreSQL as relational database. It was chosen for its advanced capabilities, its reliability and its compliance with SQL standards, making it ideal for applications requiring robust and secure data management.
+Through it we manage and save data relating to users, datasets related images and labels, to the AI architectures themselves and their results. Below you can find the structure of the database, in terms of associations and table field.
 
 ## ER Schema
 <div style="text-align: center;">
@@ -72,6 +76,20 @@ The main goal of IntelliInfer is to provide an API for loading datasets, managin
 <div style="text-align: center;">
   <img src="documents/DatabaseSchema.png" alt="Database Schema" style="max-width: 256 px; height: auto;">
 </div>
+
+## Patterns
+### Singleton Pattern
+The Singleton pattern is used to ensure that only one instance of the database connection is created. This helps to efficiently manage connection resources and prevent problems related to managing multiple simultaneous connections. It ensures that all application components use the same database instance, improving consistency and performance.
+
+To do this it uses a private constructor, accessible only via the getInstance() method. When accessed for the first time, the method creates an instance and returns the entity of the object to the client, while in subsequent calls the entity of the already existing object is returned.
+### DAO Pattern
+Sequelize is an ORM (Object-Relational Mapping) for Node.js used as DAO (Data Access Object) to facilitate the management of CRUD operations and the tables definition. We define models for each table in the database and use Sequelize as an high level interface to interact with PostgreSQL.
+In Sequelize, database tables are represented by models. Each model is a class that maps to a specific table in the database, and contains table attributes, data types, validations, and relationships with other tables.
+Sequelize also allows to define relationships between models, such as one-to-many, many-to-many, and one-to-one associations, defined using methods such as hasMany, belongsTo, hasOne, and belongsToMany.
+We use it as DAO pattern as it provides methods for performing CRUD operations on models. These methods include findAll, findByPk, create, update, and destroy.
+### Repository Pattern
+To improve the modularity and testability of the code, the Repository pattern is used in combination with Sequelize. With the Repository you are able to create objects that act as an interface between business logic and data access, and use Sequelize models to perform CRUD operations on the database. It is placed at a higher level than the DAO and on the contrary allows several different DAOs to interact. In fact, in our project it is used not only simple CRUD operations but also for more complex operations that required the use of multiple Sequelize models.
+
 
 # Proposed Neural Network Models
 
