@@ -7,12 +7,15 @@ require('dotenv').config();
 import {createBullBoard} from '@bull-board/api';
 import {BullMQAdapter} from '@bull-board/api/bullMQAdapter';
 import { ExpressAdapter } from "@bull-board/express";
-
+import { setupLogging } from "./middleware/logger"
 import {Queue} from "./queues/Queue";
 import {RedisConnection} from "./queues/RedisConnection";
 
 
 const app = express();
+
+setupLogging(app)
+
 const port = parseInt(process.env.API_PORT || "3000");
 const host = "localhost";//process.env.API_HOST ||
 
@@ -58,7 +61,7 @@ try {
   app.use('/admin/queues', serverAdapter.getRouter());
 
 } catch (err) {
-  // Gestisci l'errore
+  // todo handle log
   console.error(err);
 }
 

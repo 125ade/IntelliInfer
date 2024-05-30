@@ -14,6 +14,7 @@ RUN npm install typescript -g
 COPY ./controller ./controller
 COPY ./db ./db
 COPY ./factory ./factory
+COPY ./middleware ./middleware
 COPY ./models ./models
 COPY ./queues ./queues
 COPY ./utils ./utils

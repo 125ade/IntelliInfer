@@ -8,6 +8,7 @@ services:
     container_name: "api"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./logs:/usr/src/app/logs
     expose:
       - "${API_PORT}"
     ports:
@@ -20,6 +21,8 @@ services:
       - DOKER_QUEUE_NAME=${DOKER_QUEUE_NAME}
       - API_PORT=${API_PORT}
       - API_HOST=${API_HOST}
+      - NODE_ENV=production
+      - LOG_OUTPUT=both # Può essere 'console', 'file' o 'both'
     networks:
       - private-ntwk
     depends_on:
