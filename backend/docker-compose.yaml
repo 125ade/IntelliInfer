@@ -1,6 +1,22 @@
 version: '3.7'
 
 services:
+#  nginx:
+#    build:
+#      context: ./nginx
+#      dockerfile: Dockerfile.nginx
+#    container_name: "nginx"
+#    ports:
+#      - '80:80'
+#      - '443:443'
+#    volumes:
+#      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+#      - ./nginx/ssl_certificate.crt:/etc/nginx/ssl/ssl_certificate.crt
+#      - ./nginx/ssl_certificate_key.key:/etc/nginx/ssl/ssl_certificate_key.key
+#    depends_on:
+#      - api
+
+
   api:
     build:
       context: ./api
@@ -8,6 +24,7 @@ services:
     container_name: "api"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - logs_data:/app/logs
     expose:
       - "${API_PORT}"
     ports:
@@ -20,6 +37,11 @@ services:
       - DOKER_QUEUE_NAME=${DOKER_QUEUE_NAME}
       - API_PORT=${API_PORT}
       - API_HOST=${API_HOST}
+      - NODE_ENV=production
+      - LOG_OUTPUT=both # Può essere 'console', 'file' o 'both'
+      - LOG_PATH=/app/logs
+      - LOG_ACCESS_DIR=access
+      - LOG_ERRORS_DIR=errors
     networks:
       - private-ntwk
     depends_on:
@@ -109,3 +131,4 @@ networks:
 volumes:
   redis_data:
   postgres_data:
+  logs_data:
