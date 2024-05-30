@@ -69,7 +69,7 @@ Through it we manage and save data relating to users, datasets and related image
 
 ## ER Schema
 <div style="text-align: center;">
-  <img src="documents/ERscheme.png" alt="ER schema" style="max-width: 256 px; height: auto;">
+  <img src="documents/ERscheme.png" alt="ER schema" width="900" height="auto">
 </div>
 
 ## Database Schema
