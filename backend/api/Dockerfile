@@ -17,6 +17,8 @@ COPY ./factory ./factory
 COPY ./middleware ./middleware
 COPY ./models ./models
 COPY ./queues ./queues
+COPY ./repository ./routes
+COPY ./routes ./routes
 COPY ./utils ./utils
 COPY app.ts .
 
