@@ -74,7 +74,7 @@ Through it we manage and save data relating to users, datasets and related image
 
 ## Database Schema
 <div style="text-align: center;">
-  <img src="documents/DatabaseSchema.png" alt="Database Schema" width="200" height="auto">
+  <img src="documents/DatabaseSchema.png" alt="Database Schema" style="max-width: 256 px; height: auto;">
 </div>
 
 ## Patterns
@@ -84,7 +84,7 @@ The Singleton pattern is used to ensure that only one instance of the database c
 To do this it uses a private constructor, accessible only via the getInstance() method. When accessed for the first time, the method creates an instance and returns the entity of the object to the client, while in subsequent calls the entity of the already existing object is returned.
 
 <div style="text-align: center;">
-  <img src="documents/SingletonClass.png" alt="Singleton class" width="200" height="auto">
+  <img src="documents/SingletonClass.png" alt="Singleton class" width="400" height="auto">
 </div>
 
 ### DAO Pattern
@@ -93,13 +93,13 @@ Sequelize is an ORM (Object-Relational Mapping) for Node.js used as DAO (Data Ac
 In Sequelize, database tables are represented by models. Each model is a class that maps to a specific table in the database, and contains table attributes, data types, validations, and relationships with other tables.
 
 <div style="text-align: center;">
-  <img src="documents/SequelizeModel.png" alt="Sequelize model" width="200" height="auto">
+  <img src="documents/SequelizeModel.png" alt="Sequelize model" width="400" height="auto">
 </div>
 
 Sequelize also allows to define relationships between models, such as one-to-many, many-to-many, and one-to-one associations, defined using methods such as hasMany, belongsTo, hasOne, and belongsToMany.
 
 <div style="text-align: center;">
-  <img src="documents/relations.png" alt="Relationships between models" width="200" height="auto">
+  <img src="documents/relations.png" alt="Relationships between models" width="400" height="auto">
 </div>
 
 We use it as DAO pattern as it provides methods for performing CRUD operations on models. These methods include findAll, findByPk, create, update, and destroy.
@@ -108,7 +108,7 @@ We use it as DAO pattern as it provides methods for performing CRUD operations o
 To improve the modularity and testability of the code, the Repository pattern is used in combination with Sequelize. With the Repository you are able to create objects that act as an interface between business logic and data access, and use Sequelize models to perform CRUD operations on the database. It is placed at a higher level than the DAO and on the contrary allows several different DAOs to interact. In fact, in our project it is used not only simple CRUD operations but also for more complex operations that required the use of multiple Sequelize models.
 
 <div style="text-align: center;">
-  <img src="documents/Repository.png" alt="Repository" style="max-width: 128 px; height: auto;">
+  <img src="documents/Repository.png" alt="Repository" width="400" height="auto">
 </div>
 
 # Proposed Neural Network Models
