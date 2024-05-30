@@ -84,10 +84,8 @@ The Singleton pattern is used to ensure that only one instance of the database c
 To do this it uses a private constructor, accessible only via the getInstance() method. When accessed for the first time, the method creates an instance and returns the entity of the object to the client, while in subsequent calls the entity of the already existing object is returned.
 
 <div style="text-align: center;">
-  <img src="documents/SingletonClass.png" alt="Singleton class" style="max-width: 128 px;">
+  <img src="documents/SingletonClass.png" alt="Singleton class" width="100" height="auto">
 </div>
-
-
 
 ### DAO Pattern
 Sequelize is an ORM (Object-Relational Mapping) for Node.js used as DAO (Data Access Object) to facilitate the management of CRUD operations and the tables definition. We define models for each table in the database and use Sequelize as an high level interface to interact with PostgreSQL.
