@@ -56,5 +56,12 @@ export default class DatasetDAO implements IDao<Dataset> {
         }
         return false;
     }
+
+    // logically deletes a dataset
+    // returns the deleted dataset
+    async logicallyDelete(dataset: Dataset): Promise<Object> {
+        await dataset.set({ isDeleted: true }).save();
+        return { deletedDataset: dataset };
+    }
     
 }
