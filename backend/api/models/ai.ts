@@ -37,6 +37,10 @@ Ai.init(
       type: DataTypes.CHAR(300),
       allowNull: false
     },
+    architecture: {
+      type: DataTypes.ENUM,
+      allowNull: false
+    }
   },
   {
     sequelize,

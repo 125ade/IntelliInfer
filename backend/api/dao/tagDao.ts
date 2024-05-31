@@ -30,22 +30,6 @@ export default class TagDAO implements IDao<Tag> {
     }
     
 
-    // da implementare nel repository una funzione che dato l'id di un dataset ne aggiorna il tag
-    async update(Id: number, tag: Tag): Promise<Tag | null> {
-        try {
-          const existingTag = await Tag.findByPk(Id)
-          if (!existingTag) {
-            return null;
-          } 
-          await existingTag.update(tag);
-          return existingTag;
-        } catch {
-            throw new ConcreteErrorCreator().createServerError().setFailedUpdatingItem();
-        }
-    }
-    
-
-    
     // da implementare nella repository una funzione che prende l'id del dataset che deve essere eliminato, da questo risale al tag
     // e se il tag del dataset in questione era l'unico del database allora viene eliminato anche il tag
     async delete(id: number): Promise<boolean> {
