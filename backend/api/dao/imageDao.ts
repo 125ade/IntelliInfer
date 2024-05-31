@@ -24,6 +24,11 @@ export default class ImageDAO implements IDao<Image> {
             throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
         }
     }
+
+    // to delete if not used
+    async findById(id: number): Promise<Image | null> {
+        return await Image.findByPk(id);
+    }
     
     // non metto l'update perchè non vedo il senso di modificare un'immagine 
 

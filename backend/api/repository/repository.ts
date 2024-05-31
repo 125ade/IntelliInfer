@@ -24,13 +24,6 @@ export interface IRepository {
 
 class Repository implements IRepository {
 
-    // all actions require a default user
-    // private user: UserDao;
-
-    //constructor(user: UserDao) {
-    //   this.user = user;
-    //}
-
     // method to create tags associated with a specific dataset
     public async createTags(tags: string[], datasetId: number): Promise<Tag[]> {
         const tagDao = new TagDao()
@@ -61,6 +54,9 @@ class Repository implements IRepository {
           // Crea i tag, rimuovendo i duplicati
           const uniqueTags: string[] = [...new Set(tags as string[])];
           const createdTags = await this.createTags(uniqueTags, dataset.id);
+          
+          // associa i tags al dataset
+          createdTags.forEach( tag => { dataset.addTag(tag)});
     
           return { dataset: dataset, tags: createdTags };
         } catch {
@@ -143,8 +139,16 @@ class Repository implements IRepository {
         }
         return { updatedUser: user };
     }
+    
+    /** 
+    async deleteImage(id: number): Promise<boolean> {
+        const imageDao = new ImageDao();
+        const image = await imageDao.findById(id);
 
-    // Voglio creare un metodo che aggiorni il tag di un dataset, devo utilizzare un DAO di DatasetTag???
+    }
+    */
+
+    
     
 
 }

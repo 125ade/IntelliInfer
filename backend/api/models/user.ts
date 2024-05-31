@@ -42,6 +42,10 @@ User.init(
     token: {
       type: DataTypes.DECIMAL,
       allowNull: false
+    },
+    role: {
+      type: DataTypes.ENUM,
+      allowNull: false
     }
   },
   {
