@@ -1,80 +1,46 @@
-import User from '../models/user'
-import Image from '../models/image'
-import Ai from '../models/ai'
-import Dataset from '../models/dataset'
-import Tag from '../models/tag'
+import UserDao from '../dao/userDao';
+import ImageDao from '../dao/imageDao'
+import DatasetDao from '../dao/datasetDao'
+import TagDao from '../dao/tagDao';
+import LabelDao from '../dao/labelDao'
+import ResultDao from '../dao/resultDao'
+import Tag from '../models/tag';
 import { isImage, unzipImages } from '../utils/utils'; // Importa le funzioni di utilità
 import { SequelizeConnection } from '../db/SequelizeConnection';
-import { ConcreteErrorCreator } from '../factory/ErrorCreator'
+import { ConcreteErrorCreator } from '../factory/ErrorCreator';
 import * as fs from 'fs';
 
 
 export interface IRepository {
-    findAllModels(): Promise<Ai[]>;
-    findAllDatasets(): Promise<Dataset[]>;
-    findModelById(id: number): Promise<Ai | null>;
-    findDatasetById(id: number): Promise<Dataset | null>;
-    updateDataset(id: number, datasetData: Partial<Dataset>): Promise<void>;
-    deleteDataset(dataset: Dataset): Promise<Object>;
     createTags(tags: string[], datasetId: number): Promise<Tag[]>;
     createDataset(datasetJson: any): Promise<Object>;
-    uploadFile(datasetId: number, filePath: string): Promise<Image[]>;
-    updateUserTokenByCost(user: User, cost: number): Promise<void>;
-    checkUserToken(user: User, amount: number): void;
-    updateUserToken(user: User, token: number): Promise<Object> ;
+    //uploadFile(datasetId: number, filePath: string): Promise<Image[]>;
+    //updateUserTokenByCost(user: User, cost: number): Promise<void>;
+    //checkUserToken(user: User, amount: number): void;
+    //updateUserToken(user: User, token: number): Promise<Object> ;
 }
 
 
 class Repository implements IRepository {
 
     // all actions require a default user
-    private user: User;
+    private user: UserDao;
 
-    constructor(user: User) {
+    constructor(user: UserDao) {
        this.user = user;
-    }
-    
-    // method that lists all Ai models on the database
-    public async findAllModels(): Promise<Ai[]> {
-        return Ai.findAll();
-    }
-    
-    // method that lists all datasets on the database
-    public async findAllDatasets(): Promise<Dataset[]> {
-        return Dataset.findAll();
-    }
-    
-    // method to obtain a specific AiModel by Id
-    public async findModelById(id: number): Promise<Ai | null> {
-        return Ai.findByPk(id);
-    }
-    
-    // method to obtain a specific dataset by Id
-    public async findDatasetById(id: number): Promise<Dataset | null> {
-        return Dataset.findByPk(id);
-    }
-    
-    // method to update a specific dataset by id given parcial data
-    public async updateDataset(id: number, datasetData: Partial<Dataset>): Promise<void> {
-        await Image.update(datasetData, { where: { id } });
-    }
-    
-    // logically deletes a dataset
-    // returns the deleted dataset
-    public async deleteDataset(dataset: Dataset): Promise<Object> {
-       await dataset.set({ isDeleted: true }).save();
-       return { deletedDataset: dataset };
     }
 
     // method to create tags associated with a specific dataset
     public async createTags(tags: string[], datasetId: number): Promise<Tag[]> {
+        const tagDao = new TagDao()
         const createdTags = await Promise.all(
-          tags.map(tagName => Tag.create({ name: tagName, datasetId }))
+          tags.map(tagName => tagDao.create({ name: tagName, datasetId }))
         );
         return createdTags;
     }
 
-    public async createDataset(datasetJson: any): Promise<{ dataset: Dataset, tags: Tag[] }> {
+    /** 
+    public async createDataset(datasetJson: any): Promise<{ dataset: DatasetDao, tags: Tag[] }> {
         try {
           let tags = datasetJson.tags;
     
@@ -171,6 +137,7 @@ class Repository implements IRepository {
 
         return { updatedUser: user };
     }
+*/
 }
 // todo: methods to update model weights
 
