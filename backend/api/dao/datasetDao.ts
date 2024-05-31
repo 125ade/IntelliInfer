@@ -2,11 +2,10 @@ import { IDao } from './daoInterface';
 import Dataset from '../models/dataset';
 import { ConcreteErrorCreator } from '../factory/ErrorCreator';
 
-export default class DatasetDAO implements IDao<Dataset> {
+export default class DatasetDao implements IDao<Dataset> {
 
     constructor() {}
     
-    // da usare dentro la funzione createDataset nella repository
     async create(datasetJson: any): Promise<Dataset> {
         try{
             const dataset = await Dataset.create(datasetJson);
@@ -58,7 +57,6 @@ export default class DatasetDAO implements IDao<Dataset> {
     }
 
     // logically deletes a dataset
-    // returns the deleted dataset
     async logicallyDelete(dataset: Dataset): Promise<Object> {
         await dataset.set({ isDeleted: true }).save();
         return { deletedDataset: dataset };
