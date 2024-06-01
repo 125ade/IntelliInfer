@@ -101,7 +101,6 @@ User.hasMany(Dataset, {
   as: 'datasets',
 });
 
-Dataset.belongsToMany(Tag, { through: 'DatasetTags'});
-Tag.belongsToMany(Dataset, { through: 'DatasetTags'});
+
 
 

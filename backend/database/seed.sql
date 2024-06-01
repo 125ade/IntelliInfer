@@ -1,80 +1,122 @@
+-- Creazione della tabella users
 CREATE TABLE users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     username VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL
+    token DECIMAL NOT NULL,
+    role VARCHAR(10) NOT NULL DEFAULT 'user',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Creazione della tabella ai
 CREATE TABLE ai (
-    id INTEGER PRIMARY KEY,
-    name CHAR(200) NOT NULL,
-    description CHAR(300),
-    path_weights CHAR(300) NOT NULL,
-    created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
+    description VARCHAR(300),
+    pathWeights VARCHAR(300) NOT NULL,
+    architecture VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Creazione della tabella datasets
 CREATE TABLE datasets (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
     name VARCHAR(255) NOT NULL,
     path VARCHAR(255) NOT NULL,
     count_elements INTEGER NOT NULL,
     count_classes INTEGER NOT NULL,
     description VARCHAR(255),
-    created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP
 );
 
+-- Aggiunta del vincolo di chiave esterna per user_id
+ALTER TABLE datasets
+ADD CONSTRAINT fk_user_id
+FOREIGN KEY (user_id)
+REFERENCES users(id);
+
+-- Creazione della tabella tags
+CREATE TABLE tags (
+    name VARCHAR(255) PRIMARY KEY NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Creazione della tabella DatasetTags per la relazione molti-a-molti tra datasets e tags
+CREATE TABLE datasetstags (
+    dataset_id INTEGER NOT NULL,
+    tag_id VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (dataset_id, tag_id),
+    FOREIGN KEY (dataset_id) REFERENCES datasets(id),
+    FOREIGN KEY (tag_id) REFERENCES tags(name) -- Cambiato da 'tags(id)' a 'tags(name)'
+);
+
+-- Creazione della tabella images
 CREATE TABLE images (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     dataset_id INTEGER NOT NULL,
     path VARCHAR(300) NOT NULL,
     description VARCHAR(300),
-    created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL,
-    FOREIGN KEY (dataset_id) REFERENCES datasets(id)
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Aggiunta del vincolo di chiave esterna per dataset_id
+ALTER TABLE images
+ADD CONSTRAINT fk_dataset_id
+FOREIGN KEY (dataset_id)
+REFERENCES datasets(id);
+
+-- Creazione della tabella labels
 CREATE TABLE labels (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     dataset_id INTEGER NOT NULL,
     image_id INTEGER NOT NULL,
     path VARCHAR(300) NOT NULL,
     description VARCHAR(300),
-    created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL,
-    FOREIGN KEY (dataset_id) REFERENCES datasets(id),
-    FOREIGN KEY (image_id) REFERENCES images(id)
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Aggiunta dei vincoli di chiave esterna per dataset_id e image_id
+ALTER TABLE labels
+ADD CONSTRAINT fk_dataset_id
+FOREIGN KEY (dataset_id)
+REFERENCES datasets(id);
+
+ALTER TABLE labels
+ADD CONSTRAINT fk_image_id
+FOREIGN KEY (image_id)
+REFERENCES images(id);
+
+-- Creazione della tabella results
 CREATE TABLE results (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     image_id INTEGER NOT NULL,
     ai_id INTEGER NOT NULL,
     data JSONB NOT NULL,
     request_id INTEGER NOT NULL,
-    created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL,
-    FOREIGN KEY (image_id) REFERENCES images(id),
-    FOREIGN KEY (ai_id) REFERENCES Ai(id)
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE tags (
-    name VARCHAR(255) PRIMARY KEY NOT NULL,
-    created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL
-);
+-- Aggiunta dei vincoli di chiave esterna per image_id e ai_id
+ALTER TABLE results
+ADD CONSTRAINT fk_image_id
+FOREIGN KEY (image_id)
+REFERENCES images(id);
 
-CREATE TABLE datasetstags (
-    dataset_id INTEGER NOT NULL,
-    tag_id INTEGER NOT NULL,
-    created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL,
-    PRIMARY KEY (dataset_id, tag_id),
-    FOREIGN KEY (dataset_id) REFERENCES datasets(id),
-    FOREIGN KEY (tag_id) REFERENCES Tags(id)
-);
+ALTER TABLE results
+ADD CONSTRAINT fk_ai_id
+FOREIGN KEY (ai_id)
+REFERENCES ai(id);
+
+
+
