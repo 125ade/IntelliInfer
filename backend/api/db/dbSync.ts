@@ -7,13 +7,15 @@ import Tag from "../models/tag";
 import User from "../models/user";
 
 
-export async function dbSync(): Promise<void> {
-    await Ai.sync({alter: true });
-    await Dataset.sync({alter: true });
-    await Image.sync({alter: true });
-    await Label.sync({alter: true });
-    await Result.sync({alter: true });
-    await Tag.sync({alter: true });
-    await User.sync({alter: true });
-}
+const syncDb = async () => {
+      await User.sync();
+      await Image.sync();
+      await Ai.sync();
+      await Dataset.sync();
+      await Label.sync();
+      await Result.sync();
+      await Tag.sync();
+};
+  
+export { User, Image, Ai, Dataset, Label, Result, Tag, syncDb };
 
