@@ -35,7 +35,6 @@ export class SequelizeConnection {
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
-      models: [Ai, Dataset, Image , Label, Result, Tag, User, User] // This automatically adds models
     });
     return newInstance;
   }
