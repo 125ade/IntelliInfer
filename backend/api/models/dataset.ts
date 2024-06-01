@@ -105,10 +105,3 @@ Dataset.belongsToMany(Tag, { through: 'DatasetTags'});
 Tag.belongsToMany(Dataset, { through: 'DatasetTags'});
 
 
-
-// todo handle log
-Dataset.sync().then(() => {
-  console.log('datasets table has been synchronized.');
-}).catch(err => {
-  console.error('Unable to synchronize the datasets table:', err);
-});

@@ -98,10 +98,5 @@ Image.hasMany(Label, {
     as: 'image',
 });
 
-// todo handle error
-Label.sync().then(() => {
-  console.log('Label table has been synchronized.');
-}).catch(err => {
-  console.error('Unable to synchronize the Label table:', err);
-});
+
 

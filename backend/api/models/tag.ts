@@ -41,9 +41,3 @@ Tag.init(
   },
 );
 
-// todo handle log
-Tag.sync().then(() => {
-  console.log('Tags table has been synchronized.');
-}).catch(err => {
-  console.error('Unable to synchronize the Tags table:', err);
-});
