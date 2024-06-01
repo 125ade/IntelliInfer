@@ -20,19 +20,13 @@ export class ServerError extends ErrorCode {
     }
     
     // errore: creazione di un dataset già esistente nel database
-    setAlreadyCreatedDataset(createdDataset: Object): ErrorCode {
-      return this.set(
-        "There was an error. The created dataset already exists: " +
-          JSON.stringify(createdDataset)
-      )
+    setAlreadyCreatedDataset(): ErrorCode {
+      return this.set("There was an error. The created dataset already exists.");
     }
     
     // errore: caricamento di un file giù esistente nel database
-    setAlreadyUploadedFile(uploadedFile: Object): ErrorCode {
-        return this.set(
-            "There was an error. Already uploaded file: " +
-             JSON.stringify(uploadedFile)
-        )
+    setAlreadyUploadedFile(): ErrorCode {
+        return this.set("There was an error. Already uploaded file.");
     }
     
     // errore nell'aggiornamento dei token 
@@ -133,10 +127,8 @@ export class BadRequestError extends ErrorCode {
     }
     
     // l'immagine è già stata sottoposta a inferenza
-    setInferredImage(imageId: number, inference: any) {
-      return this.set(
-        `image id ${imageId} has already an inference: ${inference}`
-      );
+    setInferredImage() {
+      return this.set("The image has already an inference");
     }
     
     // bisogna specificare l'id del dataset nella richiesta
@@ -176,8 +168,8 @@ export class ForbiddenError extends ErrorCode {
       return this;
     }
   
-    setInsufficientToken(tokenAmout: number): ErrorCode{
-      return this.set(`you need ${tokenAmout} tokens for this operation`);
+    setInsufficientToken(): ErrorCode{
+      return this.set(`you need more tokens for this operation`);
     }
 
     setWrongEmail(): ErrorCode{
@@ -202,31 +194,31 @@ export class NotFoundError extends ErrorCode {
     }
   
     setAbstentModel(): ErrorCode{
-      return this.set(`The requested model could not be found.`);
+      return this.set("Absent model");
     }
 
     setAbstentDataset(): ErrorCode{
-        return this.set(`The requested dataset could not be found.`);
+        return this.set("Absent dataset");
     }
   
     setAbsentResults(): ErrorCode{
-        return this.set(`The requested results could not be found.`);
+        return this.set("The requested results could not be found.");
     }
 
     setAbsentTag(): ErrorCode{
-      return this.set(`The requested results could not be found.`);
+      return this.set("The requested tags could not be found.");
   }
 
-    setNoEmail(email: string): ErrorCode {
-        return this.set(`user with email ${email} doesn't exist`);
+    setNoEmail(): ErrorCode {
+        return this.set("Email not existent.");
     }
 
     setNoUser(): ErrorCode {
-      return this.set(`user not found`);
+      return this.set("user not found");
   }
 
     setAbsentItems(): ErrorCode {
-      return this.set(`Impossible to find the required items.`);
+      return this.set("Impossible to find the required items.");
   }
 
     // errore: richiesta dello stato di un'operazione di inferenza non in corso
