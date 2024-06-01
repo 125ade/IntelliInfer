@@ -39,7 +39,9 @@ Ai.init(
     },
     architecture: {
       type: DataTypes.ENUM,
-      allowNull: false
+      values: ['rcnn', 'test', 'yolo'],
+      allowNull: false,
+      defaultValue: 'yolo'
     }
   },
   {

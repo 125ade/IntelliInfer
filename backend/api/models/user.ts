@@ -45,7 +45,9 @@ User.init(
     },
     role: {
       type: DataTypes.ENUM,
-      allowNull: false
+      values: ['user', 'admin', 'syst'],
+      allowNull: false,
+      defaultValue: 'user'
     }
   },
   {
