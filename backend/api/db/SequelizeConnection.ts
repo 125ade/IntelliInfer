@@ -1,4 +1,11 @@
 import { Sequelize } from 'sequelize';
+import Ai from '../models/ai'
+import Dataset from '../models/dataset';
+import Image from '../models/image';
+import Label from '../models/label';
+import Result from '../models/result';
+import Tag from '../models/tag';
+import User from '../models/user';
 
 /**
  * The Singleton class defines the `getInstance` method that lets clients access
@@ -27,9 +34,9 @@ export class SequelizeConnection {
       port: Number(process.env.POSTGRES_PORT),  // Convert string to number
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
-      database: process.env.POSTGRES_DB
+      database: process.env.POSTGRES_DB,
+      models: [Ai, Dataset, Image , Label, Result, Tag, User, User] // This automatically adds models
     });
-
     return newInstance;
   }
 
