@@ -12,10 +12,15 @@ import {Queue} from "./queues/Queue";
 import {RedisConnection} from "./queues/RedisConnection";
 import {UserRoutes} from "./routes";
 import {dbSync} from "./db/dbSync";
+import {SequelizeConnection} from "./db/SequelizeConnection";
 
+const x = SequelizeConnection.getInstance()
+x.sequelize.sync({alter:true, force:true}).then(
+        ()=>{console.log("SYNC A FUNZIONATO!!!")}
+    ).catch(
+        (err)=>{console.log(`SYNC :(\n\n${err}`)}
+);
 
-dbSync().then(()=>{console.log("111111111111111111")})
-       .catch(()=>{console.log("000000000000000000")});
 
 
 const app = express();

@@ -11,6 +11,8 @@ export default class Ai extends Model {
 
     declare pathWeights: string;
 
+    declare architecture: string;
+
     declare readonly createdAt: Date;
 
     declare readonly updatedAt: Date;
