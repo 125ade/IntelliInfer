@@ -1,31 +1,29 @@
-import { DataTypes, Model } from 'sequelize';
+import { DataTypes, Model, Association } from 'sequelize';
 import { SequelizeConnection } from '../db/SequelizeConnection';
 import Tag from './tag';
-import DatasetTag from './datasettag';
 import User from './user';
 
 
 export default class Dataset extends Model {
 
   declare id: number;
-
   declare userId: number;
-
   declare name: string;
-
   declare path: string;
-
   declare countElements: number;
-
   declare countClasses: number;
-
   declare description: string | null;
-
   declare readonly createdAt: Date;
-
   declare readonly updatedAt: Date;
-
   declare deletedAt: Date | null;
+
+  // Association methods
+  declare addTag: (tag: Tag) => Promise<void>;
+
+  // Possible inclusions
+  declare static associations: {
+    tags: Association<Dataset, Tag>;
+  };
 
 }
 
@@ -103,7 +101,10 @@ User.hasMany(Dataset, {
   as: 'datasets',
 });
 
-Dataset.belongsToMany(Tag, { through: DatasetTag, foreignKey: 'datasetId', as: 'tags' });
+Dataset.belongsToMany(Tag, { through: 'DatasetTags'});
+Tag.belongsToMany(Dataset, { through: 'DatasetTags'});
+
+
 
 // todo handle log
 Dataset.sync().then(() => {

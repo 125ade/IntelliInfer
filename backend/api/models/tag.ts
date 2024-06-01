@@ -1,7 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
 import { SequelizeConnection } from '../db/SequelizeConnection';
-import DatasetTag from './datasettag'
-import Dataset from './dataset'
+
 
 
 export default class Tag extends Model {
@@ -41,8 +40,6 @@ Tag.init(
     timestamps: true
   },
 );
-
-Tag.belongsToMany(Dataset, { through: DatasetTag, foreignKey: 'tagId', as: 'datasets' });
 
 // todo handle log
 Tag.sync().then(() => {

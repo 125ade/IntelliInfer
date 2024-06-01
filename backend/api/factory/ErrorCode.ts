@@ -37,13 +37,26 @@ export class ServerError extends ErrorCode {
     
     // errore nell'aggiornamento dei token 
     setUpdatingToken(): ErrorCode {
-      return this.set("error on updating token");
+      return this.set("Error on updating token");
+    }
+
+    setFailedCreationItem(): ErrorCode {
+      return this.set("Error on creating item");
+    }
+
+    setFailedUpdatingItem(): ErrorCode {
+      return this.set("Error on updating item");
     }
 
     // errore nella connessione al database
     setFailedConnection(): ErrorCode {
         return this.set("There was an error connecting to the database.")
     }
+
+    // errore nella connessione al database
+    setFailedUploadFile(): ErrorCode {
+      return this.set("There was an error uploading the file.")
+  }
 }
 
 /**
@@ -62,11 +75,6 @@ export class AuthenticationError extends ErrorCode {
       return this;
     }
     
-    // mancanza di token
-    setMissingToken(): ErrorCode {
-        return this.set("Authentication failed. Token is missing.");
-    }
-    
     // token invalido
     setInvalidToken(): ErrorCode {
         return this.set("Authentication failed. Token is invalid.");
@@ -74,11 +82,6 @@ export class AuthenticationError extends ErrorCode {
     
     setNotAdmin(): ErrorCode {
       return this.set("Authentication failed. User is not the admin");
-    }
-    
-    // credito insufficiente
-    setInsufficentToken(): ErrorCode {
-      return this.set("Authentication failed. Token amount is 0");
     }
     
     // token scaduto
@@ -91,15 +94,15 @@ export class AuthenticationError extends ErrorCode {
         return this.set("Authentication failed. Token signature is invalid.");
     }
     
-    // chiave mancante
-    setMissingKey(): ErrorCode {
-        return this.set("Authentication failed. Key is missing.");
-    }
-    
     // chiave invalida
     setInvalidKey(): ErrorCode {
         return this.set("Authentication failed. Key is invalid.");
     }
+
+    // chiave invalida
+    setNotSystem(): ErrorCode {
+      return this.set("Authentication failed. No System.");
+  }
 }
 
 
@@ -129,10 +132,6 @@ export class BadRequestError extends ErrorCode {
       return this.set("There was an error. An image or zip file must be provided");
     }
     
-    setDuplicateImages(): ErrorCode {
-      return this.set("There are duplicated entries on images");
-    }
-    
     // l'immagine è già stata sottoposta a inferenza
     setInferredImage(imageId: number, inference: any) {
       return this.set(
@@ -149,6 +148,16 @@ export class BadRequestError extends ErrorCode {
     setNoResultId(): ErrorCode {
         return this.set("There was an error. ResultId must be provided");
     }
+
+    setMissingToken(): ErrorCode {
+      return this.set("There was an error. Token must be provided");
+    }
+
+    setMissingKey(): ErrorCode {
+      return this.set("There was an error. Key must be provided");
+    }
+
+
 }
 
 /**
@@ -167,21 +176,12 @@ export class ForbiddenError extends ErrorCode {
       return this;
     }
   
-    setNeedMoreToken(tokenAmout: number): ErrorCode{
+    setInsufficientToken(tokenAmout: number): ErrorCode{
       return this.set(`you need ${tokenAmout} tokens for this operation`);
     }
-  
-    setNotAccessible(id: Array<any>): ErrorCode {
-      let ids = id.join(",");
-      return this.set(`${ids} id(s) are not accessible`);
-    }
-  
-    setUnreadableUrl(url: string): ErrorCode {
-      return this.set(`unreadable url ${url}`);
-    }
-  
-    setInvalidUrlResponse(url: string): ErrorCode {
-      return this.set(`can't access to ${url}`);
+
+    setWrongEmail(): ErrorCode{
+      return this.set('Invalid Email');
     }
 }
 
@@ -209,13 +209,25 @@ export class NotFoundError extends ErrorCode {
         return this.set(`The requested dataset could not be found.`);
     }
   
-    setAbstentResults(): ErrorCode{
+    setAbsentResults(): ErrorCode{
         return this.set(`The requested results could not be found.`);
     }
+
+    setAbsentTag(): ErrorCode{
+      return this.set(`The requested results could not be found.`);
+  }
 
     setNoEmail(email: string): ErrorCode {
         return this.set(`user with email ${email} doesn't exist`);
     }
+
+    setNoUser(): ErrorCode {
+      return this.set(`user not found`);
+  }
+
+    setAbsentItems(): ErrorCode {
+      return this.set(`Impossible to find the required items.`);
+  }
 
     // errore: richiesta dello stato di un'operazione di inferenza non in corso
     setNonExistentInference(): ErrorCode {
