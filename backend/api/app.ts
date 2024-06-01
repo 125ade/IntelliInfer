@@ -11,6 +11,12 @@ import { setupLogging } from "./middleware/logger"
 import {Queue} from "./queues/Queue";
 import {RedisConnection} from "./queues/RedisConnection";
 import {UserRoutes} from "./routes";
+import {dbSync} from "./db/dbSync";
+
+
+dbSync().then(()=>{console.log("111111111111111111")})
+       .catch(()=>{console.log("000000000000000000")});
+
 
 const app = express();
 
