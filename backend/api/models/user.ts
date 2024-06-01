@@ -11,6 +11,8 @@ export default class User extends Model {
 
   declare token: number;
 
+  declare role: string;
+
   declare readonly createdAt: Date;
 
   declare readonly updatedAt: Date;

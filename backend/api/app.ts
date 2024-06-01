@@ -10,6 +10,17 @@ import { ExpressAdapter } from "@bull-board/express";
 import { setupLogging } from "./middleware/logger"
 import {Queue} from "./queues/Queue";
 import {RedisConnection} from "./queues/RedisConnection";
+import {UserRoutes} from "./routes";
+import {dbSync} from "./db/dbSync";
+import {SequelizeConnection} from "./db/SequelizeConnection";
+
+const x = SequelizeConnection.getInstance()
+x.sequelize.sync({alter:true, force:true}).then(
+        ()=>{console.log("SYNC A FUNZIONATO!!!")}
+    ).catch(
+        (err)=>{console.log(`SYNC :(\n\n${err}`)}
+);
+
 
 
 const app = express();
@@ -75,6 +86,7 @@ try {
   // todo handle log
   console.error(err);
 }
+
 
 
 // Define the route for health check

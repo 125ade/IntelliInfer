@@ -28,15 +28,22 @@ export class SequelizeConnection {
     
     const newInstance = new SequelizeConnection();
 
-    newInstance.sequelize = new Sequelize({
+    const user: string = process.env.POSTGRES_USER || "myuser";
+    const password: string = process.env.POSTGRES_PASSWORD || "mypassword";
+    const database: string = process.env.POSTGRES_DB || "db_inference";
+
+    newInstance.sequelize = new Sequelize(
+        database,
+        user,
+        password,
+        {
       dialect: 'postgres',
-      host: process.env.POSTGRES_HOST,
-      port: Number(process.env.POSTGRES_PORT),  // Convert string to number
-      username: process.env.POSTGRES_USER,
-      password: process.env.POSTGRES_PASSWORD,
-      database: process.env.POSTGRES_DB,
+      host: process.env.POSTGRES_HOST || 'database',
+      port: Number(process.env.POSTGRES_PORT || '5432'),
     });
+
     return newInstance;
+
   }
 
   /**

@@ -11,18 +11,8 @@ COPY tsconfig.json .
 RUN npm install
 RUN npm install typescript -g
 
-COPY ./controller ./controller
-COPY ./db ./db
-COPY ./factory ./factory
-COPY ./middleware ./middleware
-COPY ./models ./models
-COPY ./queues ./queues
-COPY ./repository ./routes
-COPY ./routes ./routes
-COPY ./utils ./utils
-COPY app.ts .
+COPY . .
 
-# crea la cartella per i log connessa al volume
 RUN mkdir -p /app/logs
 
 RUN npm run build

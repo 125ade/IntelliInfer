@@ -6,30 +6,30 @@ import * as rfs from 'rotating-file-stream';
 
 require('dotenv').config();
 
-const logDirectory = path.resolve(process.env.LOG_PATH || '/app/logs');
+const logDirectory :string = path.resolve(process.env.LOG_PATH || '/app/logs');
 fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory);
 
-const accessLogDirectory = path.join(logDirectory, process.env.LOG_ACCESS_DIR || 'access');
+const accessLogDirectory :string = path.join(logDirectory, process.env.LOG_ACCESS_DIR || 'access');
 fs.existsSync(accessLogDirectory) || fs.mkdirSync(accessLogDirectory);
 
-const errorLogDirectory = path.join(logDirectory, process.env.LOG_ERRORS_DIR || 'errors');
+const errorLogDirectory :string = path.join(logDirectory, process.env.LOG_ERRORS_DIR || 'errors');
 fs.existsSync(errorLogDirectory) || fs.mkdirSync(errorLogDirectory);
 
 
 // Create a rotating write stream for access logs
-const accessLogStream = rfs.createStream('access.log', {
+const accessLogStream :rfs.RotatingFileStream = rfs.createStream('access.log', {
   interval: '1d', // rotate daily
   path: accessLogDirectory,
 });
 
 // Create a rotating write stream for error logs
-const errorLogStream = rfs.createStream('error.log', {
+const errorLogStream :rfs.RotatingFileStream = rfs.createStream('error.log', {
   interval: '1d', // rotate daily
   path: errorLogDirectory,
 });
 
 const getLogFormat = () => {
-  const env = process.env.NODE_ENV || 'development';
+  const env :string = process.env.NODE_ENV || 'development';
   return env === 'production' ? 'combined' : 'dev';
 };
 
@@ -55,6 +55,7 @@ const getMorganMiddleware = () => {
       });
   }
 };
+
 
 const setupLogging = (app: Express) => {
   app.use(getMorganMiddleware());
