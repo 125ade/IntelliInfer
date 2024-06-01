@@ -50,9 +50,3 @@ Ai.init(
   },
 );
 
-// todo handle log
-Ai.sync().then(() => {
-  console.log('Ai table has been synchronized.');
-}).catch((err) => {
-  console.error('Unable to synchronize the Ai table:', err);
-});

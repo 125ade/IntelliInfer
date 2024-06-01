@@ -99,10 +99,5 @@ Ai.hasMany(Result, {
     as: 'results',
 });
 
-// todo handle error
-Result.sync().then(() => {
-  console.log('Result table has been synchronized.');
-}).catch(err => {
-  console.error('Unable to synchronize the Result table:', err);
-});
+
 

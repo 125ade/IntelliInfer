@@ -76,10 +76,5 @@ Dataset.hasMany(Image, {
   as: 'images',
 });
 
-// todo handle error
-Image.sync().then(() => {
-  console.log('Image table has been synchronized.');
-}).catch(err => {
-  console.error('Unable to synchronize the Image table:', err);
-});
+
 
