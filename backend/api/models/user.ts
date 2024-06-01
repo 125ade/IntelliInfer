@@ -57,9 +57,4 @@ User.init(
   },
 );
 
-// todo handle error
-User.sync().then(() => {
-  console.log('users table has been synchronized.');
-}).catch(err => {
-  console.error('Unable to synchronize users table:', err);
-});
+
