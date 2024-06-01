@@ -10,7 +10,7 @@ import { ExpressAdapter } from "@bull-board/express";
 import { setupLogging } from "./middleware/logger"
 import {Queue} from "./queues/Queue";
 import {RedisConnection} from "./queues/RedisConnection";
-
+import {UserRoutes} from "./routes";
 
 const app = express();
 
@@ -75,6 +75,7 @@ try {
   // todo handle log
   console.error(err);
 }
+
 
 
 // Define the route for health check

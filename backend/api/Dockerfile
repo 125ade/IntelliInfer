@@ -11,7 +11,7 @@ COPY tsconfig.json .
 RUN npm install
 RUN npm install typescript -g
 
-COPY ./controller ./controller
+COPY ./controllers ./controllers
 COPY ./db ./db
 COPY ./factory ./factory
 COPY ./middleware ./middleware
