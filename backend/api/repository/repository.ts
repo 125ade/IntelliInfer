@@ -22,7 +22,9 @@ export interface IRepository {
 }
 
 
-class Repository implements IRepository {
+export class Repository implements IRepository {
+
+    constructor() {};
 
     // method to create tags associated with a specific dataset
     public async createTags(tags: string[], datasetId: number): Promise<Tag[]> {
@@ -124,7 +126,7 @@ class Repository implements IRepository {
         const userDao = new UserDao();
         const user = await userDao.findById(userId);
         if (user !== null && user.token < amount)
-            throw new ConcreteErrorCreator().createForbiddenError().setInsufficientToken(amount);
+            throw new ConcreteErrorCreator().createForbiddenError().setInsufficientToken();
     }
 
     // updates the token amount of a specified user
