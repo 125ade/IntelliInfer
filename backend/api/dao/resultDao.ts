@@ -1,5 +1,5 @@
 import { IDao } from './daoInterface';
-import Result from '../models/tag';
+import Result from '../models/result';
 import { ConcreteErrorCreator } from '../factory/ErrorCreator';
 
 export default class ResultDAO implements IDao<Result> {
@@ -16,9 +16,13 @@ export default class ResultDAO implements IDao<Result> {
         }
     }
 
-    // we use this when we have to visualize the result related to an inference
     async findById(id: number): Promise<Result | null> {
-        return await Result.findByPk(id);
+        try {
+            const result = await Result.findByPk(id);
+            return result;
+        } catch {
+            throw new ConcreteErrorCreator().createNotFoundError().setAbsentResults();
+        }
     }
     
     // se vogliamo introdurre l'opzione di scegliere se rendere un dataset pubblico o privato, e l'utende sceglie di rendere il proprio dataset
