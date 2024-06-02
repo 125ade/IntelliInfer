@@ -5,7 +5,9 @@ import DatasetDao from '../dao/datasetDao';
 import ImageDao from '../dao/imageDao';
 import Image from '../models/image';
 import AiDao from '../dao/aiDao';
-import Ai from '../models/ai'
+import Ai from '../models/ai';
+import ResultDao from '../dao/resultDao';
+import Result from '../models/result';
 import { isImage, unzipImages } from '../utils/utils'; // Importa le funzioni di utilità
 import { SequelizeConnection } from '../db/SequelizeConnection';
 import { ConcreteErrorCreator } from '../factory/ErrorCreator';
@@ -23,7 +25,8 @@ export interface IRepository {
     updateUserToken(userId: number, token: number): Promise<Object>;
     getDatasetUserList(userId: number): Promise<Object | null>;
     listAiModels(): Promise<Ai[] | null>;
-    findModel(modelId: number): Promise<Ai | null>
+    findModel(modelId: number): Promise<Ai | null>;
+    findResult(resultId: number): Promise<Result | null>;
 }
 
 
@@ -157,6 +160,12 @@ export class Repository implements IRepository {
     async findModel(modelId: number): Promise<Ai | null>{
         const aiDao = new AiDao();
         return aiDao.findById(modelId);
+    }
+
+    // find an inference result by id
+    async findResult(resultId: number): Promise<Result | null>{
+        const resultDao = new ResultDao();
+        return resultDao.findById(resultId);
     }
     
 

@@ -12,14 +12,12 @@ export default class UserRoutes{
     initRouters(): undefined {
 
         // visualize all available models
-        this.router.get("/model/list",
-            this.userController.modelList.bind(this.userController));
+        this.router.get("/model/list", this.userController.modelList.bind(this.userController));
         
             
         
         // visualize the model filtered by id
-        this.router.get("/model/:modelId",
-           this.userController.findModelById.bind(this.userController));
+        this.router.get("/model/:modelId", this.userController.findModelById.bind(this.userController));
         
         /** 
         // todo get /dataset/list
@@ -57,12 +55,12 @@ export default class UserRoutes{
         // autenticazione
         // autorizzazione "user"
         this.router.post("/inference/:datasetId/:aiId/", this.userController.TOIMPLEMENT);
+        */
 
-        // todo get /inference/state/:resultId
-        // autenticazione
-        // autorizzazione "user"
-        this.router.get("/inference/state/:resultId", this.userController.TOIMPLEMENT);
-
+        // finds an inference result given its id
+        this.router.get("/inference/state/:resultId", this.userController.findResultById.bind(this.userController));
+        
+        /** 
         // todo get /inference/result/:resultId
         // autenticazione
         // autorizzazione "user"
