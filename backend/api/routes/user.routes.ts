@@ -11,19 +11,17 @@ export default class UserRoutes{
 
     initRouters(): undefined {
 
-        // todo get /model/list
-        // autenticazione
-        // autorizzazione "user"
+        // visualize all available models
         this.router.get("/model/list",
             this.userController.modelList.bind(this.userController));
         
-            /** 
-        // todo get /model/:modelId
-        // autenticazione
-        // autorizzazione "user"
-        // this.router.get("/model/:modelId",
-        //    this.userController.TOIMPLEMENT);
-
+            
+        
+        // visualize the model filtered by id
+        this.router.get("/model/:modelId",
+           this.userController.findModelById.bind(this.userController));
+        
+        /** 
         // todo get /dataset/list
         // autenticazione
         // autorizzazione "user"

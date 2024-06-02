@@ -11,10 +11,6 @@ export default class Image extends Model {
   
   declare description: string;
 
-  declare readonly createdAt: Date;
-
-  declare readonly updatedAt: Date;
-
 }
 
 const sequelize = SequelizeConnection.getInstance().sequelize;
@@ -45,23 +41,15 @@ Image.init(
     },
     description: {
       type: DataTypes.STRING(300)
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
+    }
   },
   {
     sequelize,
     modelName: "Image",
     tableName: "images",
-    timestamps: true
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
   },
 );
 

@@ -9,13 +9,9 @@ export default class Ai extends Model {
 
     declare description: string;
 
-    declare pathWeights: string;
+    declare pathweights: string;
 
     declare architecture: string;
-
-    declare readonly createdAt: Date;
-
-    declare readonly updatedAt: Date;
 
 }
 
@@ -35,7 +31,7 @@ Ai.init(
     description: {
       type: DataTypes.CHAR(300),
     },
-    pathWeights: {
+    pathweights: {
       type: DataTypes.CHAR(300),
       allowNull: false
     },
@@ -50,7 +46,9 @@ Ai.init(
     sequelize,
     modelName: "Ai",
     tableName: "ai",
-    timestamps: true
+    timestamps: true,
+    createdAt: 'created_at', // Utilizza la convenzione 'created_at' per il timestamp di creazione
+    updatedAt: 'updated_at' 
   },
 );
 

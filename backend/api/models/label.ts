@@ -14,10 +14,6 @@ export default class Label extends Model {
   
   declare description: string;
 
-  declare readonly createdAt: Date;
-
-  declare readonly updatedAt: Date;
-
 }
 
 const sequelize = SequelizeConnection.getInstance().sequelize;
@@ -56,23 +52,15 @@ Label.init(
     },
     description: {
       type: DataTypes.STRING(300)
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
+    }
   },
   {
     sequelize,
     modelName: "Label",
     tableName: "labels",
-    timestamps: true
+    timestamps: true,
+    createdAt: 'created_at', 
+    updatedAt: 'updated_at'
   },
 );
 

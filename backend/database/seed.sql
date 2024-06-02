@@ -14,7 +14,7 @@ CREATE TABLE ai (
     id SERIAL PRIMARY KEY,
     name VARCHAR(200) NOT NULL,
     description VARCHAR(300),
-    pathWeights VARCHAR(300) NOT NULL,
+    pathweights VARCHAR(300) NOT NULL,
     architecture VARCHAR(50) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -117,6 +117,10 @@ ALTER TABLE results
 ADD CONSTRAINT fk_ai_id
 FOREIGN KEY (ai_id)
 REFERENCES ai(id);
+
+-- Inserimento di un elemento nella tabella ai
+INSERT INTO ai (name, description, pathweights, architecture) 
+VALUES ('Nome esempio', 'Descrizione esempio', 'Percorso pesi esempio', 'yolo');
 
 
 
