@@ -21,6 +21,7 @@ export default class UserController {
                 error.send(res);
             } else {
                 // In caso di errore generico non previsto
+                console.log(error);
                 new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
             }
         }
