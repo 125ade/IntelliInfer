@@ -28,6 +28,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - logs_data:/app/logs
+      - image_data:/app/media
     expose:
       - "${API_PORT}"
     ports:
@@ -40,11 +41,12 @@ services:
       - DOKER_QUEUE_NAME=${DOKER_QUEUE_NAME}
       - API_PORT=${API_PORT}
       - API_HOST=${API_HOST}
-      - NODE_ENV=production
-      - LOG_OUTPUT=both # Può essere 'console', 'file' o 'both'
-      - LOG_PATH=/app/logs
-      - LOG_ACCESS_DIR=access
-      - LOG_ERRORS_DIR=errors
+      - SEQUELIZE_DIALECT=${SEQUELIZE_DIALECT}
+      - NODE_ENV=${NODE_ENV}
+      - LOG_OUTPUT=${LOG_OUTPUT} # Può essere 'console', 'file' o 'both'
+      - LOG_PATH=${LOG_PATH}
+      - LOG_ACCESS_DIR=${LOG_ACCESS_DIR}
+      - LOG_ERRORS_DIR=${LOG_ERRORS_DIR}
     networks:
       - private-ntwk
     depends_on:
@@ -136,4 +138,5 @@ networks:
 volumes:
   redis_data:
   postgres_data:
+  image_data:
   logs_data:
