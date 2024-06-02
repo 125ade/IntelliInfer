@@ -6,15 +6,21 @@ import * as rfs from 'rotating-file-stream';
 
 require('dotenv').config();
 
+// define the root dir
 const logDirectory :string = path.resolve(process.env.LOG_PATH || '/app/logs');
 fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory);
 
+// define the access log dir
 const accessLogDirectory :string = path.join(logDirectory, process.env.LOG_ACCESS_DIR || 'access');
 fs.existsSync(accessLogDirectory) || fs.mkdirSync(accessLogDirectory);
 
+// define the error log dir
 const errorLogDirectory :string = path.join(logDirectory, process.env.LOG_ERRORS_DIR || 'errors');
 fs.existsSync(errorLogDirectory) || fs.mkdirSync(errorLogDirectory);
 
+// define the sequelize log dir
+const sequelizeLogDirectory :string = path.join(logDirectory, process.env.LOG_SEQUELIZE_DIR || 'sequelize');
+fs.existsSync(sequelizeLogDirectory) || fs.mkdirSync(sequelizeLogDirectory);
 
 // Create a rotating write stream for access logs
 const accessLogStream :rfs.RotatingFileStream = rfs.createStream('access.log', {
@@ -28,6 +34,12 @@ const errorLogStream :rfs.RotatingFileStream = rfs.createStream('error.log', {
   path: errorLogDirectory,
 });
 
+// Create a rotating write stream for sequelize logs
+const sequelizeLogStream :rfs.RotatingFileStream = rfs.createStream('sequelize.log', {
+  interval: '1d', // rotate daily
+  path: sequelizeLogDirectory,
+});
+
 const getLogFormat = () => {
   const env :string = process.env.NODE_ENV || 'development';
   return env === 'production' ? 'combined' : 'dev';
@@ -35,7 +47,6 @@ const getLogFormat = () => {
 
 const getMorganMiddleware = () => {
   const logOutput = process.env.LOG_OUTPUT || 'both';
-  // todo mettere in doc -> 'console', 'file', 'both'
   const logFormat = getLogFormat();
 
   switch (logOutput) {
@@ -68,4 +79,29 @@ const setupLogging = (app: Express) => {
   });
 };
 
-export { setupLogging };
+
+const logSequelize = (msg: string) => {
+  const logOutput = process.env.LOG_OUTPUT || 'both';
+  const timestamp = new Date().toISOString()
+      .replace(/T/, ' ')
+      .replace(/\..+/, '');
+
+  const logMessage = `[${timestamp}] ${msg}`;
+
+  switch (logOutput) {
+    case 'console':
+      console.log(logMessage);
+      break;
+    case 'file':
+      sequelizeLogStream.write(logMessage + '\n');
+      break;
+    case 'both':
+    default:
+      sequelizeLogStream.write(logMessage + '\n');
+      console.log(logMessage);
+      break;
+  }
+};
+
+
+export { setupLogging, logSequelize };

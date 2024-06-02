@@ -1,11 +1,7 @@
-import { Sequelize } from 'sequelize';
-import Ai from '../models/ai'
-import Dataset from '../models/dataset';
-import Image from '../models/image';
-import Label from '../models/label';
-import Result from '../models/result';
-import Tag from '../models/tag';
-import User from '../models/user';
+import { Sequelize, Dialect } from 'sequelize';
+import * as process from "node:process";
+import {logSequelize} from "../middleware/logger.middleware";
+
 
 /**
  * The Singleton class defines the `getInstance` method that lets clients access
@@ -31,16 +27,21 @@ export class SequelizeConnection {
     const user: string = process.env.POSTGRES_USER || "myuser";
     const password: string = process.env.POSTGRES_PASSWORD || "mypassword";
     const database: string = process.env.POSTGRES_DB || "db_inference";
+    const dialect: Dialect = process.env.SEQUELIZE_DIALECT as Dialect || 'postgres';
+    const host: string = process.env.POSTGRES_HOST || 'database';
+    const port: number = Number(process.env.POSTGRES_PORT || '5432')
+    const flag_log: boolean = Boolean(process.env.SEQUELIZE_LOGGING ) || true;
 
     newInstance.sequelize = new Sequelize(
         database,
         user,
         password,
         {
-      dialect: 'postgres',
-      host: process.env.POSTGRES_HOST || 'database',
-      port: Number(process.env.POSTGRES_PORT || '5432'),
-    });
+          dialect: dialect,
+          host: host,
+          port: port,
+          logging: flag_log ? logSequelize : false,
+        });
 
     return newInstance;
 

@@ -1,0 +1,15 @@
+### GET check health
+GET http://localhost:3000/check/health
+Accept: application/json
+
+### GET model list
+GET http://localhost:3000/api/model/list
+Accept: application/json
+
+### GET documentazione html
+GET http://localhost:3000/admin/docs
+Accept: application/json
+
+### GET job UI
+GET http://localhost:3000/admin/queues
+Accept: application/json
