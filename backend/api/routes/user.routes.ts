@@ -15,7 +15,7 @@ export default class UserRoutes{
         // autenticazione
         // autorizzazione "user"
         this.router.get("/model/list",
-            this.userController.modelList);
+            this.userController.modelList.bind(this.userController));
         
             /** 
         // todo get /model/:modelId
