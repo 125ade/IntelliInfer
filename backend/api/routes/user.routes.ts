@@ -15,13 +15,14 @@ export default class UserRoutes{
         // autenticazione
         // autorizzazione "user"
         this.router.get("/model/list",
-            this.userController.TOIMPLEMENT);
-
+            this.userController.modelList);
+        
+            /** 
         // todo get /model/:modelId
         // autenticazione
         // autorizzazione "user"
-        this.router.get("/model/:modelId",
-            this.userController.TOIMPLEMENT);
+        // this.router.get("/model/:modelId",
+        //    this.userController.TOIMPLEMENT);
 
         // todo get /dataset/list
         // autenticazione
@@ -68,7 +69,7 @@ export default class UserRoutes{
         // autenticazione
         // autorizzazione "user"
         this.router.get("/inference/result/:resultId", this.userController.TOIMPLEMENT);
-
+*/
 
     }
 

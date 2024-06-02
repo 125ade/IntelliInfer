@@ -13,10 +13,16 @@ import { RedisConnection } from "./queues/RedisConnection";
 import { UserRoutes } from "./routes/index.routes";
 import { syncDb } from "./db/dbSync";
 import { SequelizeConnection } from "./db/SequelizeConnection";
+import bodyParser from 'body-parser';
 
 
 
 const app = express();
+
+// Middleware per il parsing del corpo delle richieste
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 
 syncDb().then(() => {
      console.log("Database connected");
@@ -93,6 +99,12 @@ try {
 app.get('/check/health', (req: Request, res: Response) => {
   res.json({ system: 'online' });
 });
+
+// Inizializza le rotte
+const userRoutes = new UserRoutes();
+
+// Usa le rotte definite nella classe UserRoutes
+app.use('/api', userRoutes.router);
 
 // Start the server
 // todo handel log
