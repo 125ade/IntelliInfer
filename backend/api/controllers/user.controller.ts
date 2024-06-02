@@ -26,7 +26,24 @@ export default class UserController {
             }
         }
     }
+
+    async findModelById(req: Request, res: Response) {
+        try {
+            const modelId: number = Number(req.params.modelId);
+            const aiModel = await this.repository.findModel(modelId);
+            res.status(200).json(aiModel);
+        } catch (error) {
+            if (error instanceof ErrorCode) {
+                error.send(res);
+            } else {
+                // In caso di errore generico non previsto
+                console.log(error);
+                new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
+            }
+        }
+    }
 }
+
 
     
 

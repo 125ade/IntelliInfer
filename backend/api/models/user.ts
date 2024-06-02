@@ -13,10 +13,6 @@ export default class User extends Model {
 
   declare role: string;
 
-  declare readonly createdAt: Date;
-
-  declare readonly updatedAt: Date;
-
 }
 
 const sequelize = SequelizeConnection.getInstance().sequelize;
@@ -57,7 +53,9 @@ User.init(
     modelName: "User",
     tableName: "users",
     timestamps: true,
-    underscored: true
+    underscored: true,
+    createdAt: 'created_at', 
+    updatedAt: 'updated_at'
   },
 );
 

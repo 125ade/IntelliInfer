@@ -13,9 +13,7 @@ export default class Dataset extends Model {
   declare countElements: number;
   declare countClasses: number;
   declare description: string | null;
-  declare readonly createdAt: Date;
-  declare readonly updatedAt: Date;
-  declare deletedAt: Date | null;
+  
 
   // Association methods
   declare addTag: (tag: Tag) => Promise<void>;
@@ -65,28 +63,16 @@ Dataset.init(
     description: {
       type: DataTypes.STRING,
       allowNull: true
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
-    deletedAt: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
+    }
   },
   {
     sequelize,
     modelName: "Dataset",
     tableName: "datasets",
     paranoid: true,
-    timestamps: true
+    timestamps: true,
+    createdAt: 'created_at', // Utilizza la convenzione 'created_at' per il timestamp di creazione
+    updatedAt: 'updated_at'
   },
 );
 

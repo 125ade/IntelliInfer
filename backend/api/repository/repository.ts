@@ -22,6 +22,7 @@ export interface IRepository {
     checkUserToken(userId: number, amount: number): void;
     updateUserToken(userId: number, token: number): Promise<Object> ;
     listAiModels(): Promise<Ai[] | null>;
+    findModel(modelId: number): Promise<Ai | null>
 }
 
 
@@ -150,14 +151,13 @@ export class Repository implements IRepository {
         const aiDao = new AiDao();
         return aiDao.findAll();
     }
-    
-    /** 
-    async deleteImage(id: number): Promise<boolean> {
-        const imageDao = new ImageDao();
-        const image = await imageDao.findById(id);
 
+    // find an Ai model by id
+    async findModel(modelId: number): Promise<Ai | null>{
+        const aiDao = new AiDao();
+        return aiDao.findById(modelId);
     }
-    */
+    
 
     
     

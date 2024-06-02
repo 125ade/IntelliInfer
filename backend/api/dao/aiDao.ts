@@ -26,12 +26,13 @@ export default class AiDao implements IDao<Ai> {
     }
     
    
-
-    // da fare un update che aggiorna i pesi
-
-    // DA AGGIORNARE CON LA FACTORY PER ERRORE
     async findById(id: number): Promise<Ai | null> {
-        return await Ai.findByPk(id);
+        try {
+            const model = await Ai.findByPk(id);
+            return model;
+        } catch {
+            throw new ConcreteErrorCreator().createNotFoundError().setAbstentModel();
+        }
     }
     
 
