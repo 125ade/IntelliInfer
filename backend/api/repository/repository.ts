@@ -4,6 +4,8 @@ import Tag from '../models/tag';
 import DatasetDao from '../dao/datasetDao';
 import ImageDao from '../dao/imageDao';
 import Image from '../models/image';
+import AiDao from '../dao/aiDao';
+import Ai from '../models/ai'
 import { isImage, unzipImages } from '../utils/utils'; // Importa le funzioni di utilità
 import { SequelizeConnection } from '../db/SequelizeConnection';
 import { ConcreteErrorCreator } from '../factory/ErrorCreator';
@@ -19,6 +21,7 @@ export interface IRepository {
     updateUserTokenByCost(userId: number, cost: number): Promise<void>;
     checkUserToken(userId: number, amount: number): void;
     updateUserToken(userId: number, token: number): Promise<Object> ;
+    listAiModels(): Promise<Ai[] | null>;
 }
 
 
@@ -140,6 +143,12 @@ export class Repository implements IRepository {
             throw new ConcreteErrorCreator().createNotFoundError().setNoUser();
         }
         return { updatedUser: user };
+    }
+    
+    // lists all available Ai models
+    async listAiModels(): Promise<Ai[] | null>{
+        const aiDao = new AiDao();
+        return aiDao.findAll();
     }
     
     /** 
