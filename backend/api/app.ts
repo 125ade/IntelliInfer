@@ -4,15 +4,15 @@ import swaggerUi from "swagger-ui-express";
 import fs from 'fs';
 import path from 'path';
 require('dotenv').config();
-import {createBullBoard} from '@bull-board/api';
-import {BullMQAdapter} from '@bull-board/api/bullMQAdapter';
+import { createBullBoard } from '@bull-board/api';
+import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { ExpressAdapter } from "@bull-board/express";
-import { setupLogging } from "./middleware/logger"
-import {Queue} from "./queues/Queue";
-import {RedisConnection} from "./queues/RedisConnection";
-import {UserRoutes} from "./routes";
-import { syncDb} from "./db/dbSync";
-import {SequelizeConnection} from "./db/SequelizeConnection";
+import { setupLogging } from "./middleware/logger.middleware";
+import { Queue } from "./queues/Queue";
+import { RedisConnection } from "./queues/RedisConnection";
+import { UserRoutes } from "./routes/index.routes";
+import { syncDb } from "./db/dbSync";
+import { SequelizeConnection } from "./db/SequelizeConnection";
 
 
 
