@@ -8,7 +8,7 @@ import AiDao from '../dao/aiDao';
 import Ai from '../models/ai';
 import ResultDao from '../dao/resultDao';
 import Result from '../models/result';
-import { isImage, unzipImages } from '../utils/utils'; // Importa le funzioni di utilità
+import { isImage, unzipImages, generatePath } from '../utils/utils'; // Importa le funzioni di utilità
 import { SequelizeConnection } from '../db/SequelizeConnection';
 import { ConcreteErrorCreator } from '../factory/ErrorCreator';
 import * as fs from 'fs';
@@ -17,7 +17,7 @@ import Dataset from '../models/dataset';
 
 
 export interface IRepository {
-    createTags(tags: string[], datasetId: number): Promise<Tag[]>;
+    // createTags(tags: string[], datasetId: number): Promise<Tag[]>;
     createDataset(datasetJson: any): Promise<Object>;
     uploadFile(datasetId: number, filePath: string): Promise<Image[]>;
     updateUserTokenByCost(userId: number, cost: number): Promise<void>;
@@ -33,40 +33,38 @@ export interface IRepository {
 export class Repository implements IRepository {
 
     constructor() {};
+    
 
-    // method to create tags associated with a specific dataset
-    public async createTags(tags: string[], datasetId: number): Promise<Tag[]> {
-        const tagDao = new TagDao()
-        const createdTags = await Promise.all(
-          tags.map(tagName => tagDao.create({ name: tagName, datasetId }))
-        );
-        return createdTags;
-    }
-
-    // funzione da ricontrollare
+    // function that creates a dataset given the informations passed by the user
     public async createDataset(datasetJson: any): Promise<{ dataset: Dataset, tags: Tag[] }> {
         try {
-          // quando passo il json con il dataset passo anche il tag o i tags che voglio associargli
-          let tags = datasetJson.tags;
+          // Estrai i tag e il nome dal JSON
+          const { tags, name, description } = datasetJson;
+          
+          
+          const nameDataset = String(name);
+          const descriptionDataset = String(description);
+          const pathdataset = await generatePath(nameDataset);
     
-          // set creation and update date
-          const now = new Date();
-          datasetJson.createdAt = now;
-          datasetJson.updatedAt = now;
-    
-          // add user id
-          //datasetJson.userId = this.user.id;
+          const datasetData: any = {
+            "name": nameDataset,
+            "description": descriptionDataset,
+            "path": pathdataset,
+            "countElements": 0,  // Supponendo che inizialmente sia 0
+            "countClasses": tags.length,  // Numero di classi uguale al numero di tag
+            "userId": 1  // Supponendo un userId statico per esempio; dovresti sostituirlo con il reale userId
+          };
     
           // Crea il dataset nel database
           const datasetDao = new DatasetDao();
-          const dataset = await datasetDao.create(datasetJson);
+          const dataset = await datasetDao.create(datasetData);
     
-          // Crea i tag, rimuovendo i duplicati
-          const uniqueTags: string[] = [...new Set(tags as string[])];
-          const createdTags = await this.createTags(uniqueTags, dataset.id);
+          // Crea i tag
+          const tagDao = new TagDao();
+          const createdTags: Tag[] = tags.map( async (tag: string) => await tagDao.create({"name": tag}));
           
           // associa i tags al dataset
-          createdTags.forEach( tag => { dataset.addTag(tag)});
+          createdTags.forEach( (tag: Tag) => { dataset.addTag(tag)});
     
           return { dataset: dataset, tags: createdTags };
         } catch {

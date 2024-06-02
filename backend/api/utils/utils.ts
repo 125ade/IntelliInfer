@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as unzipper from 'unzipper';
+import path from 'path';
 
 // Function to control if a file is an image
 export function isImage(fileName: string): boolean {
@@ -40,6 +41,14 @@ export async function unzipImages(zipFilePath: string): Promise<Buffer[]> {
       })
     });
 }
+
+// funzione che genera un path
+export async function generatePath(name: string): Promise<string> {
+    const basePath = '/path/to/datasets';
+    return path.join(basePath, name);
+}
+
+ 
 
 
 

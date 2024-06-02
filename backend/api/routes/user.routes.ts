@@ -30,12 +30,12 @@ export default class UserRoutes{
         // autenticazione
         // autorizzazione "user"
         this.router.get("/dataset/:datasetId", this.userController.TOIMPLEMENT);
+        */
 
-        // todo post /dataset/create
-        // autenticazione
-        // autorizzazione "user"
-        this.router.post("/dataset/create", this.userController.TOIMPLEMENT);
-
+        // creates a dataset
+        this.router.post("/dataset/create", this.userController.createDataset);
+        
+        /*
         // todo put /dataset/:datasetId/update
         // autenticazione
         // autorizzazione "user"
