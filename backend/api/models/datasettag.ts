@@ -12,23 +12,24 @@ DatasetTags.init(
     // Chiavi esterne
     datasetId: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
+      primaryKey: true,
+      field: 'dataset_id'
     },
     tagId: {
-      type: DataTypes.INTEGER,
-      allowNull: false
+      type: DataTypes.STRING,
+      allowNull: false,
+      primaryKey: true,
+      field: 'tag_id'
     }
   },
   {
     sequelize,
     modelName: 'DatasetTags',
     tableName: 'datasetstags',
-    timestamps: false
+    timestamps: false,
   }
 );
 
 export default DatasetTags;
 
-// Associazioni
-Dataset.belongsToMany(Tag, { through: DatasetTags });
-Tag.belongsToMany(Dataset, { through: DatasetTags });
