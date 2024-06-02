@@ -23,7 +23,7 @@ CREATE TABLE ai (
 -- Creazione della tabella datasets
 CREATE TABLE datasets (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
+    user_id INTEGER, -- ci sarà in seguito da aggiungere il not null
     name VARCHAR(255) NOT NULL,
     path VARCHAR(255) NOT NULL,
     count_elements INTEGER NOT NULL,

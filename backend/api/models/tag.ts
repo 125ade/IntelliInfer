@@ -1,11 +1,17 @@
 import { DataTypes, Model } from 'sequelize';
 import { SequelizeConnection } from '../db/SequelizeConnection';
+import DatasetTags from './datasettag';
 
 
 
 export default class Tag extends Model {
 
   declare name: string;
+
+  // Associazioni del modello
+  static associate(models: any) {
+    Tag.belongsToMany(models.Dataset, { through: DatasetTags });
+  }
 
 }
 

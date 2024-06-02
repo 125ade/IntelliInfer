@@ -61,8 +61,7 @@ export default class UserController {
 
     async createDataset(req: Request, res: Response) {
         try{
-            const datasetJson = req.body;
-            const result = await this.repository.createDataset(datasetJson);
+            const result = await this.repository.createDatasetWithTags(req.body);
             return res.status(201).json(result);
         } catch (error) {
             if (error instanceof ErrorCode) {

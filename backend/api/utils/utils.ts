@@ -42,11 +42,7 @@ export async function unzipImages(zipFilePath: string): Promise<Buffer[]> {
     });
 }
 
-// funzione che genera un path
-export async function generatePath(name: string): Promise<string> {
-    const basePath = '/path/to/datasets';
-    return path.join(basePath, name);
-}
+
 
  
 

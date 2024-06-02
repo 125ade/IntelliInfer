@@ -33,7 +33,7 @@ export default class UserRoutes{
         */
 
         // creates a dataset
-        this.router.post("/dataset/create", this.userController.createDataset);
+        this.router.post("/dataset/create", this.userController.createDataset.bind(this.userController));
         
         /*
         // todo put /dataset/:datasetId/update

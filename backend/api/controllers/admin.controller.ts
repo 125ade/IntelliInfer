@@ -1,6 +1,4 @@
 import {Response, Request} from "express";
-import { validationResult } from 'express-validator';
-import { ConcreteErrorCreator } from '../factory/ErrorCreator';
 import { Repository } from '../repository/repository'
 
 export default class AdminController {
@@ -9,7 +7,7 @@ export default class AdminController {
 
     async updateWeights(req: Request, res: Response): Promise<undefined> {}
 
-   
+   /** 
     async rechargeTokens(req: Request, res: Response): Promise<undefined> {
 
         // ConcreteErrorCreator().createBadRequestError().setMissingToken();
@@ -20,5 +18,6 @@ export default class AdminController {
         promiseResult.then((result) => {return res.json(result)})
                         .catch((err) => {return err.send()});
     }
+    */
 
 }

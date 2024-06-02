@@ -1,78 +1,83 @@
-import UserDao from '../dao/userDao';
+// import UserDao from '../dao/userDao';
 import TagDao from '../dao/tagDao';
-import Tag from '../models/tag';
+// import Tag from '../models/tag';
 import DatasetDao from '../dao/datasetDao';
-import ImageDao from '../dao/imageDao';
-import Image from '../models/image';
+// import ImageDao from '../dao/imageDao';
+// import Image from '../models/image';
 import AiDao from '../dao/aiDao';
 import Ai from '../models/ai';
 import ResultDao from '../dao/resultDao';
 import Result from '../models/result';
-import { isImage, unzipImages, generatePath } from '../utils/utils'; // Importa le funzioni di utilità
-import { SequelizeConnection } from '../db/SequelizeConnection';
-import { ConcreteErrorCreator } from '../factory/ErrorCreator';
-import * as fs from 'fs';
+// import { isImage, unzipImages} from '../utils/utils'; // Importa le funzioni di utilità
+// import { SequelizeConnection } from '../db/SequelizeConnection';
+// import { ConcreteErrorCreator } from '../factory/ErrorCreator';
+// import * as fs from 'fs';
 import Dataset from '../models/dataset';
+import DatasetTags from '../models/datasettag';
 
 
 
 export interface IRepository {
     // createTags(tags: string[], datasetId: number): Promise<Tag[]>;
-    createDataset(datasetJson: any): Promise<Object>;
-    uploadFile(datasetId: number, filePath: string): Promise<Image[]>;
-    updateUserTokenByCost(userId: number, cost: number): Promise<void>;
-    checkUserToken(userId: number, amount: number): void;
-    updateUserToken(userId: number, token: number): Promise<Object>;
-    getDatasetUserList(userId: number): Promise<Object | null>;
+    // createDataset(datasetJson: any): Promise<Object>;
+    // uploadFile(datasetId: number, filePath: string): Promise<Image[]>;
+    // updateUserTokenByCost(userId: number, cost: number): Promise<void>;
+    // checkUserToken(userId: number, amount: number): void;
+    // updateUserToken(userId: number, token: number): Promise<Object>;
+    // getDatasetUserList(userId: number): Promise<Object | null>;
     listAiModels(): Promise<Ai[] | null>;
     findModel(modelId: number): Promise<Ai | null>;
     findResult(resultId: number): Promise<Result | null>;
+    createDatasetWithTags(data: any): Promise<Dataset> ;
 }
 
 
 export class Repository implements IRepository {
 
     constructor() {};
-    
 
-    // function that creates a dataset given the informations passed by the user
-    public async createDataset(datasetJson: any): Promise<{ dataset: Dataset, tags: Tag[] }> {
-        try {
-          // Estrai i tag e il nome dal JSON
-          const { tags, name, description } = datasetJson;
-          
-          
-          const nameDataset = String(name);
-          const descriptionDataset = String(description);
-          const pathdataset = await generatePath(nameDataset);
+    async createDatasetWithTags(data: any): Promise<Dataset>  {
+        const datasetDao = new DatasetDao();
+        const tagDao = new TagDao();
+
+        const { name, description, tags } = data; // quando avremo userid ci sarà anche quello
     
-          const datasetData: any = {
-            "name": nameDataset,
-            "description": descriptionDataset,
-            "path": pathdataset,
-            "countElements": 0,  // Supponendo che inizialmente sia 0
-            "countClasses": tags.length,  // Numero di classi uguale al numero di tag
-            "userId": 1  // Supponendo un userId statico per esempio; dovresti sostituirlo con il reale userId
-          };
+        // Generate the path
+        const path = this.generatePath(name);
     
-          // Crea il dataset nel database
-          const datasetDao = new DatasetDao();
-          const dataset = await datasetDao.create(datasetData);
+        // Create the dataset
+        const newDataset = await datasetDao.create({
+          name,
+          description,
+          path,
+          countElements: 0, // Set to 0 or a default value, adjust as needed
+          countClasses: tags.length,
+          // userId,
+        });
     
-          // Crea i tag
-          const tagDao = new TagDao();
-          const createdTags: Tag[] = tags.map( async (tag: string) => await tagDao.create({"name": tag}));
-          
-          // associa i tags al dataset
-          createdTags.forEach( (tag: Tag) => { dataset.addTag(tag)});
+        // Associate tags with the dataset
+        for (const tagName of tags) {
+            const tagInstance = await tagDao.create({ name: tagName });
+            // Crea un'istanza della tabella di associazione DatasetTags
+            await DatasetTags.create({
+                datasetId: newDataset.id,
+                tagId: tagInstance.name
+            });
+          }
     
-          return { dataset: dataset, tags: createdTags };
-        } catch {
-            throw new ConcreteErrorCreator().createServerError().setFailedCreationItem();
-        }
+        return newDataset;
+    }
+    
+    // questo sarà da inserire in utils e lo importiamo come funzione, non va qui nella repository
+    generatePath(name: string) {
+        return name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
     }
     
     
+    
+
+  
+    /** 
     // Ho provato a creare un metodo che verrà usato nella rotta per l'upload di un file nel dataset
     // a seconda che il file sia un'immagine o un file zip richiama le funzioni di utilità per verificare
     // che il file sia un immagine o nel caso in cui sia un file zip eseguire l'unzip
@@ -147,6 +152,7 @@ export class Repository implements IRepository {
         }
         return { updatedUser: user };
     }
+    */
     
     // lists all available Ai models
     async listAiModels(): Promise<Ai[] | null>{
@@ -166,7 +172,7 @@ export class Repository implements IRepository {
         return resultDao.findById(resultId);
     }
     
-
+    /*
     async getDatasetUserList(userId: number): Promise<Object | null> {
         try {
             const datasetDao = new DatasetDao();
@@ -175,6 +181,7 @@ export class Repository implements IRepository {
             throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
         }
     };
+    */
 
     
     
