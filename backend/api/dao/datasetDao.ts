@@ -24,6 +24,19 @@ export default class DatasetDao implements IDao<Dataset> {
             throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
         }
     }
+
+    async findAllByUserId(Id: number): Promise<Dataset[] | ConcreteErrorCreator> {
+        try {
+          return await Dataset.findAll({
+                                                where: {
+                                                    userId: Id
+                                                }
+                                            });
+
+        } catch {
+            throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
+        }
+    }
     
    
 

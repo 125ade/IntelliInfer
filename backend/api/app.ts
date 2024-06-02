@@ -1,9 +1,11 @@
-import express from "express";
-import { Request, Response } from 'express';
-import swaggerUi from "swagger-ui-express";
 import fs from 'fs';
 import path from 'path';
+import Redis from "ioredis";
 require('dotenv').config();
+import express from "express";
+import bodyParser from 'body-parser';
+import { Request, Response } from 'express';
+import swaggerUi from "swagger-ui-express";
 import { createBullBoard } from '@bull-board/api';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { ExpressAdapter } from "@bull-board/express";
@@ -12,39 +14,45 @@ import { Queue } from "./queues/Queue";
 import { RedisConnection } from "./queues/RedisConnection";
 import { UserRoutes } from "./routes/index.routes";
 import { syncDb } from "./db/dbSync";
-import { SequelizeConnection } from "./db/SequelizeConnection";
-import bodyParser from 'body-parser';
+import * as process from "node:process";
 
 
-
-const app = express();
-
-// Middleware per il parsing del corpo delle richieste
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-
-syncDb().then(() => {
-     console.log("Database connected");
-  }
-).catch(err => {
-  console.error("Failed to sync database:", err);
-});
-
-setupLogging(app)
-
+// api variable
 const port = parseInt(process.env.API_PORT || "3000");
-const host = "localhost";//process.env.API_HOST ||
-
+const host = process.env.API_HOST || "localhost";
+// redis definition
 const redis_port = parseInt(process.env.REDIS_PORT || "6379");
 const redis_host = process.env.REDIS_HOST || 'localhost';
 const redisUrl = `redis://${redis_host}:${redis_port}/0`;
+// job queue name definition taken from env
 const QUEUE_TASK_DOCKER = process.env.DOKER_QUEUE_NAME || 'dockerTaskQueue';
 
 
+// init express
+const app = express();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// init log middleware
+setupLogging(app)
+
+// sync db                             --> SERVER START
+syncDb().then(():void=>{console.log("\t--> SYNC BD DONE")})
+// ).then(() => {
+//      console.log("Database connected");
+//   }
+// ).catch(err => {
+//   console.error("Failed to sync database:", err);
+// });
+
+
+
+
+
+// manage job
 try {
   // Ottieni la connessione Redis dalla classe singleton
-  const connection = RedisConnection.getInstance().redis;
+  const connection :Redis = RedisConnection.getInstance().redis;
 
   // Inizializza la coda con la connessione
   const dockerTaskQueue = new Queue(QUEUE_TASK_DOCKER);
@@ -84,7 +92,7 @@ try {
 
 
 
-// Load the OpenAPI JSON file
+// manage job
 try {
   const openApiSpec = JSON.parse(fs.readFileSync(path.join(__dirname, 'openapi.json'), 'utf8'));
   app.use('/admin/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
@@ -94,8 +102,7 @@ try {
 }
 
 
-
-// Define the route for health check
+// manage health check
 app.get('/check/health', (req: Request, res: Response) => {
   res.json({ system: 'online' });
 });
@@ -109,7 +116,13 @@ app.use('/api', userRoutes.router);
 // Start the server
 // todo handel log
 app.listen(port, () => {
-  console.log(`\n\tFor see health of the service: \n\t\t open http://${host}:${port}/check/health \n`);
-  console.log(`\tFor the queue UI: \n\t\t open http://${host}:${port}/admin/queues/queue/${QUEUE_TASK_DOCKER} \n`);
-  console.log(`\tFor the API doc: \n\t\t open http://${host}:${port}/admin/docs \n\n`);
+  if(process.env.NODE_ENV !== 'production') {
+    console.log(`\n\tFor see health of the service: \n\t\t open http://${host}:${port}/check/health \n`);
+    console.log(`\tFor the queue UI: \n\t\t open http://${host}:${port}/admin/queues/queue/${QUEUE_TASK_DOCKER} \n`);
+    console.log(`\tFor the API doc: \n\t\t open http://${host}:${port}/admin/docs \n\n`);
+  }else{
+    console.log("\t--> SERVER START")
+    console.log(`\t--> UI Queue Management http://${host}:${port}/admin/queues/queue/${QUEUE_TASK_DOCKER}`);
+    console.log(`\t--> API docs page       http://${host}:${port}/admin/docs `);
+  }
 });

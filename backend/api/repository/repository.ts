@@ -20,7 +20,8 @@ export interface IRepository {
     uploadFile(datasetId: number, filePath: string): Promise<Image[]>;
     updateUserTokenByCost(userId: number, cost: number): Promise<void>;
     checkUserToken(userId: number, amount: number): void;
-    updateUserToken(userId: number, token: number): Promise<Object> ;
+    updateUserToken(userId: number, token: number): Promise<Object>;
+    getDatasetUserList(userId: number): Promise<Object | null>;
     listAiModels(): Promise<Ai[] | null>;
 }
 
@@ -158,6 +159,15 @@ export class Repository implements IRepository {
 
     }
     */
+
+    async getDatasetUserList(userId: number): Promise<Object | null> {
+        try {
+            const datasetDao = new DatasetDao();
+            return await datasetDao.findById(userId);
+        }catch {
+            throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
+        }
+    };
 
     
     
