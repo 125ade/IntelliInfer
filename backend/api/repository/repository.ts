@@ -8,6 +8,8 @@ import AiDao from '../dao/aiDao';
 import Ai from '../models/ai';
 import ResultDao from '../dao/resultDao';
 import Result from '../models/result';
+import Image from '../models/image';
+import ImageDao from '../dao/imageDao';
 // import { isImage, unzipImages} from '../utils/utils'; // Importa le funzioni di utilità
 // import { SequelizeConnection } from '../db/SequelizeConnection';
 // import { ConcreteErrorCreator } from '../factory/ErrorCreator';
@@ -125,6 +127,16 @@ export class Repository implements IRepository {
         const path = this.generatePath(weightsString);
     
         return aiDao.updateItem(modelId, path);
+    }
+
+    async findDatasetById(datasetId: number): Promise<Dataset | null> {
+        const datasetDao = new DatasetDao();
+        return datasetDao.findById(datasetId);
+    }
+
+    async createImage(data: any): Promise<Image | null> {
+        const imageDao = new ImageDao();
+        return imageDao.create(data);
     }
     
     

@@ -2,7 +2,7 @@ import { IDao } from './daoInterface';
 import Image from '../models/image';
 import { ConcreteErrorCreator } from '../factory/ErrorCreator';
 
-export default class ImageDAO implements IDao<Image> {
+export default class ImageDao implements IDao<Image> {
 
     constructor() {}
     
