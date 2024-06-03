@@ -176,9 +176,8 @@ To implement inference on this architecture in our project, we relied on the res
 ## Authors
 This project is developed and maintained by the following authors:
 
-- **Zazzarini Micol** - [GitHub Profile](https://github.com/username)
-- **Author Name** - *Role/Contribution* - [GitHub Profile](https://github.com/MicolZazzarini)
-- **Author Name** - *Role/Contribution* - [GitHub Profile](https://github.com/125ade)
+- **Zazzarini Micol** - [GitHub Profile](https://github.com/MicolZazzarini)
+- **Fiorani Andrea** - [GitHub Profile](https://github.com/125ade)
 
 ## License
 This project is licensed under the [MIT License](LICENSE) - consulta il file [LICENSE](LICENSE) per ulteriori dettagli.
