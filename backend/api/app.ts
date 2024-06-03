@@ -18,6 +18,7 @@ import * as process from "node:process";
 import AdminRoutes from './routes/admin.routes';
 
 
+
 // api variable
 const port = parseInt(process.env.API_PORT || "3000");
 const host = process.env.API_HOST || "localhost";
@@ -46,8 +47,11 @@ syncDb().then(():void=>{console.log("\t--> SYNC BD DONE")})
 //   console.error("Failed to sync database:", err);
 // });
 
+app.set('view engine', 'ejs');
 
-
+app.get('/', (req, res) => { 
+    res.render('main');
+});
 
 
 // manage job

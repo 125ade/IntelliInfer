@@ -2,6 +2,10 @@ import {Response, Request} from "express";
 import { Repository } from '../repository/repository';
 import  { ErrorCode } from "../factory/ErrorCode";
 import { ConcreteErrorCreator } from "../factory/ErrorCreator";
+import Dataset from "../models/dataset";
+import Image from "../models/image";
+import fs, { PathLike } from 'fs';
+import path from 'path';
 
 export default class UserController {
 
@@ -82,7 +86,40 @@ export default class UserController {
             }
         }
     }
+
+    async uploadFile(req: Request, res: Response) {
+        try {
+            const datasetId = req.params.datasetId;
+
+            // Verifica che il campo 'file' sia definito nella richiesta
+            if (!req.file) {
+                return res.status(400).json({ error: 'Nessun file caricato' });
+            }
+            
+            const dataset = await this.repository.findDatasetById(Number(datasetId));
+            if (!dataset) {
+                return res.status(404).json({ error: 'Il dataset specificato non esiste' });
+            }
+
+            const imagePath = req.file.path;
+            
+            // Creazione dell'immagine
+            await this.repository.createImage({
+                datasetId: datasetId,
+                path: imagePath,
+                description: req.body.description // Assicurati che il body della richiesta contenga la descrizione
+            });
+            
+            res.status(200).json({ message: 'Immagine caricata con successo' });
+
+        } catch (error) {
+            console.error('Errore durante l\'upload dell\'immagine:', error);
+            res.status(500).json({ error: 'Errore durante l\'upload dell\'immagine' });
+        }
+    };
 }
+    
+
 
 
     
