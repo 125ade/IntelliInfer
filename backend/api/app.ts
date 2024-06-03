@@ -47,12 +47,6 @@ syncDb().then(():void=>{console.log("\t--> SYNC BD DONE")})
 //   console.error("Failed to sync database:", err);
 // });
 
-app.set('view engine', 'ejs');
-
-app.get('/', (req, res) => { 
-    res.render('main');
-});
-
 
 // manage job
 try {
