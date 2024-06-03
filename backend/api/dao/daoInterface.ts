@@ -5,4 +5,5 @@ export interface IDao<T> {
     update?(id: number, item2: T): Promise<T | null>;
     delete?(id: number): Promise<boolean>;
     logicallyDelete?(id: number): Promise<Object>;
+    updateItem?(id: number, property: any): Promise<T | null> 
 }

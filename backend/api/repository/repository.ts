@@ -72,7 +72,17 @@ export class Repository implements IRepository {
     
     // questo sarà da inserire in utils e lo importiamo come funzione, non va qui nella repository
     generatePath(name: string) {
-        return name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+        
+        // Rimuove spazi vuoti e caratteri speciali dal nome
+        const sanitizedName = name.replace(/[^a-zA-Z0-9]/g, '');
+
+        // Converte il nome in lowercase e sostituisci gli spazi con trattini
+        const formattedName = sanitizedName.toLowerCase().replace(/\s+/g, '-');
+
+        // Costruisce il percorso con il nome formattato
+        const path = `/path/${formattedName}`;
+
+        return path;
     }
     
     
@@ -181,20 +191,14 @@ export class Repository implements IRepository {
         }
     };
 
-    async updateModelWeights(aiId: any, weights: any ): Promise<Ai | null>  {
+    async updateModelWeights(modelId: number, weights: string ): Promise<Ai | null>  {
         const aiDao = new AiDao();
         const weightsString = String(weights);
     
         // Generate pathWeights
         const path = this.generatePath(weightsString);
     
-        // find the model specified by id
-        const model = await aiDao.findById(aiId);
-        if (model !== null){
-            model.pathweights = path;
-            await model.save();
-        }
-        return model;
+        return aiDao.updateItem(modelId, path);
     }
 }
 
