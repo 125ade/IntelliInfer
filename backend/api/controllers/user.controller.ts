@@ -21,15 +21,23 @@ export default class UserController {
                 error.send(res);
             } else {
                 // In caso di errore generico non previsto
-                console.log(error);
+                //console.log(error);
                 new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
             }
         }
     }
 
+    async datasetListByUserId(req: Request, res: Response): Promise<void> {
+        // try {
+        //     const userId =
+        // }catch (error){
+        //
+        // }
+    }
+
     async findModelById(req: Request, res: Response) {
         try {
-            const modelId: number = Number(req.params.modelId);
+            const modelId: number = Number(req.params.modelId);// todo ai model potrebbe ritornare null è da verificare
             const aiModel = await this.repository.findModel(modelId);
             res.status(200).json(aiModel);
         } catch (error) {
@@ -37,7 +45,7 @@ export default class UserController {
                 error.send(res);
             } else {
                 // In caso di errore generico non previsto
-                console.log(error);
+                //console.log(error);
                 new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
             }
         }

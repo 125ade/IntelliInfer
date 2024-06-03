@@ -12,7 +12,7 @@ import { ExpressAdapter } from "@bull-board/express";
 import { setupLogging } from "./middleware/logger.middleware";
 import { Queue } from "./queues/Queue";
 import { RedisConnection } from "./queues/RedisConnection";
-import { UserRoutes } from "./routes/index.routes";
+import {SystemRoutes, UserRoutes} from "./routes/index.routes";
 import { syncDb } from "./db/dbSync";
 import * as process from "node:process";
 
@@ -108,21 +108,22 @@ app.get('/check/health', (req: Request, res: Response) => {
 });
 
 // Inizializza le rotte
-const userRoutes = new UserRoutes();
-
+const userRoutes : UserRoutes = new UserRoutes();
+const systRoutes: SystemRoutes = new SystemRoutes()
 // Usa le rotte definite nella classe UserRoutes
 app.use('/api', userRoutes.router);
+app.use('/api', systRoutes.router);
 
 // Start the server
 // todo handel log
 app.listen(port, () => {
   if(process.env.NODE_ENV !== 'production') {
-    console.log(`\n\tFor see health of the service: \n\t\t open http://${host}:${port}/check/health \n`);
-    console.log(`\tFor the queue UI: \n\t\t open http://${host}:${port}/admin/queues/queue/${QUEUE_TASK_DOCKER} \n`);
-    console.log(`\tFor the API doc: \n\t\t open http://${host}:${port}/admin/docs \n\n`);
+    console.log(`\n\tFor see health of the service: \n\t\t open http://localhost:${port}/check/health \n`);
+    console.log(`\tFor the queue UI: \n\t\t open http://localhost:${port}/admin/queues/queue/${QUEUE_TASK_DOCKER} \n`);
+    console.log(`\tFor the API doc: \n\t\t open http://localhost:${port}/admin/docs \n\n`);
   }else{
     console.log("\t--> SERVER START")
-    console.log(`\t--> UI Queue Management http://${host}:${port}/admin/queues/queue/${QUEUE_TASK_DOCKER}`);
-    console.log(`\t--> API docs page       http://${host}:${port}/admin/docs `);
+    console.log(`\t--> UI Queue Management http://localhost:${port}/admin/queues/queue/${QUEUE_TASK_DOCKER}`);
+    console.log(`\t--> API docs page       http://localhost:${port}/admin/docs `);
   }
 });

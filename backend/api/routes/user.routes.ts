@@ -1,5 +1,8 @@
 import {Router} from "express";
 import UserController from "../controllers/user.controller";
+import {authMiddleware} from "../middleware/auth.middleware";
+import {UserRole} from "../static";
+
 
 export default class UserRoutes{
     router:Router = Router();
@@ -12,20 +15,20 @@ export default class UserRoutes{
     initRouters(): undefined {
 
         // visualize all available models
-        this.router.get("/model/list", this.userController.modelList.bind(this.userController));
+        this.router.get("/model/list", authMiddleware([UserRole.USER]), this.userController.modelList.bind(this.userController));
         
             
         
         // visualize the model filtered by id
         this.router.get("/model/:modelId", this.userController.findModelById.bind(this.userController));
         
-        /** 
+
         // todo get /dataset/list
         // autenticazione
         // autorizzazione "user"
         this.router.get("/dataset/list",
-            this.userController.TOIMPLEMENT);
-
+            this.userController.datasetListByUserId.bind(this.userController));
+/**
         // todo get /dataset/:datasetId
         // autenticazione
         // autorizzazione "user"

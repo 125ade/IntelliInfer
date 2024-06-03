@@ -1,5 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
 import { SequelizeConnection } from '../db/SequelizeConnection';
+import {UserRole} from "../static";
 
 export default class User extends Model {
 
@@ -35,6 +36,7 @@ User.init(
     },
     email: {
       type: DataTypes.STRING,
+      unique: true,
       allowNull: false,
     },
     token: {
@@ -42,10 +44,10 @@ User.init(
       allowNull: false
     },
     role: {
-      type: DataTypes.ENUM,
-      values: ['user', 'admin', 'syst'],
-      allowNull: false,
-      defaultValue: 'user'
+        type: DataTypes.ENUM,
+        values: Object.values(UserRole),
+        allowNull: false,
+        defaultValue: UserRole.USER
     }
   },
   {

@@ -7,9 +7,25 @@
   },
   "servers": [
     {
-      "url": "http://localhost:3000"
+      "url": "http://localhost:3000",
+      "description": "Local Server"
     }
   ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "examples": {
+      "BearerAuth": {
+        "summary": "Example JWT",
+        "value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1hcmNvLmNjQG1pby5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTcxNzQ0NDIzNCwibmJmIjozNDM0ODg4NDY4LCJleHAiOjE3MTc1MzA2MzQsImlzcyI6IkludGVsbGlpbmZlckFwaSIsInN1YiI6Im1hcmNvLmNjQG1pby5jb20ifQ.MmLCmJyy9Qnx9BUrA8P5-X8XV5Dzf6IKsJuOvzenSUTD-l172XTAuh_efVanal2KF2gIXJsPHewgkUspZMshUpWhXmD9Jqx9IlBacmZxtWjQr-7I5rLlCWWo-fIR7AsgEzg3cU-hVkGCY_UFNMbyf-s2Se7qKdj3LOsoxId6YdocUrmlkLhrcSOoYVor8ohzBcni5TL9dTiQsQcYrPygWEWesv_tsIZ-a0u-0YVYYzPlCvQTWHrPjvzwVLm7f54zNKEf8W-U9ajTNj-16WDYPd5KZpmbdjix_PlOzIZL9nyhjCx6ALCuuKXb54wf0dpPHFsFNt9tIlXGiJ4v7y3zKQ"
+      }
+    }
+  },
   "paths": {
     "/check/health": {
       "get": {
@@ -36,48 +52,94 @@
       }
     },
     "/api/model/list": {
-    "get": {
-      "summary": "List of AI models",
-      "description": "Returns the list of the available models in the system",
-      "responses": {
-        "200": {
-          "description": "List of the models",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
+      "get": {
+        "summary": "List of AI models",
+        "description": "Returns the list of the available models in the system",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "passwordAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of the models",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "Nome esempio"
+                      },
+                      "description": {
+                        "type": "string",
+                        "example": "Descrizione esempio"
+                      },
+                      "pathweights": {
+                        "type": "string",
+                        "example": "Percorso pesi esempio"
+                      },
+                      "architecture": {
+                        "type": "string",
+                        "example": "yolo"
+                      },
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-06-02T13:11:03.958Z"
+                      },
+                      "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-06-02T13:11:03.958Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/generate/token/{userId}": {
+      "get": {
+        "summary": "Generate Token",
+        "description": "Generates a token for the specified user",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 123
+            },
+            "description": "ID of the user"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Token generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
                   "type": "object",
                   "properties": {
-                    "id": {
-                      "type": "integer",
-                      "example": 1
-                    },
-                    "name": {
+                    "token": {
                       "type": "string",
-                      "example": "Nome esempio"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "Descrizione esempio"
-                    },
-                    "pathweights": {
-                      "type": "string",
-                      "example": "Percorso pesi esempio"
-                    },
-                    "architecture": {
-                      "type": "string",
-                      "example": "yolo"
-                    },
-                    "created_at": {
-                      "type": "string",
-                      "format": "date-time",
-                      "example": "2024-06-02T13:11:03.958Z"
-                    },
-                    "updated_at": {
-                      "type": "string",
-                      "format": "date-time",
-                      "example": "2024-06-02T13:11:03.958Z"
+                      "example": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1hcmNvLmNjQG1pby5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTcxNzQ0NDIzNCwibmJmIjozNDM0ODg4NDY4LCJleHAiOjE3MTc1MzA2MzQsImlzcyI6IkludGVsbGlpbmZlckFwaSIsInN1YiI6Im1hcmNvLmNjQG1pby5jb20ifQ.MmLCmJyy9Qnx9BUrA8P5-X8XV5Dzf6IKsJuOvzenSUTD-l172XTAuh_efVanal2KF2gIXJsPHewgkUspZMshUpWhXmD9Jqx9IlBacmZxtWjQr-7I5rLlCWWo-fIR7AsgEzg3cU-hVkGCY_UFNMbyf-s2Se7qKdj3LOsoxId6YdocUrmlkLhrcSOoYVor8ohzBcni5TL9dTiQsQcYrPygWEWesv_tsIZ-a0u-0YVYYzPlCvQTWHrPjvzwVLm7f54zNKEf8W-U9ajTNj-16WDYPd5KZpmbdjix_PlOzIZL9nyhjCx6ALCuuKXb54wf0dpPHFsFNt9tIlXGiJ4v7y3zKQ"
+
                     }
                   }
                 }
@@ -88,5 +150,5 @@
       }
     }
   }
-  }
 }
+

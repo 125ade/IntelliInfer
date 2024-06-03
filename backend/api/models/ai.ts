@@ -1,5 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
 import { SequelizeConnection } from '../db/SequelizeConnection';
+import {AiArchitecture} from "../static";
 
 export default class Ai extends Model {
 
@@ -37,9 +38,9 @@ Ai.init(
     },
     architecture: {
       type: DataTypes.ENUM,
-      values: ['rcnn', 'test', 'yolo'],
+      values: Object.values(AiArchitecture),
       allowNull: false,
-      defaultValue: 'yolo'
+      defaultValue: AiArchitecture.YOLO
     }
   },
   {

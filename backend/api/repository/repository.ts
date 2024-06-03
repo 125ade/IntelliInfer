@@ -13,6 +13,8 @@ import { SequelizeConnection } from '../db/SequelizeConnection';
 import { ConcreteErrorCreator } from '../factory/ErrorCreator';
 import * as fs from 'fs';
 import Dataset from '../models/dataset';
+import User from "../models/user";
+import UserDAO from "../dao/userDao";
 
 
 
@@ -33,6 +35,11 @@ export interface IRepository {
 export class Repository implements IRepository {
 
     constructor() {};
+
+    public async getUserById(userId: number): Promise<User | null> {
+        const user: UserDao = new UserDAO();
+        return user.findById(userId);
+    }
 
     // method to create tags associated with a specific dataset
     public async createTags(tags: string[], datasetId: number): Promise<Tag[]> {

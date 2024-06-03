@@ -20,6 +20,10 @@ export default class UserDAO implements IDao<User> {
     async findById(id: number): Promise<User | null> {
         return await User.findByPk(id);
     }
+
+    async findByEmail(email: string): Promise<User | null> {
+        return await User.findOne({ where: { email } });
+    }
     
     // I suppose the admin could create and delete users (??)
     async delete(id: number): Promise<boolean> {
