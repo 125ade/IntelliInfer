@@ -1,9 +1,5 @@
 import {Router} from "express";
 import AdminController from "../controllers/admin.controller";
-import { body, param } from 'express-validator';
-
-const tokenControl = () => body('token').notEmpty();
-const idControl = (id: string) => param(id).isInt();
 
 export default class AdminRoutes{
     router:Router = Router();

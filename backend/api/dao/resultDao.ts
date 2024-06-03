@@ -17,12 +17,11 @@ export default class ResultDAO implements IDao<Result> {
     }
 
     async findById(id: number): Promise<Result | null> {
-        try {
             const result = await Result.findByPk(id);
+            if(!result){
+                throw new ConcreteErrorCreator().createNotFoundError().setAbsentResults();
+            }
             return result;
-        } catch {
-            throw new ConcreteErrorCreator().createNotFoundError().setAbsentResults();
-        }
     }
     
     // se vogliamo introdurre l'opzione di scegliere se rendere un dataset pubblico o privato, e l'utende sceglie di rendere il proprio dataset

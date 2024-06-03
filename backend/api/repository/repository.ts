@@ -31,13 +31,15 @@ export interface IRepository {
     findResult(resultId: number): Promise<Result | null>;
     createDatasetWithTags(data: any): Promise<Dataset> ;
     logicallyDelete(datasetId: number): Promise<Object | null>
+    updateModelWeights(modelId: number, weights: string ): Promise<Ai | null> 
 }
 
 
 export class Repository implements IRepository {
 
     constructor() {};
-
+    
+    // used into the route to create a dataset
     async createDatasetWithTags(data: any): Promise<Dataset>  {
         const datasetDao = new DatasetDao();
         const tagDao = new TagDao();
@@ -70,7 +72,8 @@ export class Repository implements IRepository {
         return newDataset;
     }
     
-    // questo sarà da inserire in utils e lo importiamo come funzione, non va qui nella repository
+    
+    // NB: to move into utils.ts 
     generatePath(name: string) {
         
         // Rimuove spazi vuoti e caratteri speciali dal nome
@@ -83,6 +86,45 @@ export class Repository implements IRepository {
         const path = `/path/${formattedName}`;
 
         return path;
+    }
+
+    // lists all available Ai models
+    async listAiModels(): Promise<Ai[] | null>{
+        const aiDao = new AiDao();
+        return aiDao.findAll();
+    }
+
+    // find an Ai model by id
+    async findModel(modelId: number): Promise<Ai | null>{
+        const aiDao = new AiDao();
+        return aiDao.findById(modelId);
+    }
+
+    // find an inference result by id
+    async findResult(resultId: number): Promise<Result | null>{
+        const resultDao = new ResultDao();
+        return resultDao.findById(resultId);
+    }
+
+    // Given the datasetId, deletes logically the dataset
+    async logicallyDelete(datasetId: number): Promise<Object | null> {
+        try{
+            const datasetDao = new DatasetDao();
+            return datasetDao.logicallyDelete(datasetId);
+        } catch {
+            throw new ConcreteErrorCreator().createServerError().setFailedUpdatingItem();
+        }
+    };
+    
+    // takes an ai model identified by its id and update its property pathWeigths with the path of the new weights
+    async updateModelWeights(modelId: number, weights: string ): Promise<Ai | null>  {
+        const aiDao = new AiDao();
+        const weightsString = String(weights);
+    
+        // Generate pathWeights
+        const path = this.generatePath(weightsString);
+    
+        return aiDao.updateItem(modelId, path);
     }
     
     
@@ -163,43 +205,6 @@ export class Repository implements IRepository {
     }
     */
     
-    // lists all available Ai models
-    async listAiModels(): Promise<Ai[] | null>{
-        const aiDao = new AiDao();
-        return aiDao.findAll();
-    }
-
-    // find an Ai model by id
-    async findModel(modelId: number): Promise<Ai | null>{
-        const aiDao = new AiDao();
-        return aiDao.findById(modelId);
-    }
-
-    // find an inference result by id
-    async findResult(resultId: number): Promise<Result | null>{
-        const resultDao = new ResultDao();
-        return resultDao.findById(resultId);
-    }
-
-    // Given the datasetId, deletes logically the dataset
-    async logicallyDelete(datasetId: number): Promise<Object | null> {
-        try{
-            const datasetDao = new DatasetDao();
-            return datasetDao.logicallyDelete(datasetId);
-        } catch {
-            throw new ConcreteErrorCreator().createServerError().setFailedUpdatingItem();
-        }
-    };
-
-    async updateModelWeights(modelId: number, weights: string ): Promise<Ai | null>  {
-        const aiDao = new AiDao();
-        const weightsString = String(weights);
-    
-        // Generate pathWeights
-        const path = this.generatePath(weightsString);
-    
-        return aiDao.updateItem(modelId, path);
-    }
 }
 
 
