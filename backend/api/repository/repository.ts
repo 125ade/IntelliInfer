@@ -180,13 +180,24 @@ export class Repository implements IRepository {
             throw new ConcreteErrorCreator().createServerError().setFailedUpdatingItem();
         }
     };
-    
 
+    async updateModelWeights(aiId: any, weights: any ): Promise<Ai | null>  {
+        const aiDao = new AiDao();
+        const weightsString = String(weights);
     
+        // Generate pathWeights
+        const path = this.generatePath(weightsString);
     
-
+        // find the model specified by id
+        const model = await aiDao.findById(aiId);
+        if (model !== null){
+            model.pathweights = path;
+            await model.save();
+        }
+        return model;
+    }
 }
-// todo: methods to update model weights
+
 
 
 

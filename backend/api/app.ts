@@ -15,6 +15,7 @@ import { RedisConnection } from "./queues/RedisConnection";
 import { UserRoutes } from "./routes/index.routes";
 import { syncDb } from "./db/dbSync";
 import * as process from "node:process";
+import AdminRoutes from './routes/admin.routes';
 
 
 // api variable
@@ -109,9 +110,11 @@ app.get('/check/health', (req: Request, res: Response) => {
 
 // Inizializza le rotte
 const userRoutes = new UserRoutes();
+const adminRoutes = new AdminRoutes();
 
 // Usa le rotte definite nella classe UserRoutes
 app.use('/api', userRoutes.router);
+app.use('/admin', adminRoutes.router);
 
 // Start the server
 // todo handel log

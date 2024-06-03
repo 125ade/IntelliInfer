@@ -19,7 +19,7 @@ export default class UserController {
             if (error instanceof ErrorCode) {
                 error.send(res);
             } else {
-                console.log(error);
+                // console.log(error);
                 new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
             }
         }
@@ -34,7 +34,7 @@ export default class UserController {
             if (error instanceof ErrorCode) {
                 error.send(res);
             } else {
-                console.log(error);
+                // console.log(error);
                 new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
             }
         }
@@ -49,7 +49,7 @@ export default class UserController {
             if (error instanceof ErrorCode) {
                 error.send(res);
             } else {
-                console.log(error);
+                // console.log(error);
                 new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
             }
         }
@@ -63,7 +63,7 @@ export default class UserController {
             if (error instanceof ErrorCode) {
                 error.send(res);
             } else {
-                console.log(error);
+                // console.log(error);
                 new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
             }
         }
@@ -77,7 +77,7 @@ export default class UserController {
             if (error instanceof ErrorCode) {
                 error.send(res);
             } else {
-                console.log(error);
+                // console.log(error);
                 new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
             }
         }
