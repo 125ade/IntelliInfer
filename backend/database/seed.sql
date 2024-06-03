@@ -29,6 +29,7 @@ CREATE TABLE datasets (
     count_elements INTEGER NOT NULL,
     count_classes INTEGER NOT NULL,
     description VARCHAR(255),
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE, -- Add the new field
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP
@@ -121,6 +122,12 @@ REFERENCES ai(id);
 -- Inserimento di un elemento nella tabella ai
 INSERT INTO ai (name, description, pathweights, architecture) 
 VALUES ('Nome esempio', 'Descrizione esempio', 'Percorso pesi esempio', 'yolo');
+
+-- Insert seed data into datasets
+INSERT INTO datasets (name, path, count_elements, count_classes, description, is_deleted) VALUES
+('Ships', '/path/to/ships', 100, 5, 'Dataset of Sar images for ships detection', FALSE),
+('Dogs', '/path/to/dogs', 200, 10, 'Dataset of images for dogs detection', FALSE),
+('Cats', '/path/to/cats', 150, 8, 'Dataset of images for cats detection', FALSE);
 
 
 

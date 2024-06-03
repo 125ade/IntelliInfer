@@ -14,6 +14,7 @@ import Result from '../models/result';
 // import * as fs from 'fs';
 import Dataset from '../models/dataset';
 import DatasetTags from '../models/datasettag';
+import { ConcreteErrorCreator } from '../factory/ErrorCreator';
 
 
 
@@ -29,6 +30,7 @@ export interface IRepository {
     findModel(modelId: number): Promise<Ai | null>;
     findResult(resultId: number): Promise<Result | null>;
     createDatasetWithTags(data: any): Promise<Dataset> ;
+    logicallyDelete(datasetId: number): Promise<Object | null>
 }
 
 
@@ -74,9 +76,6 @@ export class Repository implements IRepository {
     }
     
     
-    
-
-  
     /** 
     // Ho provato a creare un metodo che verrà usato nella rotta per l'upload di un file nel dataset
     // a seconda che il file sia un'immagine o un file zip richiama le funzioni di utilità per verificare
@@ -171,17 +170,17 @@ export class Repository implements IRepository {
         const resultDao = new ResultDao();
         return resultDao.findById(resultId);
     }
-    
-    /*
-    async getDatasetUserList(userId: number): Promise<Object | null> {
-        try {
+
+    // Given the datasetId, deletes logically the dataset
+    async logicallyDelete(datasetId: number): Promise<Object | null> {
+        try{
             const datasetDao = new DatasetDao();
-            return await datasetDao.findById(userId);
-        }catch {
-            throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
+            return datasetDao.logicallyDelete(datasetId);
+        } catch {
+            throw new ConcreteErrorCreator().createServerError().setFailedUpdatingItem();
         }
     };
-    */
+    
 
     
     
