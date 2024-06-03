@@ -4,6 +4,29 @@
 
 # IntelliInfer
 
+## Table of Contents
+- [Introduction](#introduction)
+- [Project Goal](#projectgoal)
+- [Design](#design)
+  - [Rotte](#rotte)
+  - [Uses Case Diagram](#usescasediagram)
+- [Database](#database)
+  - [ER Schema](#erschema)
+  - [Database Schema](#databaseschema)
+  - [Sequelize](#sequelize)
+- [Patterns](#patterns)
+  - [Singleton Pattern](#singletonpattern)
+  - [DAO Pattern](#daopattern)
+  - [Repository Pattern](#repositorypattern)
+  - [Factory Pattern](#factorypattern)
+- [Proposed Neural Network models](#proposedneuralnetworkmodels)
+  - [Overview](#overview)
+  - [Yolov5](#yolov5)
+  - [Faster RCNN](#fasterrcnn)
+- [Authors](#authors)
+- [License](#license)
+
+# Introdution
 The IntelliInfer project, developed for the Advanced Programming exam at the Polytechnic University of the Marche (UNIVPM) during the academic year 2023-2024, represents an advanced API for managing datasets and executing inferences based on artificial intelligence models. This project was conceived to facilitate interaction with data and leverage the power of artificial intelligence to extract meaningful information from it. It was developed during the Master's degree program in Computer Engineering and Automation.
 
 
@@ -77,7 +100,7 @@ Through it we manage and save data relating to users, datasets and related image
   <img src="documents/DatabaseSchema.jpg" alt="Database Schema" style="max-width: 256 px; height: auto;">
 </div>
 
-### Sequelize
+## Sequelize
 Sequelize is an ORM (Object-Relational Mapping) for Node.js used to facilitate the management of CRUD operations and the tables definition. We define models for each table in the database and use Sequelize as an high level interface to interact with PostgreSQL.
 
 In Sequelize, database tables are represented by models. Each model is a class that maps to a specific table in the database, and contains table attributes, data types, validations, and relationships with other tables.
@@ -149,5 +172,15 @@ Also the Faster RCNN (Region-based Convolutional Neural Network) is a deep learn
 </div>
 
 To implement inference on this architecture in our project, we relied on the resources found in the following GitHub repository: https://github.com/litcoderr/faster-rcnn-inference/blob/main/docker/Dockerfile
+
+## Authors
+This project is developed and maintained by the following authors:
+
+- **Zazzarini Micol** - [GitHub Profile](https://github.com/username)
+- **Author Name** - *Role/Contribution* - [GitHub Profile](https://github.com/MicolZazzarini)
+- **Author Name** - *Role/Contribution* - [GitHub Profile](https://github.com/125ade)
+
+## License
+This project is licensed under the [MIT License](LICENSE) - consulta il file [LICENSE](LICENSE) per ulteriori dettagli.
 
 
