@@ -125,9 +125,9 @@ VALUES ('Yolov5', 'Yolov5 neural network for detection tasks', '/primo/path/esem
 
 -- Insert seed data into datasets
 INSERT INTO datasets (name, path, count_elements, count_classes, description, is_deleted) VALUES
-('Ships', '/path/to/ships', 100, 5, 'Dataset of Sar images for ships detection', FALSE),
-('Dogs', '/path/to/dogs', 200, 10, 'Dataset of images for dogs detection', FALSE),
-('Cats', '/path/to/cats', 150, 8, 'Dataset of images for cats detection', FALSE);
+('Ships', '/ships', 100, 5, 'Dataset of Sar images for ships detection', FALSE),
+('Dogs', '/dogs', 200, 10, 'Dataset of images for dogs detection', FALSE),
+('Cats', '/cats', 150, 8, 'Dataset of images for cats detection', FALSE);
 
 
 

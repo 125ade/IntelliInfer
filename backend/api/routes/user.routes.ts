@@ -1,24 +1,44 @@
 import {Router} from "express";
 import UserController from "../controllers/user.controller";
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+import Dataset from "../models/dataset";
 
 
-
-// Configura multer per gestire l'upload dei file
+/*
+// Setup Multer to save directly to Docker volume
 const storage = multer.diskStorage({
-    destination: async (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
-        // Definisco ora una destinazione temporanea /uploads, la destinazione vera la definisco nel repository
-        cb(null, '../uploads/'); 
+    destination: '/app/media', // This is where the images will be saved in the Docker volume
+    filename: (req, file, cb) => {
+      cb(null, Date.now() + '-' + file.originalname);
+    }
+  });
+*/
+
+const storage = multer.diskStorage({
+    destination: async (req, file, cb) => {
+        const datasetId = req.params.datasetId;
+        const dataset = await Dataset.findByPk(datasetId);
+        const datasetPath = dataset?.path;
+        if(typeof datasetPath === 'string'){
+           const destination = path.join('/app/media', datasetPath, 'img');
+
+           // Assicurati che la cartella di destinazione esista
+           if (!fs.existsSync(destination)) {
+              fs.mkdirSync(destination, { recursive: true });
+           }
+           cb(null, destination);
+        }
     },
-    filename: (req: Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
-        cb(null, file.originalname);
+    filename: (req, file, cb) => {
+      cb(null, Date.now() + '-' + file.originalname);
     }
 });
+
   
-const upload = multer({
-    storage: storage,
-});
+const upload = multer({ storage });
 
 export default class UserRoutes{
     router:Router = Router();
@@ -53,6 +73,15 @@ export default class UserRoutes{
         // autenticazione
         // autorizzazione "user"
         this.router.post("/dataset/:datasetId/upload", upload.single("image"), this.userController.uploadFile.bind(this.userController));
+
+
+        // Rotta POST per l'upload del file
+        this.router.post('/upload', upload.single('image'), (req: Request, res: Response) => {
+            if (!req.file) {
+                return res.status(400).send('No file uploaded.');
+            }
+            res.send(`File uploaded successfully: ${req.file.filename}`);
+        });
         
         /** 
         // todo get /inference/result/:resultId

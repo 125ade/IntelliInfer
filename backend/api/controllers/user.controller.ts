@@ -96,11 +96,6 @@ export default class UserController {
                 return res.status(400).json({ error: 'Nessun file caricato' });
             }
             
-            const dataset = await this.repository.findDatasetById(Number(datasetId));
-            if (!dataset) {
-                return res.status(404).json({ error: 'Il dataset specificato non esiste' });
-            }
-
             const imagePath = req.file.path;
             
             // Creazione dell'immagine

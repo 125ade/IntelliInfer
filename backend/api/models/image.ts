@@ -33,7 +33,8 @@ Image.init(
       references: {
         model: Dataset,
         key: 'id'
-      }
+      },
+      field: 'dataset_id'
     },
     path: {
       type: DataTypes.STRING(300),
