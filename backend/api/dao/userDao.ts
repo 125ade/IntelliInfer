@@ -18,7 +18,11 @@ export default class UserDAO implements IDao<User> {
     
     // to delete if not used
     async findById(id: number): Promise<User | null> {
-        return await User.findByPk(id);
+        const user = await User.findByPk(id);
+        if(!user){
+            throw new ConcreteErrorCreator().createNotFoundError().setAbstentModel();
+        }
+        return user;
     }
     
     // I suppose the admin could create and delete users (??)
