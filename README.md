@@ -119,6 +119,10 @@ To improve the modularity and testability of the code, the Repository pattern is
 ## Factory Pattern
 The Factory pattern is used to define and manage exceptions. It is a creational pattern that provides an interface for creating objects, allowing subclasses to alter the type of objects that will be created. By using this pattern for exceptions, we centralize the creation logic, making it easier to manage and extend our error handling mechanism. It allows us to create different types of specific exception object in a consistent and centralized manner. 
 
+<div style="text-align: center;">
+  <img src="documents/FactoryPattern.drowio.png" alt="Sequelize model" width="400" height="auto">
+</div>
+
 # Proposed Neural Network Models
 
 ## Overview
