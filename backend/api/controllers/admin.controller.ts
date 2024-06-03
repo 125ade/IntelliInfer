@@ -13,15 +13,11 @@ export default class AdminController {
 
     async updateWeights(req: Request, res: Response): Promise<undefined> {
         try{
-            const { aiId } = req.params;
-            const { weights } = req.body;
+            const aiId: number = Number(req.params.aiId);
+            const weights: string = String(req.body.weights);
 
-            if (weights) {
-                const model = this.repository.updateModelWeights( aiId, weights);
-                res.status(200).json(model);
-            } else {
-                throw new ConcreteErrorCreator().createBadRequestError().setAbsentBody();
-            }
+            const model = await this.repository.updateModelWeights(aiId, weights);
+            res.status(200).json(model);
         } catch (error){
             if (error instanceof ErrorCode) {
                 error.send(res);
