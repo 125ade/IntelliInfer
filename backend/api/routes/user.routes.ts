@@ -35,17 +35,11 @@ export default class UserRoutes{
         // creates a dataset
         this.router.post("/dataset/create", this.userController.createDataset.bind(this.userController));
         
-        /*
-        // todo put /dataset/:datasetId/update
-        // autenticazione
-        // autorizzazione "user"
-        this.router.put("/dataset/:datasetId/update", this.userController.TOIMPLEMENT);
 
-        // todo delete /dataset/:datasetId/delete
-        // autenticazione
-        // autorizzazione "user"
-        this.router.delete("/dataset/:datasetId/delete", this.userController.TOIMPLEMENT);
-
+        // deletes a dataset (logically)
+        this.router.delete("/dataset/:datasetId/delete", this.userController.deleteDatasetById.bind(this.userController));
+        
+        /** 
         // todo post /dataset/:datasetId/upload
         // autenticazione
         // autorizzazione "user"

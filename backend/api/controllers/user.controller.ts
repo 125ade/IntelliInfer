@@ -17,10 +17,8 @@ export default class UserController {
             res.status(200).json(aiModels);
         } catch (error) {
             if (error instanceof ErrorCode) {
-                // Usare il metodo send dell'errore specifico per inviare la risposta
                 error.send(res);
             } else {
-                // In caso di errore generico non previsto
                 console.log(error);
                 new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
             }
@@ -36,7 +34,6 @@ export default class UserController {
             if (error instanceof ErrorCode) {
                 error.send(res);
             } else {
-                // In caso di errore generico non previsto
                 console.log(error);
                 new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
             }
@@ -52,7 +49,6 @@ export default class UserController {
             if (error instanceof ErrorCode) {
                 error.send(res);
             } else {
-                // In caso di errore generico non previsto
                 console.log(error);
                 new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
             }
@@ -67,7 +63,20 @@ export default class UserController {
             if (error instanceof ErrorCode) {
                 error.send(res);
             } else {
-                // In caso di errore generico non previsto
+                console.log(error);
+                new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
+            }
+        }
+    }
+
+    async deleteDatasetById(req: Request, res: Response) {
+        try{
+            const result = await this.repository.logicallyDelete(Number(req.params.datasetId));
+            return res.status(201).json(result);
+        } catch (error) {
+            if (error instanceof ErrorCode) {
+                error.send(res);
+            } else {
                 console.log(error);
                 new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
             }

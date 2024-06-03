@@ -6,6 +6,7 @@ export default class DatasetDao implements IDao<Dataset> {
 
     constructor() {}
     
+    // creates a dataset with informations given by datasetJson
     async create(datasetJson: any): Promise<Dataset> {
         try{
             const dataset = await Dataset.create(datasetJson);
@@ -15,64 +16,60 @@ export default class DatasetDao implements IDao<Dataset> {
         }
     }
     
-    
+    // returns all datasets on database
     async findAll(): Promise<Dataset[] | null> {
         try {
-          const datasets = await Dataset.findAll();
+          const datasets: Dataset[] = await Dataset.findAll({
+            where: {
+              isDeleted: false
+            }
+          });
           return datasets;
         } catch {
             throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
         }
     }
-
-    async findAllByUserId(Id: number): Promise<Dataset[] | ConcreteErrorCreator> {
+    
+    // returns all datasets associated to a specific userId on database
+    async findAllByUserId(userid: number): Promise<Dataset[] | ConcreteErrorCreator> {
         try {
-          return await Dataset.findAll({
-                                                where: {
-                                                    userId: Id
-                                                }
-                                            });
-
+            return await Dataset.findAll({
+                where: {
+                    userId: userid
+                }
+            });
         } catch {
             throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
         }
     }
     
    
-
-    async update?(Id: number, dataset: Dataset): Promise<Dataset | null> {
-        try {
-          
-          const existingDataset = await Dataset.findByPk(Id);
-          if (!existingDataset) {
-            return null;
-          } 
-          await existingDataset.update(dataset);
-          return existingDataset;
-        } catch {
-            throw new ConcreteErrorCreator().createServerError().setFailedUpdatingItem();
-        }
-    }
-
-    // DA AGGIORNARE CON LA FACTORY PER ERRORE
-    async findById(id: number): Promise<Dataset | null> {
-        return await Dataset.findByPk(id);
+    // find a dataset by datasetId
+    async findById(datasetId: number): Promise<Dataset | null> {
+        return await Dataset.findOne({
+            where: {
+              id: datasetId,
+              isDeleted: false
+            }
+          });
     }
     
 
-    async delete(id: number): Promise<boolean> {
-        const dataset = await Dataset.findByPk(id);
-        if (dataset) {
-            await dataset.destroy();
-            return true;
+    // logically deletes a dataset (sets isDeleted to true)
+    // da fare gestione migliore degli errori, vorrei gestire anche la possibilità che il dataset con l'id specificato non sia presente nel db
+    async logicallyDelete(datasetId: number): Promise<Object> {
+        try{
+            return await Dataset.update(
+                { isDeleted: true },
+                {
+                  where: { id: datasetId },
+                  returning: true
+                }
+            );
+        } catch {
+            throw new ConcreteErrorCreator().createNotFoundError().setAbstentDataset();
         }
-        return false;
-    }
-
-    // logically deletes a dataset
-    async logicallyDelete(dataset: Dataset): Promise<Object> {
-        await dataset.set({ isDeleted: true }).save();
-        return { deletedDataset: dataset };
+        
     }
     
 }

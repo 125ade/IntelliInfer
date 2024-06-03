@@ -14,6 +14,7 @@ export default class Dataset extends Model {
   declare countElements: number;
   declare countClasses: number;
   declare description: string | null;
+  declare isDeleted: boolean; 
 
   // Associazioni del modello
   static associate(models: any) {
@@ -63,6 +64,12 @@ Dataset.init(
     description: {
       type: DataTypes.STRING,
       allowNull: true
+    },
+    isDeleted: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+      field: 'is_deleted'
     }
   },
   {
