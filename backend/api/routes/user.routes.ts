@@ -5,6 +5,8 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import Dataset from "../models/dataset";
+import unzipper from 'unzipper';
+
 
 
 /*
@@ -17,6 +19,7 @@ const storage = multer.diskStorage({
   });
 */
 
+/** 
 const storage = multer.diskStorage({
     destination: async (req, file, cb) => {
         const datasetId = req.params.datasetId;
@@ -33,11 +36,25 @@ const storage = multer.diskStorage({
         }
     },
     filename: (req, file, cb) => {
-      cb(null, Date.now() + '-' + file.originalname);
+      cb(null, file.originalname);
+    }
+});
+*/
+
+const storage = multer.diskStorage({
+    destination: async (req, file, cb) => {
+        const destination = path.join('/app/media', 'img');
+        if (!fs.existsSync(destination)) {
+              fs.mkdirSync(destination, { recursive: true });
+        }
+        cb(null, destination);
+    },
+    filename: (req, file, cb) => {
+      cb(null, file.originalname);
     }
 });
 
-  
+
 const upload = multer({ storage });
 
 export default class UserRoutes{
@@ -69,19 +86,18 @@ export default class UserRoutes{
         // finds an inference result given its id
         this.router.get("/inference/state/:resultId", this.userController.findResultById.bind(this.userController));
 
-        // todo post /dataset/:datasetId/upload
-        // autenticazione
-        // autorizzazione "user"
-        this.router.post("/dataset/:datasetId/upload", upload.single("image"), this.userController.uploadFile.bind(this.userController));
 
+        // esegue l'upload di un'immagine
+        this.router.post("/dataset/:datasetId/upload/image", upload.single("image"), this.userController.uploadImage.bind(this.userController));
 
-        // Rotta POST per l'upload del file
-        this.router.post('/upload', upload.single('image'), (req: Request, res: Response) => {
-            if (!req.file) {
-                return res.status(400).send('No file uploaded.');
-            }
-            res.send(`File uploaded successfully: ${req.file.filename}`);
-        });
+        
+        // esegue l'upload di un file zip
+        this.router.post('/dataset/:datasetId/upload/zip', upload.single('zip'), this.userController.uploadZip.bind(this.userController));
+    
+
+        // esegue l'upload di un file( zip o immagine)
+        this.router.post('/dataset/:datasetId/upload/file', upload.single('file'), this.userController.uploadFile.bind(this.userController));
+        
         
         /** 
         // todo get /inference/result/:resultId
