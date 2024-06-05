@@ -6,56 +6,13 @@ import path from 'path';
 import fs from 'fs';
 import Dataset from "../models/dataset";
 import unzipper from 'unzipper';
+import AdmZip, { IZipEntry }  from 'adm-zip';
+import mime from 'mime-types';
 
 
-
-/*
-// Setup Multer to save directly to Docker volume
-const storage = multer.diskStorage({
-    destination: '/app/media', // This is where the images will be saved in the Docker volume
-    filename: (req, file, cb) => {
-      cb(null, Date.now() + '-' + file.originalname);
-    }
-  });
-*/
-
-/** 
-const storage = multer.diskStorage({
-    destination: async (req, file, cb) => {
-        const datasetId = req.params.datasetId;
-        const dataset = await Dataset.findByPk(datasetId);
-        const datasetPath = dataset?.path;
-        if(typeof datasetPath === 'string'){
-           const destination = path.join('/app/media', datasetPath, 'img');
-
-           // Assicurati che la cartella di destinazione esista
-           if (!fs.existsSync(destination)) {
-              fs.mkdirSync(destination, { recursive: true });
-           }
-           cb(null, destination);
-        }
-    },
-    filename: (req, file, cb) => {
-      cb(null, file.originalname);
-    }
-});
-*/
-
-const storage = multer.diskStorage({
-    destination: async (req, file, cb) => {
-        const destination = path.join('/app/media', 'img');
-        if (!fs.existsSync(destination)) {
-              fs.mkdirSync(destination, { recursive: true });
-        }
-        cb(null, destination);
-    },
-    filename: (req, file, cb) => {
-      cb(null, file.originalname);
-    }
-});
-
-
-const upload = multer({ storage });
+// Configura multer per gestire i file caricati
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 export default class UserRoutes{
     router:Router = Router();
@@ -97,6 +54,9 @@ export default class UserRoutes{
 
         // esegue l'upload di un file( zip o immagine)
         this.router.post('/dataset/:datasetId/upload/file', upload.single('file'), this.userController.uploadFile.bind(this.userController));
+
+        
+        
         
         
         /** 
