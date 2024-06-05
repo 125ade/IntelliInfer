@@ -16,7 +16,7 @@ The main goal of IntelliInfer is to provide an API for loading datasets, managin
 - env
 - modificare la chiave privata all'interno di ```secrets```
 - ```bash
-   openssl genrsa -out private_key.pem 2048
+   openssl genrsa -des3 -out test_purpose_private_key.pem 2048
 - ```bash
    openssl rsa -in test_purpose_private_key.pem -pubout -out test_purpose_public_key.pem
 

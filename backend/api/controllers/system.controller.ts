@@ -1,8 +1,9 @@
-import {Response, Request} from "express";
+import {Response, Request, NextFunction} from "express";
 import { Repository } from '../repository/repository';
 import  { ErrorCode } from "../factory/ErrorCode";
 import { ConcreteErrorCreator } from "../factory/ErrorCreator";
 import {generateToken} from "../token";
+import User from "../models/user";
 
 export default class SystemController {
 
@@ -16,21 +17,33 @@ export default class SystemController {
         try {
             const userId: number = Number(req.params.userId);
             if (isNaN(userId)) {
-                res.status(400).json({ error: 'Invalid user ID' });
-                return;
+                new ConcreteErrorCreator().createBadRequestError().setNoUserId().send(res)
             }
 
-            const user = await this.repository.getUserById(userId);
-            if (!user) {
-                res.status(404).json({ error: 'User not found' });
-                return;
+            const user: User | null = await this.repository.getUserById(userId);
+            if (user !== null) {
+                const token = generateToken(user);
+                res.status(200).json({ token });
+            }else{
+                new ConcreteErrorCreator().createNotFoundError().setNoUser().send(res)
             }
 
-            const token = generateToken(user);
-            res.status(200).json({ token });
+
         } catch (error) {
-            res.status(500).json({ error: 'Internal server error' });
+            new ConcreteErrorCreator().createServerError().setFailedGenToken().send(res)
         }
+    }
+
+    async startInference(req: Request, res: Response, next: NextFunction) {
+
+    }
+
+    async checkStatusInference(req: Request, res: Response, next: NextFunction) {
+
+    }
+
+    async getInfernceResoult(req: Request, res: Response, next: NextFunction) {
+
     }
 
 }

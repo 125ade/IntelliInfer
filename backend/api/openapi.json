@@ -18,12 +18,6 @@
         "scheme": "bearer",
         "bearerFormat": "JWT"
       }
-    },
-    "examples": {
-      "BearerAuth": {
-        "summary": "Example JWT",
-        "value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1hcmNvLmNjQG1pby5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTcxNzQ0NDIzNCwibmJmIjozNDM0ODg4NDY4LCJleHAiOjE3MTc1MzA2MzQsImlzcyI6IkludGVsbGlpbmZlckFwaSIsInN1YiI6Im1hcmNvLmNjQG1pby5jb20ifQ.MmLCmJyy9Qnx9BUrA8P5-X8XV5Dzf6IKsJuOvzenSUTD-l172XTAuh_efVanal2KF2gIXJsPHewgkUspZMshUpWhXmD9Jqx9IlBacmZxtWjQr-7I5rLlCWWo-fIR7AsgEzg3cU-hVkGCY_UFNMbyf-s2Se7qKdj3LOsoxId6YdocUrmlkLhrcSOoYVor8ohzBcni5TL9dTiQsQcYrPygWEWesv_tsIZ-a0u-0YVYYzPlCvQTWHrPjvzwVLm7f54zNKEf8W-U9ajTNj-16WDYPd5KZpmbdjix_PlOzIZL9nyhjCx6ALCuuKXb54wf0dpPHFsFNt9tIlXGiJ4v7y3zKQ"
-      }
     }
   },
   "paths": {
@@ -58,9 +52,6 @@
         "security": [
           {
             "bearerAuth": []
-          },
-          {
-            "passwordAuth": []
           }
         ],
         "responses": {

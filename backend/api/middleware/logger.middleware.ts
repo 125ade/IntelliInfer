@@ -3,6 +3,7 @@ import path from 'path';
 import morgan from 'morgan';
 import { Express, Request, Response, NextFunction } from 'express';
 import * as rfs from 'rotating-file-stream';
+import * as process from "node:process";
 
 require('dotenv').config();
 
@@ -22,21 +23,23 @@ fs.existsSync(errorLogDirectory) || fs.mkdirSync(errorLogDirectory);
 const sequelizeLogDirectory :string = path.join(logDirectory, process.env.LOG_SEQUELIZE_DIR || 'sequelize');
 fs.existsSync(sequelizeLogDirectory) || fs.mkdirSync(sequelizeLogDirectory);
 
+const interval_rotation: string = process.env.LOG_INTERVAL_ROTATION || '1d';
+
 // Create a rotating write stream for access logs
 const accessLogStream :rfs.RotatingFileStream = rfs.createStream('access.log', {
-  interval: '1d', // rotate daily
+  interval: interval_rotation,
   path: accessLogDirectory,
 });
 
 // Create a rotating write stream for error logs
 const errorLogStream :rfs.RotatingFileStream = rfs.createStream('error.log', {
-  interval: '1d', // rotate daily
+  interval: interval_rotation,
   path: errorLogDirectory,
 });
 
 // Create a rotating write stream for sequelize logs
 const sequelizeLogStream :rfs.RotatingFileStream = rfs.createStream('sequelize.log', {
-  interval: '1d', // rotate daily
+  interval: interval_rotation,
   path: sequelizeLogDirectory,
 });
 

@@ -1,5 +1,7 @@
 import {Router} from "express";
 import UserController from "../controllers/system.controller";
+import {validateParamIntGreaterThanZero} from "../middleware/validation.middleware";
+
 
 export default class UserRoutes{
     router:Router = Router();
@@ -12,7 +14,10 @@ export default class UserRoutes{
     initRouters(): undefined {
 
         // visualize all available models
-        this.router.get("/generate/token/:userId", this.userController.generateTokenFromUserId.bind(this.userController));
+        this.router.get(
+            "/generate/token/:userId",
+            validateParamIntGreaterThanZero("userId"),
+            this.userController.generateTokenFromUserId.bind(this.userController));
 
 
     }
