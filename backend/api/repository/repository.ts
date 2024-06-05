@@ -17,6 +17,8 @@ import ImageDao from '../dao/imageDao';
 import Dataset from '../models/dataset';
 import DatasetTags from '../models/datasettag';
 import { ConcreteErrorCreator } from '../factory/ErrorCreator';
+import path from 'path';
+import fs, { PathLike } from 'fs';
 
 
 
@@ -32,8 +34,9 @@ export interface IRepository {
     findModel(modelId: number): Promise<Ai | null>;
     findResult(resultId: number): Promise<Result | null>;
     createDatasetWithTags(data: any): Promise<Dataset> ;
-    logicallyDelete(datasetId: number): Promise<Object | null>
-    updateModelWeights(modelId: number, weights: string ): Promise<Ai | null> 
+    logicallyDelete(datasetId: number): Promise<Object | null>;
+    updateModelWeights(modelId: number, weights: string ): Promise<Ai | null>;
+    createDestinationRepo(datasetId: number): Promise<string | Error> ;
 }
 
 
@@ -137,6 +140,23 @@ export class Repository implements IRepository {
     async createImage(data: any): Promise<Image | null> {
         const imageDao = new ImageDao();
         return imageDao.create(data);
+    }
+
+    async createDestinationRepo(datasetId: number): Promise<string | Error> {
+        const datasetDao = new DatasetDao();
+        const dataset = await Dataset.findByPk(datasetId);
+        const datasetPath = dataset?.path;
+        if(typeof datasetPath === 'string'){
+            const destination = path.join('/app/media', datasetPath, 'img');
+    
+            // Assicurati che la cartella di destinazione esista
+            if (!fs.existsSync(destination)) {
+                fs.mkdirSync(destination, { recursive: true });
+            }
+            return destination;
+        } else {
+            return new Error('Dataset path not found');
+        }
     }
     
     
