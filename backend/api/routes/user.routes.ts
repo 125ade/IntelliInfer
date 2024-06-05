@@ -1,13 +1,6 @@
 import {Router} from "express";
 import UserController from "../controllers/user.controller";
-import { Request, Response } from 'express';
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
-import Dataset from "../models/dataset";
-import unzipper from 'unzipper';
-import AdmZip, { IZipEntry }  from 'adm-zip';
-import mime from 'mime-types';
 
 
 // Configura multer per gestire i file caricati

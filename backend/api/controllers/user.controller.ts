@@ -10,6 +10,7 @@ import unzipper from 'unzipper';
 import { checkMimeType } from "../utils/utils";
 import AdmZip, { IZipEntry }  from 'adm-zip';
 import mime from 'mime-types';
+import ImageDao from "../dao/imageDao";
 
 
 export default class UserController {
@@ -44,7 +45,7 @@ export default class UserController {
                 error.send(res);
             } else {
                 // console.log(error);
-                new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
+                throw new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
             }
         }
     }
@@ -59,7 +60,7 @@ export default class UserController {
                 error.send(res);
             } else {
                 // console.log(error);
-                new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
+                throw new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
             }
         }
     }
@@ -73,7 +74,7 @@ export default class UserController {
                 error.send(res);
             } else {
                 // console.log(error);
-                new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
+                throw new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
             }
         }
     }
@@ -87,14 +88,14 @@ export default class UserController {
                 error.send(res);
             } else {
                 // console.log(error);
-                new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
+                throw new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
             }
         }
     }
 
     async uploadImage(req: Request, res: Response) {
         if (!req.file) {
-            return res.status(400).json({ error: 'Nessun file caricato' });
+            return res.status(400).json({ error: 'File must be provided' });
         }
 
         const destination = await this.repository.createDestinationRepo(Number(req.params.datasetId));
@@ -107,49 +108,53 @@ export default class UserController {
                     const filePath = path.join(destination, `${req.file.originalname}`);
                     fs.writeFileSync(filePath, req.file.buffer);
 
+                    const imageDao = new ImageDao;
+                    imageDao.create({
+                        "datasetId": Number(req.params.datasetId),
+                        "path": filePath,
+                        "description": req.body.description
+                      });
+
                     // Invia una risposta di successo
-                    res.send('File caricato e processato con successo.');
+                    res.send('File uploaded successfully.');
+
                 } catch (error) {
-                    res.status(500).send(`Errore nel caricamento del file: ${error}`);
+                    res.status(500).send(`An error occurred while uploading file: ${error}`);
                 }
             } else {
-                res.status(500).send('Il file caricato non è un\'immagine.');
+                res.status(500).send('Error: an image must be provided.');
             }
         };
     }
 
 
 
-async uploadZip (req: Request, res: Response) {
-        if (!req.file) {
-            return res.status(400).send('Nessun file caricato.');
-        }
-    
-        const zip = new AdmZip(req.file.buffer);
-        const zipEntries: IZipEntry[] = zip.getEntries();
-
-        const destination = await this.repository.createDestinationRepo(Number(req.params.datasetId));
-        if( typeof destination === 'string'){
+    async uploadZip(req: Request, res: Response) {
+            if (!req.file) {
+                return res.status(400).json({ error: 'File must be provided' });
+            } else{
         
-            zipEntries.forEach((entry: IZipEntry) => {
-                const entryName = entry.entryName;
-                const entryData = entry.getData();
-                const mimeType = mime.lookup(entryName);
-    
-                if (mimeType && mimeType.startsWith('image/')) {
-                    const filePath = path.join(destination, entryName);
-                    fs.writeFileSync(filePath, entryData);
+            const zip = new AdmZip(req.file.buffer);
+            const zipEntries: IZipEntry[] = zip.getEntries();
+            
+            try{
+                const destination = await this.repository.createDestinationRepo(Number(req.params.datasetId));
+                if(typeof destination === 'string'){
+                await this.repository.processZipEntries(Number(req.params.datasetId),zipEntries, destination);
+                res.send('File uploaded successfully')
                 }
-            });
-    
-            res.send('File caricato e processato con successo.');
-        };
+            } catch(err) {
+                if( err instanceof ErrorCode){
+                    err.send(res);
+                }
+            }
+        }
     };
     
 
     async uploadFile(req: Request, res: Response){
         if (!req.file) {
-            return res.status(400).json({ error: 'Nessun file caricato' });
+            return res.status(400).json({ error: 'File must be provided' });
         }
 
         const destination = await this.repository.createDestinationRepo(Number(req.params.datasetId));
@@ -164,27 +169,21 @@ async uploadZip (req: Request, res: Response) {
                     fs.writeFileSync(filePath, req.file.buffer);
 
                     // Invia una risposta di successo
-                    res.send('File caricato e processato con successo.');
+                    res.send('File uploaded successfully.');
                 } catch (error) {
-                    res.status(500).send(`Errore nel caricamento del file: ${error}`);
+                    res.status(500).send(`Error on uploading file: ${error}`);
                 }
             } else if (mimeType.startsWith('application/zip')) {
-                const zip = new AdmZip(req.file.buffer);
-                const zipEntries: IZipEntry[] = zip.getEntries();
-
-                zipEntries.forEach((entry: IZipEntry) => {
-                    const entryName = entry.entryName;
-                    const entryData = entry.getData();
-                    const mimeType = mime.lookup(entryName);
-        
-                    if (mimeType && mimeType.startsWith('image/')) {
-                        const filePath = path.join(destination, entryName);
-                        fs.writeFileSync(filePath, entryData);
-                    }
-                });
-                res.send('File caricato e processato con successo.');
+                try{
+                    const zip = new AdmZip(req.file.buffer);
+                    const zipEntries: IZipEntry[] = zip.getEntries();
+                    await this.repository.processZipEntries(Number(req.params.datasetId), zipEntries, destination);
+                    res.send('File uploaded successfully.');
+                } catch(error){
+                    res.status(500).send(`Errore on uploading file: ${error}`);
+                }
             } else {
-                res.status(500).send('Il file caricato non è un\'immagine.');
+                res.status(500).send('File format not supported');
             }
         }
     }

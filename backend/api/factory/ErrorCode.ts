@@ -47,10 +47,15 @@ export class ServerError extends ErrorCode {
         return this.set("There was an error connecting to the database.")
     }
 
-    // errore nella connessione al database
+    // errore durante l'upload di un file
     setFailedUploadFile(): ErrorCode {
       return this.set("There was an error uploading the file.")
-  }
+    }
+
+    // errore nella connessione al database
+    setFailedCreationRepo(): ErrorCode {
+      return this.set("Error. Dataset path must be provided")
+    }
 }
 
 /**
