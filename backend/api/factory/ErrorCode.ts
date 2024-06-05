@@ -78,6 +78,10 @@ export class AuthenticationError extends ErrorCode {
     setInvalidToken(): ErrorCode {
         return this.set("Authentication failed. Token is invalid.");
     }
+    // token invalido
+    setNoToken(): ErrorCode {
+        return this.set("Authentication failed. Token is not provided.");
+    }
     
     setNotAdmin(): ErrorCode {
       return this.set("Authentication failed. User is not the admin");

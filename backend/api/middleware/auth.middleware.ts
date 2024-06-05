@@ -1,25 +1,30 @@
 import { Request, Response, NextFunction } from 'express';
 import { ConcreteErrorCreator} from "../factory/ErrorCreator";
 import {decodeToken, ITokenPayload, validateToken} from '../token'
+import {UserRole} from "../static";
 
 
 export const verifyTokenSignature = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    let jwt: string | undefined = req.headers.authorization;
+        let jwt: string | undefined = req.headers.authorization;
 
-    if (!jwt) {
-      next(new ConcreteErrorCreator().createAuthenticationError().setInvalidToken().send(res));
-    }
 
-    if (jwt && jwt.toLowerCase().startsWith('bearer')) {
-      jwt = jwt.slice('bearer'.length).trim();
-      await validateToken(jwt);
-      next();
-    } else {
-      next(new ConcreteErrorCreator().createAuthenticationError().setInvalidToken().send(res));
-    }
+        if (!jwt) {
+          next(new ConcreteErrorCreator().createAuthenticationError().setInvalidToken().send(res));
+
+        }
+
+        if (jwt && jwt.toLowerCase().startsWith('bearer')) {
+          jwt = jwt.slice('bearer'.length).trim();
+          await validateToken(jwt);
+          next();
+        } else {
+          next(new ConcreteErrorCreator().createAuthenticationError().setInvalidSignature().send(res));
+
+        }
   } catch (error: any) {
     next(new ConcreteErrorCreator().createAuthenticationError().setInvalidToken().send(res));
+
   }
 };
 
@@ -31,9 +36,7 @@ export const verifyUserRole =  (allowedAccessTypes: string[]) => {
             const token: string = jwt.slice('bearer'.length).trim()
             const decodedToken: any = decodeToken(token);
 
-            const hasAccessToEndpoint: boolean = allowedAccessTypes.some(
-                (at: string): boolean => decodedToken.role === at
-            );
+            const hasAccessToEndpoint: boolean = allowedAccessTypes.includes(decodedToken.role);
 
             if (hasAccessToEndpoint) {
                 return next();
@@ -66,42 +69,28 @@ export const verifyTokenExpiration =  (req: Request, res: Response, next: NextFu
   }
 };
 
+export const AuthUser = [
+    verifyTokenSignature,
+    verifyTokenExpiration,
+    verifyUserRole([UserRole.USER,]),
+]
 
+export const AuthAdmin = [
+    verifyTokenSignature,
+    verifyTokenExpiration,
+    verifyUserRole([UserRole.ADMIN,]),
+]
 
-export const authorize = (allowedAccessTypes: string[]) => {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      let jwt: string | undefined = req.headers.authorization;
+export const AuthSystem = [
+    verifyTokenSignature,
+    verifyTokenExpiration,
+    verifyUserRole([UserRole.ADMIN,]),
+]
 
-      // verify request has token
-      if (!jwt) {
-        next(new ConcreteErrorCreator().createAuthenticationError().setInvalidToken());
-        //return res.status(401).json({ message: 'Invalid token ' });
-      }
-
-      // remove Bearer if using Bearer Authorization mechanism
-      if (jwt !== undefined && jwt.toLowerCase().startsWith('bearer')) {
-          jwt = jwt.slice('bearer'.length).trim();
-          // verify token hasn't expired yet
-          const decodedToken: ITokenPayload = await validateToken(jwt);
-
-          const hasAccessToEndpoint: boolean = allowedAccessTypes.some(
-              (at: string): boolean => decodedToken.role === at
-          );
-          if (!hasAccessToEndpoint) {
-            next(new ConcreteErrorCreator().createAuthenticationError().setNotRightRole());
-            //return res.status(401).json({message: 'No enough privileges to access endpoint'});
-          }
-
-          next();
-      }
-
-    } catch (error: any) {
-      if (error.name === 'TokenExpiredError') {
-          next(new ConcreteErrorCreator().createAuthenticationError().setTokenExpired());
-      }
-        next(new ConcreteErrorCreator().createAuthenticationError().setFailAuthUser());
-    }
-  };
-};
-
+export const AuthMix= (arrayRole: string[])=> {
+    return [
+        verifyTokenSignature,
+        verifyTokenExpiration,
+        verifyUserRole(arrayRole),
+    ]
+}
