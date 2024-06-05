@@ -4,6 +4,29 @@
 
 # IntelliInfer
 
+## Table of Contents
+- [Introduction](#introduction)
+- [Project Goal](#projectgoal)
+- [Design](#design)
+  - [Rotte](#rotte)
+  - [Uses Case Diagram](#usescasediagram)
+- [Database](#database)
+  - [ER Schema](#erschema)
+  - [Database Schema](#databaseschema)
+  - [Sequelize](#sequelize)
+- [Patterns](#patterns)
+  - [Singleton Pattern](#singletonpattern)
+  - [DAO Pattern](#daopattern)
+  - [Repository Pattern](#repositorypattern)
+  - [Factory Pattern](#factorypattern)
+- [Proposed Neural Network models](#proposedneuralnetworkmodels)
+  - [Overview](#overview)
+  - [Yolov5](#yolov5)
+  - [Faster RCNN](#fasterrcnn)
+- [Authors](#authors)
+- [License](#license)
+
+# Introdution
 The IntelliInfer project, developed for the Advanced Programming exam at the Polytechnic University of the Marche (UNIVPM) during the academic year 2023-2024, represents an advanced API for managing datasets and executing inferences based on artificial intelligence models. This project was conceived to facilitate interaction with data and leverage the power of artificial intelligence to extract meaningful information from it. It was developed during the Master's degree program in Computer Engineering and Automation.
 
 
@@ -87,18 +110,8 @@ Through it we manage and save data relating to users, datasets and related image
   <img src="documents/DatabaseSchema.jpg" alt="Database Schema" style="max-width: 256 px; height: auto;">
 </div>
 
-## Patterns
-### Singleton Pattern
-The Singleton pattern is used to ensure that only one instance of the database connection is created. This helps to efficiently manage connection resources and prevent problems related to managing multiple simultaneous connections. It ensures that all application components use the same database instance, improving consistency and performance.
-
-To do this it uses a private constructor, accessible only via the getInstance() method. When accessed for the first time, the method creates an instance and returns the entity of the object to the client, while in subsequent calls the entity of the already existing object is returned.
-
-<div style="text-align: center;">
-  <img src="documents/SingletonClass.png" alt="Singleton class" width="400" height="auto">
-</div>
-
-### DAO Pattern
-Sequelize is an ORM (Object-Relational Mapping) for Node.js used as DAO (Data Access Object) to facilitate the management of CRUD operations and the tables definition. We define models for each table in the database and use Sequelize as an high level interface to interact with PostgreSQL.
+## Sequelize
+Sequelize is an ORM (Object-Relational Mapping) for Node.js used to facilitate the management of CRUD operations and the tables definition. We define models for each table in the database and use Sequelize as an high level interface to interact with PostgreSQL.
 
 In Sequelize, database tables are represented by models. Each model is a class that maps to a specific table in the database, and contains table attributes, data types, validations, and relationships with other tables.
 
@@ -112,13 +125,35 @@ Sequelize also allows to define relationships between models, such as one-to-man
   <img src="documents/relations.png" alt="Relationships between models" width="400" height="auto">
 </div>
 
-We use it as DAO pattern as it provides methods for performing CRUD operations on models. These methods include findAll, findByPk, create, update, and destroy.
+# Patterns 
+## Singleton Pattern
+The Singleton pattern is used to ensure that only one instance of the database connection is created. This helps to efficiently manage connection resources and prevent problems related to managing multiple simultaneous connections. It ensures that all application components use the same database instance, improving consistency and performance.
 
-### Repository Pattern
-To improve the modularity and testability of the code, the Repository pattern is used in combination with Sequelize. With the Repository you are able to create objects that act as an interface between business logic and data access, and use Sequelize models to perform CRUD operations on the database. It is placed at a higher level than the DAO and on the contrary allows several different DAOs to interact. In fact, in our project it is used not only simple CRUD operations but also for more complex operations that required the use of multiple Sequelize models.
+To do this it uses a private constructor, accessible only via the getInstance() method. When accessed for the first time, the method creates an instance and returns the entity of the object to the client, while in subsequent calls the entity of the already existing object is returned.
+
+<div style="text-align: center;">
+  <img src="documents/SingletonClass.png" alt="Singleton class" width="400" height="auto">
+</div>
+
+## DAO Pattern
+We implemented the Data Access Object (DAO) pattern to manage database operations using Sequelize models. The DAO pattern is a structural pattern that abstracts and encapsulates all access to the data source and provide a consistent API for CRUD (Create, Read, Update, Delete) operations. It is an intermediary between the application's business logic and the database, it isolates the application layer from the persistence layer, making the codebase more modular and easier to maintain, and it promotes code reuse by centralizing data access logic. This results in a more robust, flexible, and scalable application architecture.
+
+In detail, we defined a Dao Interface IDao to define all optional crud operations available for our models, and we defined for each Sequelize model a Dao class implementing the operations according to our needs.
+
+NB: inserire qui il codice tipo di un DAO e l'interfaccia IDao
+
+## Repository Pattern
+To improve the modularity and testability of the code, the Repository pattern is used in combination with DAO pattern. The Repository pattern is placed at an higher level than the Data Access Object and on the contrary allows several different DAOs to interact. We defined a IRepository interface and we implemented the Repository class to define more complex operations that required the use of multiple DAO models. 
 
 <div style="text-align: center;">
   <img src="documents/Repository.png" alt="Repository" width="400" height="auto">
+</div>
+
+## Factory Pattern
+The Factory pattern is used to define and manage exceptions. It is a creational pattern that provides an interface for creating objects, allowing subclasses to alter the type of objects that will be created. By using this pattern for exceptions, we centralize the creation logic, making it easier to manage and extend our error handling mechanism. It allows us to create different types of specific exception object in a consistent and centralized manner. 
+
+<div style="text-align: center;">
+  <img src="documents/FactoryPattern.drawio.png" alt="Sequelize model" width="400" height="auto">
 </div>
 
 # Proposed Neural Network Models
@@ -147,5 +182,14 @@ Also the Faster RCNN (Region-based Convolutional Neural Network) is a deep learn
 </div>
 
 To implement inference on this architecture in our project, we relied on the resources found in the following GitHub repository: https://github.com/litcoderr/faster-rcnn-inference/blob/main/docker/Dockerfile
+
+## Authors
+This project is developed and maintained by the following authors:
+
+- **Zazzarini Micol** - [GitHub Profile](https://github.com/MicolZazzarini)
+- **Fiorani Andrea** - [GitHub Profile](https://github.com/125ade)
+
+## License
+This project is licensed under the [MIT License](LICENSE) - consulta il file [LICENSE](LICENSE) per ulteriori dettagli.
 
 

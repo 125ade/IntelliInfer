@@ -1,15 +1,34 @@
 import {Response, Request} from "express";
-import { validationResult } from 'express-validator';
-import { ConcreteErrorCreator } from '../factory/ErrorCreator';
 import { Repository } from '../repository/repository'
+import { ConcreteErrorCreator } from "../factory/ErrorCreator";
+import { ErrorCode } from "../factory/ErrorCode";
 
 export default class AdminController {
 
-    repository = new Repository();
+    private repository: Repository;
 
-    async updateWeights(req: Request, res: Response): Promise<undefined> {}
+    constructor() {
+        this.repository = new Repository();
+    }
 
-   
+    async updateWeights(req: Request, res: Response): Promise<undefined> {
+        try{
+            const aiId: number = Number(req.params.aiId);
+            const weights: string = String(req.body.weights);
+
+            const model = await this.repository.updateModelWeights(aiId, weights);
+            res.status(200).json(model);
+        } catch (error){
+            if (error instanceof ErrorCode) {
+                error.send(res);
+            } else {
+                console.log(error);
+                new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
+            }
+        }
+    }
+
+   /** 
     async rechargeTokens(req: Request, res: Response): Promise<undefined> {
 
         // ConcreteErrorCreator().createBadRequestError().setMissingToken();
@@ -20,5 +39,6 @@ export default class AdminController {
         promiseResult.then((result) => {return res.json(result)})
                         .catch((err) => {return err.send()});
     }
+    */
 
 }

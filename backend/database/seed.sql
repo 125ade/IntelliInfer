@@ -23,12 +23,13 @@ CREATE TABLE ai (
 -- Creazione della tabella datasets
 CREATE TABLE datasets (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
+    user_id INTEGER, -- ci sarà in seguito da aggiungere il not null
     name VARCHAR(255) NOT NULL,
     path VARCHAR(255) NOT NULL,
     count_elements INTEGER NOT NULL,
     count_classes INTEGER NOT NULL,
     description VARCHAR(255),
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE, -- Add the new field
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP
@@ -127,7 +128,13 @@ VALUES
 
 -- Inserimento di un elemento nella tabella ai
 INSERT INTO ai (name, description, pathweights, architecture) 
-VALUES ('Nome esempio', 'Descrizione esempio', 'Percorso pesi esempio', 'yolo');
+VALUES ('Yolov5', 'Yolov5 neural network for detection tasks', '/primo/path/esempio', 'yolo');
+
+-- Insert seed data into datasets
+INSERT INTO datasets (name, path, count_elements, count_classes, description, is_deleted) VALUES
+('Ships', '/ships', 100, 5, 'Dataset of Sar images for ships detection', FALSE),
+('Dogs', '/dogs', 200, 10, 'Dataset of images for dogs detection', FALSE),
+('Cats', '/cats', 150, 8, 'Dataset of images for cats detection', FALSE);
 
 
 

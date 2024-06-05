@@ -143,6 +143,11 @@ export class BadRequestError extends ErrorCode {
     setAbsentFile(): ErrorCode {
       return this.set("There was an error. An image or zip file must be provided");
     }
+
+    // file da caricare assente 
+    setAbsentBody(): ErrorCode {
+      return this.set("There was an error. Body request must be provided");
+    }
     
     // l'immagine è già stata sottoposta a inferenza
     setInferredImage() {

@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as unzipper from 'unzipper';
+import path from 'path';
 
 // Function to control if a file is an image
 export function isImage(fileName: string): boolean {
@@ -40,6 +41,30 @@ export async function unzipImages(zipFilePath: string): Promise<Buffer[]> {
       })
     });
 }
+
+export function checkMimeType(nameFile: string): string {
+    const extension = nameFile.split('.').pop()?.toLowerCase();
+
+    if (!extension) {
+        return "Estensione del file non valida.";
+    }
+
+    switch (extension) {
+        case "jpg":
+        case "jpeg":
+        case "png":
+        case "gif":
+            return "img";
+        case "zip":
+            return "zip";
+        default:
+            return "Other";
+    }
+}
+
+
+
+ 
 
 
 

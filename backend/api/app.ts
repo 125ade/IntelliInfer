@@ -15,6 +15,8 @@ import { RedisConnection } from "./queues/RedisConnection";
 import {SystemRoutes, UserRoutes} from "./routes/index.routes";
 import { syncDb } from "./db/dbSync";
 import * as process from "node:process";
+import AdminRoutes from './routes/admin.routes';
+
 import {AuthUser, verifyTokenExpiration, verifyTokenSignature, verifyUserRole} from "./middleware/auth.middleware";
 import {UserRole} from "./static";
 import {handleRouteNotFound} from "./middleware/route.middleware";
@@ -42,9 +44,6 @@ setupLogging(app)
 
 // sync db
 syncDb().then(():void=>{console.log("\t--> SYNC BD DONE")})
-
-
-
 
 
 
@@ -106,8 +105,11 @@ try {
 // Inizializza le rotte
 const userRoutes : UserRoutes = new UserRoutes();
 const systRoutes: SystemRoutes = new SystemRoutes()
+const adminRoutes = new AdminRoutes();
+
 // Usa le rotte definite nella classe UserRoutes
 app.use('/api', userRoutes.router);
+app.use('/admin', adminRoutes.router);
 app.use('/api', systRoutes.router);
 
 

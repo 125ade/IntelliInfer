@@ -11,24 +11,30 @@ import Result from '../models/result';
 import { isImage, unzipImages } from '../utils/utils'; // Importa le funzioni di utilità
 import { SequelizeConnection } from '../db/SequelizeConnection';
 import { ConcreteErrorCreator } from '../factory/ErrorCreator';
-import * as fs from 'fs';
+
 import Dataset from '../models/dataset';
 import User from "../models/user";
-import UserDAO from "../dao/userDao";
+import DatasetTags from '../models/datasettag';
+import path from 'path';
+import fs, { PathLike } from 'fs';
 
 
 
 export interface IRepository {
-    createTags(tags: string[], datasetId: number): Promise<Tag[]>;
-    createDataset(datasetJson: any): Promise<Object>;
-    uploadFile(datasetId: number, filePath: string): Promise<Image[]>;
-    updateUserTokenByCost(userId: number, cost: number): Promise<void>;
-    checkUserToken(userId: number, amount: number): void;
-    updateUserToken(userId: number, token: number): Promise<Object>;
-    getDatasetUserList(userId: number): Promise<Object | null>;
+    // createTags(tags: string[], datasetId: number): Promise<Tag[]>;
+    // createDataset(datasetJson: any): Promise<Object>;
+    // uploadFile(datasetId: number, filePath: string): Promise<Image[]>;
+    // updateUserTokenByCost(userId: number, cost: number): Promise<void>;
+    // checkUserToken(userId: number, amount: number): void;
+    // updateUserToken(userId: number, token: number): Promise<Object>;
+    // getDatasetUserList(userId: number): Promise<Object | null>;
     listAiModels(): Promise<Ai[] | null>;
     findModel(modelId: number): Promise<Ai | null>;
     findResult(resultId: number): Promise<Result | null>;
+    createDatasetWithTags(data: any): Promise<Dataset> ;
+    logicallyDelete(datasetId: number): Promise<Object | null>;
+    updateModelWeights(modelId: number, weights: string ): Promise<Ai | null>;
+    createDestinationRepo(datasetId: number): Promise<string | Error> ;
 }
 
 
@@ -37,7 +43,7 @@ export class Repository implements IRepository {
     constructor() {};
 
     public async getUserById(userId: number): Promise<User | null> {
-        const user: UserDao = new UserDAO();
+        const user: UserDao = new UserDao();
         return user.findById(userId);
     }
 
@@ -50,38 +56,123 @@ export class Repository implements IRepository {
         return createdTags;
     }
 
-    // funzione da ricontrollare
-    public async createDataset(datasetJson: any): Promise<{ dataset: Dataset, tags: Tag[] }> {
-        try {
-          // quando passo il json con il dataset passo anche il tag o i tags che voglio associargli
-          let tags = datasetJson.tags;
-    
-          // set creation and update date
-          const now = new Date();
-          datasetJson.createdAt = now;
-          datasetJson.updatedAt = now;
-    
-          // add user id
-          //datasetJson.userId = this.user.id;
-    
-          // Crea il dataset nel database
-          const datasetDao = new DatasetDao();
-          const dataset = await datasetDao.create(datasetJson);
-    
-          // Crea i tag, rimuovendo i duplicati
-          const uniqueTags: string[] = [...new Set(tags as string[])];
-          const createdTags = await this.createTags(uniqueTags, dataset.id);
-          
-          // associa i tags al dataset
-          createdTags.forEach( tag => { dataset.addTag(tag)});
-    
-          return { dataset: dataset, tags: createdTags };
+    // used into the route to create a dataset
+    async createDatasetWithTags(data: any): Promise<Dataset>  {
+        const datasetDao = new DatasetDao();
+        const tagDao = new TagDao();
+
+        const { name, description, tags } = data; // quando avremo userid ci sarà anche quello
+
+        // Generate the path
+        const path = this.generatePath(name);
+
+        // Create the dataset
+        const newDataset = await datasetDao.create({
+          name,
+          description,
+          path,
+          countElements: 0, // Set to 0 or a default value, adjust as needed
+          countClasses: tags.length,
+          // userId,
+        });
+
+        // Associate tags with the dataset
+        for (const tagName of tags) {
+            const tagInstance = await tagDao.create({ name: tagName });
+            // Crea un'istanza della tabella di associazione DatasetTags
+            await DatasetTags.create({
+                datasetId: newDataset.id,
+                tagId: tagInstance.name
+            });
+          }
+
+        return newDataset;
+    }
+
+
+    // NB: to move into utils.ts
+    generatePath(name: string) {
+
+        // Rimuove spazi vuoti e caratteri speciali dal nome
+        const sanitizedName = name.replace(/[^a-zA-Z0-9]/g, '');
+
+        // Converte il nome in lowercase e sostituisci gli spazi con trattini
+        const formattedName = sanitizedName.toLowerCase().replace(/\s+/g, '-');
+
+        // Costruisce il percorso con il nome formattato
+        const path = `/path/${formattedName}`;
+
+        return path;
+    }
+
+    // lists all available Ai models
+    async listAiModels(): Promise<Ai[] | null>{
+        const aiDao = new AiDao();
+        return aiDao.findAll();
+    }
+
+    // find an Ai model by id
+    async findModel(modelId: number): Promise<Ai | null>{
+        const aiDao = new AiDao();
+        return aiDao.findById(modelId);
+    }
+
+    // find an inference result by id
+    async findResult(resultId: number): Promise<Result | null>{
+        const resultDao = new ResultDao();
+        return resultDao.findById(resultId);
+    }
+
+    // Given the datasetId, deletes logically the dataset
+    async logicallyDelete(datasetId: number): Promise<Object | null> {
+        try{
+            const datasetDao = new DatasetDao();
+            return datasetDao.logicallyDelete(datasetId);
         } catch {
-            throw new ConcreteErrorCreator().createServerError().setFailedCreationItem();
+            throw new ConcreteErrorCreator().createServerError().setFailedUpdatingItem();
+        }
+    };
+
+    // takes an ai model identified by its id and update its property pathWeigths with the path of the new weights
+    async updateModelWeights(modelId: number, weights: string ): Promise<Ai | null>  {
+        const aiDao = new AiDao();
+        const weightsString = String(weights);
+
+        // Generate pathWeights
+        const path = this.generatePath(weightsString);
+
+        return aiDao.updateItem(modelId, path);
+    }
+
+    async findDatasetById(datasetId: number): Promise<Dataset | null> {
+        const datasetDao = new DatasetDao();
+        return datasetDao.findById(datasetId);
+    }
+
+    async createImage(data: any): Promise<Image | null> {
+        const imageDao = new ImageDao();
+        return imageDao.create(data);
+    }
+
+    async createDestinationRepo(datasetId: number): Promise<string | Error> {
+        const datasetDao = new DatasetDao();
+        const dataset = await Dataset.findByPk(datasetId);
+        const datasetPath = dataset?.path;
+        if(typeof datasetPath === 'string'){
+            const destination = path.join('/app/media', datasetPath, 'img');
+
+            // Assicurati che la cartella di destinazione esista
+            if (!fs.existsSync(destination)) {
+                fs.mkdirSync(destination, { recursive: true });
+            }
+            return destination;
+        } else {
+            return new Error('Dataset path not found');
         }
     }
     
     
+    /**
     // Ho provato a creare un metodo che verrà usato nella rotta per l'upload di un file nel dataset
     // a seconda che il file sia un'immagine o un file zip richiama le funzioni di utilità per verificare
     // che il file sia un immagine o nel caso in cui sia un file zip eseguire l'unzip
@@ -156,46 +247,16 @@ export class Repository implements IRepository {
         }
         return { updatedUser: user };
     }
-    
-    // lists all available Ai models
-    async listAiModels(): Promise<Ai[] | null>{
-        const aiDao = new AiDao();
-        return aiDao.findAll();
-    }
-
-    // find an Ai model by id
-    async findModel(modelId: number): Promise<Ai | null>{
-        const aiDao = new AiDao();
-        return aiDao.findById(modelId);
-    }
-
-    // find an inference result by id
-    async findResult(resultId: number): Promise<Result | null>{
-        const resultDao = new ResultDao();
-        return resultDao.findById(resultId);
-    }
-    
-
-    async getDatasetUserList(userId: number): Promise<Object | null> {
-        try {
-            const datasetDao = new DatasetDao();
-            return await datasetDao.findById(userId);
-        }catch {
-            throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
-        }
-    };
-
-    
-    
+    */
 
 }
-// todo: methods to update model weights
 
 
 
 
-    
 
-    
+
+
+
 
 

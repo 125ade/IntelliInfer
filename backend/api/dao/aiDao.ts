@@ -27,12 +27,11 @@ export default class AiDao implements IDao<Ai> {
     
    
     async findById(id: number): Promise<Ai | null> {
-        try {
             const model = await Ai.findByPk(id);
+            if(!model){
+                throw new ConcreteErrorCreator().createNotFoundError().setAbstentModel();
+            }
             return model;
-        } catch {
-            throw new ConcreteErrorCreator().createNotFoundError().setAbstentModel();
-        }
     }
     
 
@@ -43,6 +42,15 @@ export default class AiDao implements IDao<Ai> {
             return true;
         }
         return false;
+    }
+
+    async updateItem(id: number, weights: any): Promise<Ai | null> {
+        const model = await Ai.findByPk(id);
+            if(!model){
+                throw new ConcreteErrorCreator().createNotFoundError().setAbstentModel();
+            }
+            model.pathweights = weights;
+            return model;
     }
     
 }

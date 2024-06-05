@@ -2,7 +2,7 @@ import { IDao } from './daoInterface';
 import Image from '../models/image';
 import { ConcreteErrorCreator } from '../factory/ErrorCreator';
 
-export default class ImageDAO implements IDao<Image> {
+export default class ImageDao implements IDao<Image> {
 
     constructor() {}
     
@@ -25,9 +25,12 @@ export default class ImageDAO implements IDao<Image> {
         }
     }
 
-    // to delete if not used
     async findById(id: number): Promise<Image | null> {
-        return await Image.findByPk(id);
+        const image = await Image.findByPk(id);
+        if(!image){
+            throw new ConcreteErrorCreator().createNotFoundError().setAbstentModel();
+        }
+        return image;
     }
     
     // non metto l'update perchè non vedo il senso di modificare un'immagine 
