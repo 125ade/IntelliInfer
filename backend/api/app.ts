@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import Redis from "ioredis";
 require('dotenv').config();
-import express from "express";
+import express, {Express} from "express";
 import bodyParser from 'body-parser';
 import { Request, Response } from 'express';
 import swaggerUi from "swagger-ui-express";
@@ -12,40 +12,39 @@ import { ExpressAdapter } from "@bull-board/express";
 import { setupLogging } from "./middleware/logger.middleware";
 import { Queue } from "./queues/Queue";
 import { RedisConnection } from "./queues/RedisConnection";
-import { UserRoutes } from "./routes/index.routes";
+import {SystemRoutes, UserRoutes} from "./routes/index.routes";
 import { syncDb } from "./db/dbSync";
 import * as process from "node:process";
 import AdminRoutes from './routes/admin.routes';
 
+import {AuthUser, verifyTokenExpiration, verifyTokenSignature, verifyUserRole} from "./middleware/auth.middleware";
+import {UserRole} from "./static";
+import {handleRouteNotFound} from "./middleware/route.middleware";
 
 
 // api variable
-const port = parseInt(process.env.API_PORT || "3000");
-const host = process.env.API_HOST || "localhost";
+const port: number = parseInt(process.env.API_PORT || "3000");
+const host: string = process.env.API_HOST || "localhost";
 // redis definition
-const redis_port = parseInt(process.env.REDIS_PORT || "6379");
-const redis_host = process.env.REDIS_HOST || 'localhost';
-const redisUrl = `redis://${redis_host}:${redis_port}/0`;
+const redis_port: number = parseInt(process.env.REDIS_PORT || "6379");
+const redis_host: string = process.env.REDIS_HOST || 'localhost';
+const redisUrl: string = `redis://${redis_host}:${redis_port}/0`;
 // job queue name definition taken from env
-const QUEUE_TASK_DOCKER = process.env.DOKER_QUEUE_NAME || 'dockerTaskQueue';
+const QUEUE_TASK_DOCKER: string = process.env.DOKER_QUEUE_NAME || 'dockerTaskQueue';
 
 
 // init express
-const app = express();
+const app: Express = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
 
 // init log middleware
 setupLogging(app)
 
-// sync db                             --> SERVER START
+// sync db
 syncDb().then(():void=>{console.log("\t--> SYNC BD DONE")})
-// ).then(() => {
-//      console.log("Database connected");
-//   }
-// ).catch(err => {
-//   console.error("Failed to sync database:", err);
-// });
+
 
 
 // manage job
@@ -101,29 +100,27 @@ try {
 }
 
 
-// manage health check
-app.get('/check/health', (req: Request, res: Response) => {
-  res.json({ system: 'online' });
-});
+
 
 // Inizializza le rotte
-const userRoutes = new UserRoutes();
+const userRoutes : UserRoutes = new UserRoutes();
+const systRoutes: SystemRoutes = new SystemRoutes()
 const adminRoutes = new AdminRoutes();
 
 // Usa le rotte definite nella classe UserRoutes
 app.use('/api', userRoutes.router);
 app.use('/admin', adminRoutes.router);
+app.use('/api', systRoutes.router);
+
+
+// manage health check
+app.get('/check/health', (req: Request, res: Response) => {res.json({ system: 'online' });});
+// manage 404 route not found
+app.use(handleRouteNotFound);
 
 // Start the server
-// todo handel log
 app.listen(port, () => {
-  if(process.env.NODE_ENV !== 'production') {
-    console.log(`\n\tFor see health of the service: \n\t\t open http://${host}:${port}/check/health \n`);
-    console.log(`\tFor the queue UI: \n\t\t open http://${host}:${port}/admin/queues/queue/${QUEUE_TASK_DOCKER} \n`);
-    console.log(`\tFor the API doc: \n\t\t open http://${host}:${port}/admin/docs \n\n`);
-  }else{
     console.log("\t--> SERVER START")
-    console.log(`\t--> UI Queue Management http://${host}:${port}/admin/queues/queue/${QUEUE_TASK_DOCKER}`);
-    console.log(`\t--> API docs page       http://${host}:${port}/admin/docs `);
-  }
+    console.log(`\t--> UI Queue Management http://localhost:${port}/admin/queues/queue/${QUEUE_TASK_DOCKER}`);
+    console.log(`\t--> API docs page       http://localhost:${port}/admin/docs `);
 });

@@ -34,6 +34,16 @@ The IntelliInfer project, developed for the Advanced Programming exam at the Pol
 
 The main goal of IntelliInfer is to provide an API for loading datasets, managing them, and using AI models to perform inference. Users can upload their datasets and utilize the available models to make predictions on new data.
 
+# Quick start
+
+- env
+- modificare la chiave privata all'interno di ```secrets```
+- ```bash
+   openssl genrsa -des3 -out test_purpose_private_key.pem 2048
+- ```bash
+   openssl rsa -in test_purpose_private_key.pem -pubout -out test_purpose_public_key.pem
+
+
 # Design
 
 ## Rotte

@@ -28,22 +28,28 @@ export default class UserController {
             if (error instanceof ErrorCode) {
                 error.send(res);
             } else {
-                // console.log(error);
                 new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
             }
         }
     }
 
+    async datasetListByUserId(req: Request, res: Response): Promise<void> {
+        // try {
+        //     const userId =
+        // }catch (error){
+        //
+        // }
+    }
+
     async findModelById(req: Request, res: Response) {
         try {
-            const modelId: number = Number(req.params.modelId);
+            const modelId: number = Number(req.params.modelId);// todo ai model potrebbe ritornare null è da verificare
             const aiModel = await this.repository.findModel(modelId);
             res.status(200).json(aiModel);
         } catch (error) {
             if (error instanceof ErrorCode) {
                 error.send(res);
             } else {
-                // console.log(error);
                 new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
             }
         }
@@ -124,28 +130,28 @@ async uploadZip (req: Request, res: Response) {
         if (!req.file) {
             return res.status(400).send('Nessun file caricato.');
         }
-    
+
         const zip = new AdmZip(req.file.buffer);
         const zipEntries: IZipEntry[] = zip.getEntries();
 
         const destination = await this.repository.createDestinationRepo(Number(req.params.datasetId));
         if( typeof destination === 'string'){
-        
+
             zipEntries.forEach((entry: IZipEntry) => {
                 const entryName = entry.entryName;
                 const entryData = entry.getData();
                 const mimeType = mime.lookup(entryName);
-    
+
                 if (mimeType && mimeType.startsWith('image/')) {
                     const filePath = path.join(destination, entryName);
                     fs.writeFileSync(filePath, entryData);
                 }
             });
-    
+
             res.send('File caricato e processato con successo.');
         };
     };
-    
+
 
     async uploadFile(req: Request, res: Response){
         if (!req.file) {
@@ -176,7 +182,7 @@ async uploadZip (req: Request, res: Response) {
                     const entryName = entry.entryName;
                     const entryData = entry.getData();
                     const mimeType = mime.lookup(entryName);
-        
+
                     if (mimeType && mimeType.startsWith('image/')) {
                         const filePath = path.join(destination, entryName);
                         fs.writeFileSync(filePath, entryData);
@@ -189,7 +195,7 @@ async uploadZip (req: Request, res: Response) {
         }
     }
 }
-    
+
 
 
 

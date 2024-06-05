@@ -1,22 +1,20 @@
-// import UserDao from '../dao/userDao';
+import UserDao from '../dao/userDao';
 import TagDao from '../dao/tagDao';
-// import Tag from '../models/tag';
+import Tag from '../models/tag';
 import DatasetDao from '../dao/datasetDao';
-// import ImageDao from '../dao/imageDao';
-// import Image from '../models/image';
+import ImageDao from '../dao/imageDao';
+import Image from '../models/image';
 import AiDao from '../dao/aiDao';
 import Ai from '../models/ai';
 import ResultDao from '../dao/resultDao';
 import Result from '../models/result';
-import Image from '../models/image';
-import ImageDao from '../dao/imageDao';
-// import { isImage, unzipImages} from '../utils/utils'; // Importa le funzioni di utilità
-// import { SequelizeConnection } from '../db/SequelizeConnection';
-// import { ConcreteErrorCreator } from '../factory/ErrorCreator';
-// import * as fs from 'fs';
-import Dataset from '../models/dataset';
-import DatasetTags from '../models/datasettag';
+import { isImage, unzipImages } from '../utils/utils'; // Importa le funzioni di utilità
+import { SequelizeConnection } from '../db/SequelizeConnection';
 import { ConcreteErrorCreator } from '../factory/ErrorCreator';
+
+import Dataset from '../models/dataset';
+import User from "../models/user";
+import DatasetTags from '../models/datasettag';
 import path from 'path';
 import fs, { PathLike } from 'fs';
 
@@ -43,17 +41,31 @@ export interface IRepository {
 export class Repository implements IRepository {
 
     constructor() {};
-    
+
+    public async getUserById(userId: number): Promise<User | null> {
+        const user: UserDao = new UserDao();
+        return user.findById(userId);
+    }
+
+    // method to create tags associated with a specific dataset
+    public async createTags(tags: string[], datasetId: number): Promise<Tag[]> {
+        const tagDao = new TagDao()
+        const createdTags = await Promise.all(
+          tags.map(tagName => tagDao.create({ name: tagName, datasetId }))
+        );
+        return createdTags;
+    }
+
     // used into the route to create a dataset
     async createDatasetWithTags(data: any): Promise<Dataset>  {
         const datasetDao = new DatasetDao();
         const tagDao = new TagDao();
 
         const { name, description, tags } = data; // quando avremo userid ci sarà anche quello
-    
+
         // Generate the path
         const path = this.generatePath(name);
-    
+
         // Create the dataset
         const newDataset = await datasetDao.create({
           name,
@@ -63,7 +75,7 @@ export class Repository implements IRepository {
           countClasses: tags.length,
           // userId,
         });
-    
+
         // Associate tags with the dataset
         for (const tagName of tags) {
             const tagInstance = await tagDao.create({ name: tagName });
@@ -73,14 +85,14 @@ export class Repository implements IRepository {
                 tagId: tagInstance.name
             });
           }
-    
+
         return newDataset;
     }
-    
-    
-    // NB: to move into utils.ts 
+
+
+    // NB: to move into utils.ts
     generatePath(name: string) {
-        
+
         // Rimuove spazi vuoti e caratteri speciali dal nome
         const sanitizedName = name.replace(/[^a-zA-Z0-9]/g, '');
 
@@ -120,15 +132,15 @@ export class Repository implements IRepository {
             throw new ConcreteErrorCreator().createServerError().setFailedUpdatingItem();
         }
     };
-    
+
     // takes an ai model identified by its id and update its property pathWeigths with the path of the new weights
     async updateModelWeights(modelId: number, weights: string ): Promise<Ai | null>  {
         const aiDao = new AiDao();
         const weightsString = String(weights);
-    
+
         // Generate pathWeights
         const path = this.generatePath(weightsString);
-    
+
         return aiDao.updateItem(modelId, path);
     }
 
@@ -148,7 +160,7 @@ export class Repository implements IRepository {
         const datasetPath = dataset?.path;
         if(typeof datasetPath === 'string'){
             const destination = path.join('/app/media', datasetPath, 'img');
-    
+
             // Assicurati che la cartella di destinazione esista
             if (!fs.existsSync(destination)) {
                 fs.mkdirSync(destination, { recursive: true });
@@ -160,7 +172,7 @@ export class Repository implements IRepository {
     }
     
     
-    /** 
+    /**
     // Ho provato a creare un metodo che verrà usato nella rotta per l'upload di un file nel dataset
     // a seconda che il file sia un'immagine o un file zip richiama le funzioni di utilità per verificare
     // che il file sia un immagine o nel caso in cui sia un file zip eseguire l'unzip
@@ -236,15 +248,15 @@ export class Repository implements IRepository {
         return { updatedUser: user };
     }
     */
-    
+
 }
 
 
 
 
 
-    
 
-    
+
+
 
 

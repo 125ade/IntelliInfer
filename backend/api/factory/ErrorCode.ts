@@ -50,7 +50,12 @@ export class ServerError extends ErrorCode {
     // errore nella connessione al database
     setFailedUploadFile(): ErrorCode {
       return this.set("There was an error uploading the file.")
-  }
+    }
+
+    // errore nella connessione al database
+    setFailedGenToken(): ErrorCode {
+      return this.set("failed creation token.")
+    }
 }
 
 /**
@@ -73,9 +78,17 @@ export class AuthenticationError extends ErrorCode {
     setInvalidToken(): ErrorCode {
         return this.set("Authentication failed. Token is invalid.");
     }
+    // token invalido
+    setNoToken(): ErrorCode {
+        return this.set("Authentication failed. Token is not provided.");
+    }
     
     setNotAdmin(): ErrorCode {
       return this.set("Authentication failed. User is not the admin");
+    }
+
+    setNotRightRole(): ErrorCode {
+      return this.set("Authentication failed. User not have the right role to use the resource");
     }
     
     // token scaduto
@@ -91,6 +104,11 @@ export class AuthenticationError extends ErrorCode {
     // chiave invalida
     setInvalidKey(): ErrorCode {
         return this.set("Authentication failed. Key is invalid.");
+    }
+
+    //Failed to authenticate user
+    setFailAuthUser(): ErrorCode {
+        return this.set("Authentication failed. Failed to authenticate user.");
     }
 
     // chiave invalida
@@ -144,6 +162,11 @@ export class BadRequestError extends ErrorCode {
     // bisogna specificare l'id dei risultati nella richiesta
     setNoResultId(): ErrorCode {
         return this.set("There was an error. ResultId must be provided");
+    }
+
+    // bisogna specificare l'id dell'utente nella richiesta
+    setNoUserId(): ErrorCode {
+        return this.set("There was an error. User Id must be provided");
     }
 
     setMissingToken(): ErrorCode {
@@ -204,6 +227,10 @@ export class NotFoundError extends ErrorCode {
 
     setAbstentDataset(): ErrorCode{
         return this.set("Absent dataset");
+    }
+
+    setNoRoute(): ErrorCode{
+        return this.set("No route found.");
     }
   
     setAbsentResults(): ErrorCode{

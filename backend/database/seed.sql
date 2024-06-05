@@ -2,7 +2,7 @@
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
     token DECIMAL NOT NULL,
     role VARCHAR(10) NOT NULL DEFAULT 'user',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -118,6 +118,13 @@ ALTER TABLE results
 ADD CONSTRAINT fk_ai_id
 FOREIGN KEY (ai_id)
 REFERENCES ai(id);
+
+-- Inserimento di un elemento nella tabella user
+INSERT INTO users (username, email, token, role, created_at, updated_at)
+VALUES
+  ('Marco', 'marco.cc@mio.com', 15, 'user', NOW(), NOW()),
+  ('Anna', 'a.nna@fit.com', 10, 'admin', NOW(), NOW()),
+  ('Mauro', 'mauro.sys@intelliinfer.com', 100, 'syst', NOW(), NOW());
 
 -- Inserimento di un elemento nella tabella ai
 INSERT INTO ai (name, description, pathweights, architecture) 

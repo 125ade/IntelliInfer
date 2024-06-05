@@ -28,7 +28,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - logs_data:/app/logs
-      - image_data:/app/media
+      - media_data:/app/media
+      - secrets_data:/app/secrets
     expose:
       - "${API_PORT}"
     ports:
@@ -41,10 +42,16 @@ services:
       - DOKER_QUEUE_NAME=${DOKER_QUEUE_NAME}
       - API_PORT=${API_PORT}
       - API_HOST=${API_HOST}
+      - API_SECRET_KEY_NAME=${API_SECRET_KEY_NAME}
+      - API_PUBLIC_KEY_NAME=${API_PUBLIC_KEY_NAME}
+      - TOKEN_EXPIRE=${TOKEN_EXPIRE}
+      - TOKEN_ALGORITHM=${TOKEN_ALGORITHM}
+      - API_SERVICE_NAME=${API_SERVICE_NAME}
       - SEQUELIZE_DIALECT=${SEQUELIZE_DIALECT}
       - SEQUELIZE_LOGGING=${SEQUELIZE_LOGGING}
       - NODE_ENV=${NODE_ENV}
       - LOG_OUTPUT=${LOG_OUTPUT} # Può essere 'console', 'file' o 'both'
+      - LOG_INTERVAL_ROTATION=${LOG_INTERVAL_ROTATION}
       - LOG_PATH=${LOG_PATH}
       - LOG_ACCESS_DIR=${LOG_ACCESS_DIR}
       - LOG_ERRORS_DIR=${LOG_ERRORS_DIR}
@@ -138,5 +145,6 @@ networks:
 volumes:
   redis_data:
   postgres_data:
-  image_data:
+  secrets_data:
+  media_data:
   logs_data:
