@@ -1,6 +1,8 @@
 import { IDao } from './daoInterface';
 import Dataset from '../models/dataset';
 import { ConcreteErrorCreator } from '../factory/ErrorCreator';
+import {SuccessResponse} from "../utils/utils";
+import {ErrorCode} from "../factory/ErrorCode";
 
 export default class DatasetDao implements IDao<Dataset> {
 
@@ -31,11 +33,12 @@ export default class DatasetDao implements IDao<Dataset> {
     }
     
     // returns all datasets associated to a specific userId on database
-    async findAllByUserId(userId: number): Promise<Dataset[] | ConcreteErrorCreator> {
+    async findAllByUserId(user_id: number): Promise<Dataset[] | ConcreteErrorCreator> {
         try {
             return await Dataset.findAll({
                 where: {
-                    userId: userId
+                    userId: user_id,
+                    isDeleted: false
                 }
             });
         } catch {
@@ -62,17 +65,27 @@ export default class DatasetDao implements IDao<Dataset> {
 
     // logically deletes a dataset (sets isDeleted to true)
     // da fare gestione migliore degli errori, vorrei gestire anche la possibilità che il dataset con l'id specificato non sia presente nel db
-    async logicallyDelete(datasetId: number): Promise<Object> {
+    async logicallyDelete(datasetId: number): Promise<ErrorCode | SuccessResponse>{
         try{
-            return await Dataset.update(
+            const [numberOfAffectedRows, affectedRows] = await Dataset.update(
                 { isDeleted: true },
                 {
-                  where: { id: datasetId },
-                  returning: true
+                    where: { id: datasetId },
+                    returning: true
                 }
-            );
+            ) as [number, Dataset[]];
+
+            if (numberOfAffectedRows === 0) {
+                throw new ConcreteErrorCreator().createNotFoundError().setAbstentDataset();
+            }
+
+            return {
+                success: true,
+                message: "deleted successfully",
+                obj: affectedRows[0]
+            };
         } catch {
-            throw new ConcreteErrorCreator().createNotFoundError().setAbstentDataset();
+            return new ConcreteErrorCreator().createNotFoundError().setAbstentDataset();
         }
         
     }

@@ -2,7 +2,8 @@ import {Router, Request, Response, RequestHandler } from "express";
 import UserController from "../controllers/user.controller";
 import multer from 'multer';
 import { validateCreateDataset, validateParamIntGreaterThanZero, validateFileUpload } from "../middleware/validation.middleware";
-import { AuthUser } from "../middleware/auth.middleware";
+import {AuthUser, verifyTokenExpiration, verifyTokenSignature, verifyUserRole} from "../middleware/auth.middleware";
+import {UserRole} from "../static";
 
 
 // Configura multer per gestire i file caricati
@@ -25,7 +26,7 @@ export default class UserRoutes{
             AuthUser,
             this.userController.modelList.bind(this.userController)
         );
-        
+
 
         // visualize the model filtered by id
         this.router.get(
@@ -40,7 +41,7 @@ export default class UserRoutes{
         // creates a dataset
         this.router.post(
             "/dataset/create",
-            //AuthUser,
+            AuthUser,
             validateCreateDataset,
             this.userController.createDataset.bind(this.userController)
         );
@@ -48,7 +49,7 @@ export default class UserRoutes{
 
         // deletes a dataset (logically)
         this.router.delete(
-            "/dataset/:datasetId/delete",
+            "/dataset/delete/:datasetId",
             AuthUser,
             validateParamIntGreaterThanZero('datasetId'),
             this.userController.deleteDatasetById.bind(this.userController)
@@ -97,11 +98,10 @@ export default class UserRoutes{
         // todo get /dataset/list
         // autenticazione
         // autorizzazione "user"
-        const routeHandler: RequestHandler = async (req: Request, res: Response) => {
-            await this.userController.datasetListByUserId(req, res);
-        };
-
-        this.router.get('/dataset/list', AuthUser, routeHandler);
+        this.router.get(
+            '/dataset/list',
+            AuthUser,
+            this.userController.datasetListByUserId.bind(this.userController));
 /**
         // todo get /dataset/:datasetId
         // autenticazione

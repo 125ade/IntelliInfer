@@ -12,6 +12,7 @@ import AdmZip, { IZipEntry }  from 'adm-zip';
 import mime from 'mime-types';
 import ImageDao from "../dao/imageDao";
 import User from "../models/user";
+import {decodeToken} from "../token";
 
 
 export default class UserController {
@@ -37,21 +38,29 @@ export default class UserController {
 
     async datasetListByUserId(req: Request, res: Response): Promise<void> {
         try {
-            const userEmail: string | undefined = req.userEmail;
-
-            if (userEmail) {
-                const user = await this.repository.getUserByEmail(userEmail);
-                if (user && user instanceof User) {
-                    const datasetList = await this.repository.getDatasetListByUserId(user.id);
-                    res.status(200).json(datasetList);
+            const token = req.headers.authorization
+            if (token !== undefined){
+                const decode = decodeToken(token.split(' ')[1]);
+                if (decode.email) {
+                    const user = await this.repository.getUserByEmail(decode.email);
+                    if (user && user instanceof User) {
+                        const datasetList = await this.repository.getDatasetListByUserId(user.id);
+                        res.status(200).json({list: datasetList});
+                    } else {
+                        throw new ConcreteErrorCreator().createNotFoundError().setNoUser()
+                    }
                 } else {
-                    res.status(404).json({ error: 'User not found or invalid user type' });
+                    throw new ConcreteErrorCreator().createBadRequestError().setMissingToken()
                 }
-            } else {
-                res.status(400).json({ error: 'User email is undefined' });
+            }else{
+                throw new ConcreteErrorCreator().createAuthenticationError().setNoToken()
             }
+
         } catch (error) {
-            res.status(500).json({ error: 'Internal server error' });
+            if (error instanceof ErrorCode) {
+                error.send(res);
+            }
+            new ConcreteErrorCreator().createServerError().setFailedDeleteItem().send(res)
         }
     }
 
@@ -88,14 +97,30 @@ export default class UserController {
 
     async createDataset(req: Request, res: Response) {
         try{
-            const result = await this.repository.createDatasetWithTags(req.body);
-            return res.status(201).json(result);
+            const token = req.headers.authorization
+            if (token !== undefined){
+                const decode = decodeToken(token.split(' ')[1]);
+                if (decode.email) {
+                    const user = await this.repository.getUserByEmail(decode.email);
+                    if (user && user instanceof User) {
+                        const result = await this.repository.createDatasetWithTags(req.body, user);
+                        return res.status(201).json(result);
+                    }else{
+                        throw new ConcreteErrorCreator().createNotFoundError().setNoUser();
+                    }
+                }else{
+                    throw new ConcreteErrorCreator().createNotFoundError().setNoUser();
+                }
+            }else{
+                throw new ConcreteErrorCreator().createAuthenticationError().setNoToken();
+            }
+
         } catch (error) {
             if (error instanceof ErrorCode) {
                 error.send(res);
             } else {
                 // console.log(error);
-                throw new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
+                throw new ConcreteErrorCreator().createServerError().setFailedCreationItem().send(res);
             }
         }
     }

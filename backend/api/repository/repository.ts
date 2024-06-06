@@ -30,7 +30,7 @@ export interface IRepository {
     listAiModels(): Promise<Ai[] | null>;
     findModel(modelId: number): Promise<Ai | null>;
     findResult(resultId: number): Promise<Result | null>;
-    createDatasetWithTags(data: any): Promise<Dataset> ;
+    createDatasetWithTags(data: any, user: User): Promise<Dataset> ;
     logicallyDelete(datasetId: number): Promise<Object | null>;
     updateModelWeights(modelId: number, weights: string ): Promise<Ai | null>;
     createDestinationRepo(datasetId: number): Promise<string | null> ;
@@ -68,7 +68,7 @@ export class Repository implements IRepository {
     }
 
     // used into the route to create a dataset
-    async createDatasetWithTags(data: any): Promise<Dataset>  {
+    async createDatasetWithTags(data: any, user: User): Promise<Dataset>  {
         const datasetDao = new DatasetDao();
         const tagDao = new TagDao();
 
@@ -84,7 +84,7 @@ export class Repository implements IRepository {
           path,
           countElements: 0, // Set to 0 or a default value, adjust as needed
           countClasses: tags.length,
-          // userId,
+          userId: user.id,
         });
 
         // Associate tags with the dataset
@@ -135,7 +135,7 @@ export class Repository implements IRepository {
     }
 
     // Given the datasetId, deletes logically the dataset
-    async logicallyDelete(datasetId: number): Promise<Object | null> {
+    async logicallyDelete(datasetId: number){
         try{
             const datasetDao = new DatasetDao();
             return datasetDao.logicallyDelete(datasetId);
