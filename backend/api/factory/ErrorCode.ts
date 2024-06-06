@@ -47,7 +47,7 @@ export class ServerError extends ErrorCode {
         return this.set("There was an error connecting to the database.")
     }
 
-    // errore nella connessione al database
+    // errore durante l'upload di un file
     setFailedUploadFile(): ErrorCode {
       return this.set("There was an error uploading the file.")
     }
@@ -55,6 +55,12 @@ export class ServerError extends ErrorCode {
     // errore nella connessione al database
     setFailedGenToken(): ErrorCode {
       return this.set("failed creation token.")
+    }
+
+
+    // errore nella connessione al database
+    setFailedCreationRepo(): ErrorCode {
+      return this.set("Error. Dataset path must be provided")
     }
 }
 
@@ -82,7 +88,7 @@ export class AuthenticationError extends ErrorCode {
     setNoToken(): ErrorCode {
         return this.set("Authentication failed. Token is not provided.");
     }
-    
+
     setNotAdmin(): ErrorCode {
       return this.set("Authentication failed. User is not the admin");
     }
@@ -90,7 +96,7 @@ export class AuthenticationError extends ErrorCode {
     setNotRightRole(): ErrorCode {
       return this.set("Authentication failed. User not have the right role to use the resource");
     }
-    
+
     // token scaduto
     setTokenExpired(): ErrorCode {
       return this.set("Authentication failed. Token has expired");
@@ -232,7 +238,7 @@ export class NotFoundError extends ErrorCode {
     setNoRoute(): ErrorCode{
         return this.set("No route found.");
     }
-  
+
     setAbsentResults(): ErrorCode{
         return this.set("The requested results could not be found.");
     }
