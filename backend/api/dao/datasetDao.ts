@@ -47,12 +47,16 @@ export default class DatasetDao implements IDao<Dataset> {
     // find a dataset by datasetId
     // NB we have to handle errors
     async findById(datasetId: number): Promise<Dataset | null> {
-        return await Dataset.findOne({
-            where: {
-              id: datasetId,
-              isDeleted: false
-            }
-          });
+        try {
+            return await Dataset.findOne({
+                where: {
+                    id: datasetId,
+                    isDeleted: false
+                }
+            });
+        } catch (error) {
+            throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
+        }
     }
     
 

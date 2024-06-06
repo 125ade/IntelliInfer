@@ -17,6 +17,8 @@ import User from "../models/user";
 import DatasetTags from '../models/datasettag';
 import path from 'path';
 import fs, { PathLike } from 'fs';
+import AdmZip, { IZipEntry }  from 'adm-zip';
+import mime from 'mime-types';
 
 
 
@@ -34,7 +36,8 @@ export interface IRepository {
     createDatasetWithTags(data: any): Promise<Dataset> ;
     logicallyDelete(datasetId: number): Promise<Object | null>;
     updateModelWeights(modelId: number, weights: string ): Promise<Ai | null>;
-    createDestinationRepo(datasetId: number): Promise<string | Error> ;
+    createDestinationRepo(datasetId: number): Promise<string | null> ;
+    processZipEntries(datasetId: number, zipEntries: IZipEntry[], destination: string): Promise<void | null>
 }
 
 
@@ -154,9 +157,10 @@ export class Repository implements IRepository {
         return imageDao.create(data);
     }
 
-    async createDestinationRepo(datasetId: number): Promise<string | Error> {
+    async createDestinationRepo(datasetId: number): Promise<string | null> {
         const datasetDao = new DatasetDao();
-        const dataset = await Dataset.findByPk(datasetId);
+        //const dataset = await Dataset.findByPk(datasetId);
+        const dataset = await datasetDao.findById(datasetId);
         const datasetPath = dataset?.path;
         if(typeof datasetPath === 'string'){
             const destination = path.join('/app/media', datasetPath, 'img');
@@ -167,9 +171,39 @@ export class Repository implements IRepository {
             }
             return destination;
         } else {
-            return new Error('Dataset path not found');
+            throw new ConcreteErrorCreator().createServerError().setFailedCreationRepo();
         }
     }
+
+    async processZipEntries(datasetId: number, zipEntries: IZipEntry[], destination: string): Promise<void | null> {
+        try {
+            zipEntries.forEach((entry: IZipEntry) => {
+                const entryName = entry.entryName;
+                const entryData = entry.getData();
+                const mimeType = mime.lookup(entryName);
+    
+                if (mimeType && mimeType.startsWith('image/')) {
+                    const filePath = path.join(destination, entryName);
+                    fs.writeFileSync(filePath, entryData);
+
+                    // Salva l'immagine nel database utilizzando ImageDao
+                    const imageDao = new ImageDao()
+                    imageDao.create({
+                    datasetId: datasetId, 
+                    path: entryName,
+                    description: 'image'
+                });
+                }
+            });
+        } catch {
+            //return false; // Restituisce false se si verifica un errore durante l'elaborazione
+            throw new ConcreteErrorCreator().createServerError().setFailedUploadFile();
+        }
+    }
+
+
+
+
     
     
     /**
