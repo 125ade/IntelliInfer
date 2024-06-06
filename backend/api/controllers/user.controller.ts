@@ -5,10 +5,9 @@ import { ConcreteErrorCreator } from "../factory/ErrorCreator";
 import fs from 'fs';
 import path from 'path';
 import AdmZip, { IZipEntry }  from 'adm-zip';
-import mime from 'mime-types';
-import ImageDao from "../dao/imageDao";
 import User from "../models/user";
 import {decodeToken} from "../token";
+import UserDao from "../dao/userDao";
 
 
 export default class UserController {
@@ -252,6 +251,29 @@ export default class UserController {
                 res.status(200).json( { Result: 'File uploaded successfully'}); // todo: success interface
             }
         } catch(error){
+            if( error instanceof ErrorCode){
+                error.send(res);
+            } else {
+                new ConcreteErrorCreator().createServerError().setFailedUploadFile().send(res);
+            }
+        }
+    }
+
+
+    async displayResidualCredit(req: Request, res: Response){
+        try {
+            const userEmail = req.userEmail;
+
+            if (!userEmail) {
+                throw new ConcreteErrorCreator().createBadRequestError().setMissingEmail();
+            }
+            
+            const user = await this.repository.getUserByEmail(userEmail);
+
+            if( user instanceof User){
+                res.status(200).json({ token: user.token });
+            }
+        } catch (error) {
             if( error instanceof ErrorCode){
                 error.send(res);
             } else {

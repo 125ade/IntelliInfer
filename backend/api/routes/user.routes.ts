@@ -6,9 +6,10 @@ import {AuthUser, verifyTokenExpiration, verifyTokenSignature, verifyUserRole} f
 import {UserRole} from "../static";
 
 
-// Configura multer per gestire i file caricati
+// Multer configuration to manage uploaded files
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+
 
 export default class UserRoutes{
     router:Router = Router();
@@ -20,7 +21,7 @@ export default class UserRoutes{
 
     initRouters(): undefined {
 
-        // visualize all available models
+        // visualize all available ai models
         this.router.get(
             "/model/list",
             AuthUser,
@@ -28,7 +29,7 @@ export default class UserRoutes{
         );
 
 
-        // visualize the model filtered by id
+        // visualize an ai model filtered by id
         this.router.get(
             "/model/:modelId",
             AuthUser,
@@ -36,7 +37,6 @@ export default class UserRoutes{
             this.userController.findModelById.bind(this.userController)
         );
         
-
 
         // creates a dataset
         this.router.post(
@@ -57,7 +57,7 @@ export default class UserRoutes{
 
 
         // finds an inference result given its id
-        // todo: we have to change this route because we have to find the result given the id of the inference
+        // TODO: we have to change this route because we have to find the result given the id of the inference
         this.router.get(
             "/inference/result/:resultId",
             AuthUser,
@@ -66,7 +66,7 @@ export default class UserRoutes{
         );
 
 
-        // esegue l'upload di un'immagine
+        // upload of an image
         this.router.post(
             "/dataset/:datasetId/upload/image",
             //AuthUser,
@@ -75,7 +75,7 @@ export default class UserRoutes{
             this.userController.uploadImage.bind(this.userController));
 
 
-        // esegue l'upload di un file zip
+        // upload of a zip file
         this.router.post(
             '/dataset/:datasetId/upload/zip',
             //AuthUser,
@@ -84,7 +84,8 @@ export default class UserRoutes{
             this.userController.uploadZip.bind(this.userController));
 
 
-        // esegue l'upload di un file( zip o immagine)
+        // upload of a file (zip or image)
+        // TODO: handle user tokens
         this.router.post(
             '/dataset/:datasetId/upload/file',
             //validateParamIntGreaterThanZero('datasetId'),
@@ -94,15 +95,7 @@ export default class UserRoutes{
         );
 
 
-        /**
-        // todo get /inference/state/:resultId
-        // autenticazione
-        // autorizzazione "user"
-        this.router.get("/inference/result/:resultId", this.userController.TOIMPLEMENT);
-        */
-
-
-
+        // todo get /dataset/list
         // autenticazione
         // autorizzazione "user"
         this.router.get(
@@ -121,6 +114,12 @@ export default class UserRoutes{
             this.userController.datasetDetail.bind(this.userController));
 
 
-        
+
+        // display of a user's remaining credit
+        this.router.get('/display/credit',
+            AuthUser,
+            this.userController.displayResidualCredit.bind(this.userController)
+        );
+
     }
 }

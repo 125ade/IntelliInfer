@@ -195,6 +195,10 @@ export class BadRequestError extends ErrorCode {
       return this.set("There was an error. File format not supported.");
     }
 
+    setMissingEmail(): ErrorCode {
+      return this.set("There was an error. User email not found.");
+    }
+
 
 }
 
