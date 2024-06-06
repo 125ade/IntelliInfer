@@ -1,4 +1,4 @@
-import {param, check, validationResult} from "express-validator";
+import {body, param, check, validationResult} from "express-validator";
 import { ConcreteErrorCreator } from "../factory/ErrorCreator";
 import { Request, Response, NextFunction } from 'express';
 
@@ -63,3 +63,11 @@ export function validateFileUpload(req: Request, res: Response, next: NextFuncti
 
     next();
 }
+
+// Definisci i middleware di validazione per l'email e i token
+export const validateRechargeRequest = [
+    body('email').isEmail().normalizeEmail(),
+    body('tokensToAdd').isInt({ min: 1 }).toInt()
+];
+
+

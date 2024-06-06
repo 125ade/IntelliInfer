@@ -1,6 +1,7 @@
 import {Router} from "express";
 import AdminController from "../controllers/admin.controller";
 import { AuthAdmin } from "../middleware/auth.middleware";
+import { validateRechargeRequest } from "../middleware/validation.middleware";
 
 export default class AdminRoutes{
     router:Router = Router();
@@ -24,7 +25,8 @@ export default class AdminRoutes{
         // route to recharge user credit
         this.router.put(
             "/credit/recharge",
-            AuthAdmin, 
+            AuthAdmin,
+            validateRechargeRequest, 
             this.adminController.rechargeTokens.bind(this.adminController)
         );
 
