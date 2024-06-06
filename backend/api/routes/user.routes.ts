@@ -1,15 +1,8 @@
 import {Router} from "express";
 import UserController from "../controllers/user.controller";
-import {UserRole} from "../static";
-
-import { Request, Response } from 'express';
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
-import Dataset from "../models/dataset";
-import unzipper from 'unzipper';
-import AdmZip, { IZipEntry }  from 'adm-zip';
-import mime from 'mime-types';
+import { validateCreateDataset, validateParamIntGreaterThanZero, validateFileUpload } from "../middleware/validation.middleware";
+import { AuthUser } from "../middleware/auth.middleware";
 
 
 // Configura multer per gestire i file caricati
@@ -27,24 +20,49 @@ export default class UserRoutes{
     initRouters(): undefined {
 
         // visualize all available models
-        this.router.get("/model/list", this.userController.modelList.bind(this.userController));
+        this.router.get(
+            "/model/list",
+            AuthUser,
+            this.userController.modelList.bind(this.userController)
+        );
         
 
         // visualize the model filtered by id
-        this.router.get("/model/:modelId", this.userController.findModelById.bind(this.userController));
+        this.router.get(
+            "/model/:modelId",
+            AuthUser,
+            validateParamIntGreaterThanZero('modelId'),
+            this.userController.findModelById.bind(this.userController)
+        );
         
 
 
         // creates a dataset
-        this.router.post("/dataset/create", this.userController.createDataset.bind(this.userController));
+        this.router.post(
+            "/dataset/create",
+            //AuthUser,
+            validateCreateDataset,
+            this.userController.createDataset.bind(this.userController)
+        );
 
 
         // deletes a dataset (logically)
-        this.router.delete("/dataset/:datasetId/delete", this.userController.deleteDatasetById.bind(this.userController));
+        this.router.delete(
+            "/dataset/:datasetId/delete",
+            AuthUser,
+            validateParamIntGreaterThanZero('datasetId'),
+            this.userController.deleteDatasetById.bind(this.userController)
+        );
 
 
         // finds an inference result given its id
-        this.router.get("/inference/state/:resultId", this.userController.findResultById.bind(this.userController));
+        // todo: we have to change this route because we have to find the result given the id of the inference
+        this.router.get(
+            "/inference/state/:resultId",
+            AuthUser,
+            validateParamIntGreaterThanZero('resultId'), 
+            this.userController.findResultById.bind(this.userController)
+        );
 
 
         // esegue l'upload di un'immagine
@@ -56,7 +74,13 @@ export default class UserRoutes{
 
 
         // esegue l'upload di un file( zip o immagine)
-        this.router.post('/dataset/:datasetId/upload/file', upload.single('file'), this.userController.uploadFile.bind(this.userController));
+        this.router.post(
+            '/dataset/:datasetId/upload/file',
+            validateParamIntGreaterThanZero('datasetId'),
+            upload.single('file'),
+            validateFileUpload,
+            this.userController.uploadFile.bind(this.userController)
+        );
 
 
 

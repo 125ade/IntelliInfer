@@ -1,11 +1,11 @@
 import {Router} from "express";
-import UserController from "../controllers/system.controller";
+import SystemController from "../controllers/system.controller";
 import {validateParamIntGreaterThanZero} from "../middleware/validation.middleware";
 
 
-export default class UserRoutes{
+export default class SystemRoutes{
     router:Router = Router();
-    userController:UserController = new UserController();
+    systemController:SystemController = new SystemController();
 
     constructor() {
         this.initRouters();
@@ -17,7 +17,7 @@ export default class UserRoutes{
         this.router.get(
             "/generate/token/:userId",
             validateParamIntGreaterThanZero("userId"),
-            this.userController.generateTokenFromUserId.bind(this.userController));
+            this.systemController.generateTokenFromUserId.bind(this.systemController));
 
 
     }
