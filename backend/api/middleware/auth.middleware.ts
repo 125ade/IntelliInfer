@@ -34,6 +34,11 @@ export const verifyTokenSignature = async (req: Request, res: Response, next: Ne
   }
 };
 
+const verifyUserRole_ = (decodedToken: { role: string }, allowedAccessTypes: string[]): boolean => {
+    // Controlla se il ruolo dell'utente è incluso nei ruoli consentiti
+    return allowedAccessTypes.includes(decodedToken.role);
+};
+
 export const verifyUserRole =  (allowedAccessTypes: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -41,12 +46,8 @@ export const verifyUserRole =  (allowedAccessTypes: string[]) => {
         if(jwt !== undefined) {
             const token: string = jwt.slice('bearer'.length).trim()
             const decodedToken: any = decodeToken(token);
-
-            const hasAccessToEndpoint: boolean = allowedAccessTypes.includes(decodedToken.role);
-
+            const hasAccessToEndpoint: boolean = verifyUserRole_(decodedToken, allowedAccessTypes);
             if (hasAccessToEndpoint) {
-                req.userEmail = decodedToken.userEmail;
-                req.userRole = decodedToken.role;
                 return next();
             } else {
                 return next(new ConcreteErrorCreator().createAuthenticationError().setNotRightRole().send(res));

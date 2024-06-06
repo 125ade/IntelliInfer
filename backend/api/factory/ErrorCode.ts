@@ -42,6 +42,10 @@ export class ServerError extends ErrorCode {
       return this.set("Error on updating item");
     }
 
+    setFailedDeleteItem(): ErrorCode {
+      return this.set("Error on deleting item");
+    }
+
     // errore nella connessione al database
     setFailedConnection(): ErrorCode {
         return this.set("There was an error connecting to the database.")

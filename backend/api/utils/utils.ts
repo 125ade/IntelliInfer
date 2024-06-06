@@ -62,7 +62,11 @@ export function checkMimeType(nameFile: string): string {
     }
 }
 
-
+export interface SuccessResponse {
+    success: boolean;
+    message?: string;
+    obj?: Object;
+}
 
  
 

@@ -1,6 +1,7 @@
 import { IDao } from './daoInterface';
 import User from '../models/user';
 import { ConcreteErrorCreator } from '../factory/ErrorCreator';
+import {ErrorCode} from "../factory/ErrorCode";
 
 export default class UserDAO implements IDao<User> {
 
