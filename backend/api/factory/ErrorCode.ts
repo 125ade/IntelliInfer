@@ -70,6 +70,10 @@ export class ServerError extends ErrorCode {
     setFailedRetriveItem() {
         return this.set("Error. Item can not be provided")
     }
+
+    setFailedStartInference() {
+        return this.set("Error. Inference can not start")
+    }
 }
 
 /**
