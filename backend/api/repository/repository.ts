@@ -20,21 +20,14 @@ import mime from 'mime-types';
 
 
 export interface IRepository {
-    // createTags(tags: string[], datasetId: number): Promise<Tag[]>;
-    // createDataset(datasetJson: any): Promise<Object>;
-    // uploadFile(datasetId: number, filePath: string): Promise<Image[]>;
-    // updateUserTokenByCost(userId: number, cost: number): Promise<void>;
-    // checkUserToken(userId: number, amount: number): void;
-    // updateUserToken(userId: number, token: number): Promise<Object>;
-    // getDatasetUserList(userId: number): Promise<Object | null>;
     listAiModels(): Promise<Ai[] | null>;
     findModel(modelId: number): Promise<Ai | null>;
     findResult(resultId: number): Promise<Result | null>;
     createDatasetWithTags(data: any, user: User): Promise<Dataset> ;
     logicallyDelete(datasetId: number): Promise<Object | null>;
     updateModelWeights(modelId: number, weights: string ): Promise<Ai | null>;
-    createDestinationRepo(datasetId: number): Promise<string | null> ;
-    processZipEntries(datasetId: number, zipEntries: IZipEntry[], destination: string): Promise<void | null>
+    createDestinationRepo(datasetId: number): Promise<string | ConcreteErrorCreator> ;
+    processZipEntries(datasetId: number, zipEntries: IZipEntry[], destination: string): Promise<void | ConcreteErrorCreator>
 }
 
 
@@ -165,7 +158,7 @@ export class Repository implements IRepository {
         return imageDao.create(data);
     }
 
-    async createDestinationRepo(datasetId: number): Promise<string | null> {
+    async createDestinationRepo(datasetId: number): Promise<string | ConcreteErrorCreator> {
         const datasetDao = new DatasetDao();
         //const dataset = await Dataset.findByPk(datasetId);
         const dataset = await datasetDao.findById(datasetId);
@@ -183,7 +176,7 @@ export class Repository implements IRepository {
         }
     }
 
-    async processZipEntries(datasetId: number, zipEntries: IZipEntry[], destination: string): Promise<void | null> {
+    async processZipEntries(datasetId: number, zipEntries: IZipEntry[], destination: string): Promise<void | ConcreteErrorCreator> {
         try {
             zipEntries.forEach((entry: IZipEntry) => {
                 const entryName = entry.entryName;
@@ -209,49 +202,7 @@ export class Repository implements IRepository {
         }
     }
 
-
-
-
     
-    
-    /**
-    // Ho provato a creare un metodo che verrà usato nella rotta per l'upload di un file nel dataset
-    // a seconda che il file sia un'immagine o un file zip richiama le funzioni di utilità per verificare
-    // che il file sia un immagine o nel caso in cui sia un file zip eseguire l'unzip
-    public async uploadFile(datasetId: number, filePath: string) {
-
-        const sequelize = SequelizeConnection.getInstance().sequelize;
-        try {
-            let images;
-            const imageDao = new ImageDao();
-
-            if(isImage(filePath)) {
-                const image = await imageDao.create({
-                    datasetId: datasetId,
-                    path: filePath
-                });
-                images = [image];
-            } else {
-                const bufferList = await unzipImages(filePath);
-                images = await Promise.all(bufferList.map(async (buffer: any) => {
-                    const tempFilePath = `${filePath}-${Date.now()}.img`; // Nome temporaneo per il file immagine
-                    fs.writeFileSync(tempFilePath, buffer); // Scrivi il buffer su un file temporaneo
-                    const img = await imageDao.create({
-                        dataset_id: datasetId,
-                        path: tempFilePath // Salva il percorso del file temporaneo
-                    });
-                    return img;
-                }));
-            }
-
-            // Aggiorna il conteggio degli elementi nel dataset
-            await Dataset.increment('count_elements', { where: { id: datasetId }});
-            return images;
-        } catch (error) {
-            throw new ConcreteErrorCreator().createServerError().setFailedUploadFile();
-        }
-    } 
-
     // updates the user token amount subtracting a cost
     // checks if the user has the available amount
     public async updateUserTokenByCost(userId: number, cost: number): Promise<void> {
@@ -289,8 +240,6 @@ export class Repository implements IRepository {
         }
         return { updatedUser: user };
     }
-    */
-
 }
 
 
