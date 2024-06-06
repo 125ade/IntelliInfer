@@ -2,15 +2,9 @@ import {Response, Request} from "express";
 import { Repository } from '../repository/repository';
 import  { ErrorCode } from "../factory/ErrorCode";
 import { ConcreteErrorCreator } from "../factory/ErrorCreator";
-import Dataset from "../models/dataset";
-import Image from "../models/image";
-import fs, { PathLike } from 'fs';
+import fs from 'fs';
 import path from 'path';
-import unzipper from 'unzipper';
-import { checkMimeType } from "../utils/utils";
 import AdmZip, { IZipEntry }  from 'adm-zip';
-import mime from 'mime-types';
-import ImageDao from "../dao/imageDao";
 
 
 export default class UserController {
@@ -99,98 +93,102 @@ export default class UserController {
             }
         }
     }
-
+    
+    // route to upload a single image on volume, and on database
     async uploadImage(req: Request, res: Response) {
-        if (!req.file) {
-            return res.status(400).json({ error: 'File must be provided' });
-        }
-
-        const destination = await this.repository.createDestinationRepo(Number(req.params.datasetId));
-        if( typeof destination === 'string'){
-
-            const mimeType = req.file.mimetype;
-            if (mimeType.startsWith('image/')) {
-                try{
-                    // Salva il file nella directory di destinazione
-                    const filePath = path.join(destination, `${req.file.originalname}`);
-                    fs.writeFileSync(filePath, req.file.buffer);
-
-                    const imageDao = new ImageDao;
-                    imageDao.create({
-                        "datasetId": Number(req.params.datasetId),
-                        "path": filePath,
-                        "description": req.body.description
-                      });
-
-                    // Invia una risposta di successo
-                    res.send('File uploaded successfully.');
-
-                } catch (error) {
-                    res.status(500).send(`An error occurred while uploading file: ${error}`);
-                }
-            } else {
-                res.status(500).send('Error: an image must be provided.');
+        try{
+            if (!req.file) {
+                throw new ConcreteErrorCreator().createBadRequestError().setAbsentFile();
             }
-        };
+    
+            const destination = await this.repository.createDestinationRepo(Number(req.params.datasetId));
+            if( typeof destination === 'string'){
+    
+                const mimeType = req.file.mimetype;
+                if (mimeType.startsWith('image/')) {
+    
+                        const filePath = path.join(destination, `${req.file.originalname}`);
+                        fs.writeFileSync(filePath, req.file.buffer);
+    
+                        this.repository.createImage({
+                            "datasetId": Number(req.params.datasetId),
+                            "path": filePath,
+                            "description": req.body.description
+                          });
+                        
+                        res.status(200).json({ Result: 'File uploaded successfully.'});
+                };
+            }
+        } catch(error) {
+            if( error instanceof ErrorCode){
+                error.send(res);
+            } else {
+                new ConcreteErrorCreator().createServerError().setFailedUploadFile().send(res);
+            }
+        }
     }
 
 
-
+    // route to upload a file zip on volume and on database
     async uploadZip(req: Request, res: Response) {
+        try{
             if (!req.file) {
-                return res.status(400).json({ error: 'File must be provided' });
-            } else{
+                throw new ConcreteErrorCreator().createBadRequestError().setAbsentFile();
+            } 
 
             const zip = new AdmZip(req.file.buffer);
             const zipEntries: IZipEntry[] = zip.getEntries();
 
-            try{
-                const destination = await this.repository.createDestinationRepo(Number(req.params.datasetId));
-                if(typeof destination === 'string'){
+            const destination = await this.repository.createDestinationRepo(Number(req.params.datasetId));
+            if(typeof destination === 'string'){
                 await this.repository.processZipEntries(Number(req.params.datasetId),zipEntries, destination);
-                res.send('File uploaded successfully')
-                }
-            } catch(err) {
-                if( err instanceof ErrorCode){
-                    err.send(res);
-                }
+                res.status(200).json( { Result: 'File uploaded successfully'})
+            }
+        } catch(error) {
+            if( error instanceof ErrorCode){
+                error.send(res);
+            } else {
+                new ConcreteErrorCreator().createServerError().setFailedUploadFile().send(res);
             }
         }
-    };
-
-
+    }
+        
+    // route to upload an image or a file zip on volume and on database
     async uploadFile(req: Request, res: Response){
-        if (!req.file) {
-            return res.status(400).json({ error: 'File must be provided' });
-        }
-
-        const destination = await this.repository.createDestinationRepo(Number(req.params.datasetId));
-        if( typeof destination === 'string'){
-
-            const mimeType = req.file.mimetype;
-
-            if (mimeType.startsWith('image/')) {
-                try{
-                    // Salva il file nella directory di destinazione
+        try{
+            if (!req.file) {
+                throw new ConcreteErrorCreator().createBadRequestError().setAbsentFile();
+            }
+    
+            const destination = await this.repository.createDestinationRepo(Number(req.params.datasetId));
+    
+            if( typeof destination === 'string'){
+    
+                const mimeType = req.file.mimetype;
+    
+                if (mimeType.startsWith('image/')) {
                     const filePath = path.join(destination, `${req.file.originalname}`);
                     fs.writeFileSync(filePath, req.file.buffer);
-
-                    // Invia una risposta di successo
-                    res.send('File uploaded successfully.');
-                } catch (error) {
-                    res.status(500).send(`Error on uploading file: ${error}`);
-                }
-            } else if (mimeType.startsWith('application/zip')) {
-                try{
+        
+                    this.repository.createImage({
+                        "datasetId": Number(req.params.datasetId),
+                        "path": filePath,
+                        "description": req.body.description
+                    });
+                } else if (mimeType.startsWith('application/zip')) {
                     const zip = new AdmZip(req.file.buffer);
                     const zipEntries: IZipEntry[] = zip.getEntries();
-                    await this.repository.processZipEntries(Number(req.params.datasetId), zipEntries, destination);
-                    res.send('File uploaded successfully.');
-                } catch(error){
-                    res.status(500).send(`Errore on uploading file: ${error}`);
+                    await this.repository.processZipEntries(Number(req.params.datasetId),zipEntries, destination);
+                } else {
+                    throw new ConcreteErrorCreator().createBadRequestError().setNotSupportedFile();
                 }
+                res.status(200).json( { Result: 'File uploaded successfully'}); // todo: success interface
+            }
+        } catch(error){
+            if( error instanceof ErrorCode){
+                error.send(res);
             } else {
-                res.status(500).send('File format not supported');
+                new ConcreteErrorCreator().createServerError().setFailedUploadFile().send(res);
             }
         }
     }

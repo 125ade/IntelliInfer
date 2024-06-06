@@ -147,40 +147,44 @@ export class BadRequestError extends ErrorCode {
     
     // file da caricare assente 
     setAbsentFile(): ErrorCode {
-      return this.set("There was an error. An image or zip file must be provided");
+      return this.set("There was an error. An image or zip file must be provided.");
     }
 
     // file da caricare assente 
     setAbsentBody(): ErrorCode {
-      return this.set("There was an error. Body request must be provided");
+      return this.set("There was an error. Body request must be provided.");
     }
     
     // l'immagine è già stata sottoposta a inferenza
     setInferredImage() {
-      return this.set("The image has already an inference");
+      return this.set("The image has already an inference.");
     }
     
     // bisogna specificare l'id del dataset nella richiesta
     setNoDatasetId(): ErrorCode {
-        return this.set("There was an error. DatasetId must be provided");
+        return this.set("There was an error. DatasetId must be provided.");
     }
     
     // bisogna specificare l'id dei risultati nella richiesta
     setNoResultId(): ErrorCode {
-        return this.set("There was an error. ResultId must be provided");
+        return this.set("There was an error. ResultId must be provided.");
     }
 
     // bisogna specificare l'id dell'utente nella richiesta
     setNoUserId(): ErrorCode {
-        return this.set("There was an error. User Id must be provided");
+        return this.set("There was an error. User Id must be provided.");
     }
 
     setMissingToken(): ErrorCode {
-      return this.set("There was an error. Token must be provided");
+      return this.set("There was an error. Token must be provided.");
     }
 
     setMissingKey(): ErrorCode {
-      return this.set("There was an error. Key must be provided");
+      return this.set("There was an error. Key must be provided.");
+    }
+
+    setNotSupportedFile(): ErrorCode {
+      return this.set("There was an error. File format not supported.");
     }
 
 
