@@ -50,6 +50,17 @@ export class Repository implements IRepository {
         return user.findById(userId);
     }
 
+    public async getUserByEmail(userEmail: string): Promise<User | ConcreteErrorCreator> {
+        const user: UserDao = new UserDao();
+        return user.findByEmail(userEmail);
+    }
+
+
+    public async getDatasetListByUserId(userId: number): Promise<Dataset[] | ConcreteErrorCreator> {
+        const dataset: DatasetDao = new DatasetDao();
+        return dataset.findAllByUserId(userId);
+    }
+
     // method to create tags associated with a specific dataset
     public async createTags(tags: string[], datasetId: number): Promise<Tag[]> {
         const tagDao = new TagDao()

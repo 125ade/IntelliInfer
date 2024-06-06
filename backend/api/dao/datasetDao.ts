@@ -31,11 +31,11 @@ export default class DatasetDao implements IDao<Dataset> {
     }
     
     // returns all datasets associated to a specific userId on database
-    async findAllByUserId(userid: number): Promise<Dataset[] | ConcreteErrorCreator> {
+    async findAllByUserId(userId: number): Promise<Dataset[] | ConcreteErrorCreator> {
         try {
             return await Dataset.findAll({
                 where: {
-                    userId: userid
+                    userId: userId
                 }
             });
         } catch {

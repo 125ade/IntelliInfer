@@ -1,4 +1,4 @@
-import {Router} from "express";
+import {Router, Request, Response, RequestHandler } from "express";
 import UserController from "../controllers/user.controller";
 import multer from 'multer';
 import { validateCreateDataset, validateParamIntGreaterThanZero, validateFileUpload } from "../middleware/validation.middleware";
@@ -60,7 +60,7 @@ export default class UserRoutes{
         this.router.get(
             "/inference/state/:resultId",
             AuthUser,
-            validateParamIntGreaterThanZero('resultId'), 
+            validateParamIntGreaterThanZero('resultId'),
             this.userController.findResultById.bind(this.userController)
         );
 
@@ -97,8 +97,11 @@ export default class UserRoutes{
         // todo get /dataset/list
         // autenticazione
         // autorizzazione "user"
-        this.router.get("/dataset/list",
-            this.userController.datasetListByUserId.bind(this.userController));
+        const routeHandler: RequestHandler = async (req: Request, res: Response) => {
+            await this.userController.datasetListByUserId(req, res);
+        };
+
+        this.router.get('/dataset/list', AuthUser, routeHandler);
 /**
         // todo get /dataset/:datasetId
         // autenticazione

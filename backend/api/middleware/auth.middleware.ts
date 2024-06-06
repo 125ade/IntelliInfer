@@ -3,6 +3,12 @@ import { ConcreteErrorCreator} from "../factory/ErrorCreator";
 import {decodeToken, ITokenPayload, validateToken} from '../token'
 import {UserRole} from "../static";
 
+declare module 'express' {
+    export interface Request {
+        userEmail?: string;
+        userRole?: string;
+    }
+}
 
 export const verifyTokenSignature = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -39,6 +45,8 @@ export const verifyUserRole =  (allowedAccessTypes: string[]) => {
             const hasAccessToEndpoint: boolean = allowedAccessTypes.includes(decodedToken.role);
 
             if (hasAccessToEndpoint) {
+                req.userEmail = decodedToken.userEmail;
+                req.userRole = decodedToken.role;
                 return next();
             } else {
                 return next(new ConcreteErrorCreator().createAuthenticationError().setNotRightRole().send(res));

@@ -25,8 +25,17 @@ export default class UserDAO implements IDao<User> {
         return user;
     }
 
-    async findByEmail(email: string): Promise<User | null> {
-        return await User.findOne({ where: { email } });
+    async findByEmail(email: string): Promise<User | ConcreteErrorCreator> {
+         try {
+            let user: User | null = await User.findOne({ where: { email } });
+            if (user === null) {
+                throw new ConcreteErrorCreator().createNotFoundError().setNoUser();
+            } else {
+                return user;
+            }
+         } catch (error) {
+             throw new ConcreteErrorCreator().createNotFoundError().setNoUser();
+         }
     }
     
     // I suppose the admin could create and delete users (??)
