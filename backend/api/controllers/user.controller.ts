@@ -60,6 +60,33 @@ export default class UserController {
         }
     }
 
+
+
+    async datasetDetail(req: Request, res: Response): Promise<void> {
+        try{
+            if (req.params.datasetId !== undefined){
+                const datasetId = Number(req.params.datasetId);
+                const dataset = await this.repository.getDatasetDetail(datasetId);
+                if (dataset !== null && dataset !== undefined && !(dataset instanceof ErrorCode)){
+                    res.status(200).json(dataset);
+                }else{
+                    throw new ConcreteErrorCreator().createNotFoundError().setAbstentDataset();
+                }
+            }else{
+                throw new ConcreteErrorCreator().createBadRequestError().setNoDatasetId();
+            }
+
+        }catch(error){
+            if (error instanceof ErrorCode) {
+                error.send(res);
+            }else{
+                new ConcreteErrorCreator().createServerError().setFailedRetriveItem().send(res)
+            }
+        }
+
+    }
+
+
     async findModelById(req: Request, res: Response) {
         try {
             const modelId: number = Number(req.params.modelId);// todo ai model potrebbe ritornare null è da verificare

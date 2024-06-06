@@ -1,6 +1,6 @@
-import { IDao } from './daoInterface';
+import {IDao} from './daoInterface';
 import Dataset from '../models/dataset';
-import { ConcreteErrorCreator } from '../factory/ErrorCreator';
+import {ConcreteErrorCreator} from '../factory/ErrorCreator';
 import {SuccessResponse} from "../utils/utils";
 import {ErrorCode} from "../factory/ErrorCode";
 
@@ -78,7 +78,6 @@ export default class DatasetDao implements IDao<Dataset> {
             if (numberOfAffectedRows === 0) {
                 throw new ConcreteErrorCreator().createNotFoundError().setAbstentDataset();
             }
-
             return {
                 success: true,
                 message: "deleted successfully",

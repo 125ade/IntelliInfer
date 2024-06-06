@@ -66,6 +66,10 @@ export class ServerError extends ErrorCode {
     setFailedCreationRepo(): ErrorCode {
       return this.set("Error. Dataset path must be provided")
     }
+
+    setFailedRetriveItem() {
+        return this.set("Error. Item can not be provided")
+    }
 }
 
 /**

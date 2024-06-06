@@ -16,6 +16,7 @@ import path from 'path';
 import fs from 'fs';
 import { IZipEntry }  from 'adm-zip';
 import mime from 'mime-types';
+import {ErrorCode} from "../factory/ErrorCode";
 
 
 
@@ -28,6 +29,7 @@ export interface IRepository {
     findModel(modelId: number): Promise<Ai | null>;
     findResult(resultId: number): Promise<Result | null>;
     createDatasetWithTags(data: any, user: User): Promise<Dataset> ;
+    getDatasetDetail(datasetId: number): Promise<Dataset | ErrorCode> ;
     logicallyDelete(datasetId: number): Promise<Object | null>;
     updateModelWeights(modelId: number, weights: string ): Promise<Ai | null>;
     findDatasetById(datasetId: number): Promise<Dataset | null>;
@@ -248,6 +250,21 @@ export class Repository implements IRepository {
             throw new ConcreteErrorCreator().createNotFoundError().setNoUser();
         }
         return { updatedUser: user };
+    }
+
+
+    async getDatasetDetail(datasetId: number): Promise<Dataset | ErrorCode> {
+        try{
+            const datasetDao = new DatasetDao();
+            const dataset = await datasetDao.findById(datasetId);
+            if( dataset !== null && dataset !== undefined ){
+                return dataset
+            }else{
+                return new ConcreteErrorCreator().createNotFoundError().setAbstentDataset();
+            }
+        } catch {
+            return new ConcreteErrorCreator().createNotFoundError().setAbstentDataset();
+        }
     }
 }
 

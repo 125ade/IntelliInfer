@@ -102,15 +102,25 @@ export default class UserRoutes{
         this.router.get(
             '/dataset/list',
             AuthUser,
-            this.userController.datasetListByUserId.bind(this.userController)
-        );
-        
-        
+            this.userController.datasetListByUserId.bind(this.userController));
+
+
+        // todo get /dataset/:datasetId
+        // autenticazione
+        // autorizzazione "user"
+        this.router.get(
+            "/dataset/:datasetId",
+            AuthUser,
+            validateParamIntGreaterThanZero('datasetId'),
+            this.userController.datasetDetail.bind(this.userController));
+
+
+
         // display of a user's remaining credit
         this.router.get('/display/credit',
             AuthUser,
             this.userController.displayResidualCredit.bind(this.userController)
         );
-        
+
     }
 }
