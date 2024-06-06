@@ -102,7 +102,7 @@ export default class UserRoutes{
         */
 
 
-        // todo get /dataset/list
+
         // autenticazione
         // autorizzazione "user"
         this.router.get(
@@ -110,18 +110,17 @@ export default class UserRoutes{
             AuthUser,
             this.userController.datasetListByUserId.bind(this.userController));
 
-        /**
+
         // todo get /dataset/:datasetId
         // autenticazione
         // autorizzazione "user"
-        this.router.get("/dataset/:datasetId", this.userController.TOIMPLEMENT);
-        */
+        this.router.get(
+            "/dataset/:datasetId",
+            AuthUser,
+            validateParamIntGreaterThanZero('datasetId'),
+            this.userController.datasetDetail.bind(this.userController));
 
-        /**
-        // todo post /inference/:datasetId/:aiId/
-        // autenticazione
-        // autorizzazione "user"
-        this.router.post("/inference/:datasetId/:aiId/", this.userController.TOIMPLEMENT);
-        */
+
+        
     }
 }
