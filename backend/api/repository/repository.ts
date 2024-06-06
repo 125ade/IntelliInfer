@@ -8,16 +8,13 @@ import AiDao from '../dao/aiDao';
 import Ai from '../models/ai';
 import ResultDao from '../dao/resultDao';
 import Result from '../models/result';
-import { isImage, unzipImages } from '../utils/utils'; // Importa le funzioni di utilità
-import { SequelizeConnection } from '../db/SequelizeConnection';
 import { ConcreteErrorCreator } from '../factory/ErrorCreator';
-
 import Dataset from '../models/dataset';
 import User from "../models/user";
 import DatasetTags from '../models/datasettag';
 import path from 'path';
-import fs, { PathLike } from 'fs';
-import AdmZip, { IZipEntry }  from 'adm-zip';
+import fs from 'fs';
+import { IZipEntry }  from 'adm-zip';
 import mime from 'mime-types';
 
 

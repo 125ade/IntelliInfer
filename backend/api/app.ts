@@ -15,10 +15,6 @@ import { RedisConnection } from "./queues/RedisConnection";
 import {SystemRoutes, UserRoutes, AdminRoutes} from "./routes/index.routes";
 import { syncDb } from "./db/dbSync";
 import * as process from "node:process";
-
-
-import {AuthUser, verifyTokenExpiration, verifyTokenSignature, verifyUserRole} from "./middleware/auth.middleware";
-import {UserRole} from "./static";
 import {handleRouteNotFound} from "./middleware/route.middleware";
 
 
@@ -103,9 +99,9 @@ try {
 
 
 // Inizializza le rotte
-const userRoutes : UserRoutes = new UserRoutes();
+const userRoutes: UserRoutes = new UserRoutes();
 const systRoutes: SystemRoutes = new SystemRoutes()
-const adminRoutes = new AdminRoutes();
+const adminRoutes: AdminRoutes = new AdminRoutes();
 
 // Usa le rotte definite nella classe UserRoutes
 app.use('/api', userRoutes.router);
