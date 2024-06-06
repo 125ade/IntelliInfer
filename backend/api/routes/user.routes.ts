@@ -1,9 +1,9 @@
-import {Router, Request, Response, RequestHandler } from "express";
+import {Router} from "express";
 import UserController from "../controllers/user.controller";
 import multer from 'multer';
 import { validateCreateDataset, validateParamIntGreaterThanZero, validateFileUpload } from "../middleware/validation.middleware";
-import {AuthUser, verifyTokenExpiration, verifyTokenSignature, verifyUserRole} from "../middleware/auth.middleware";
-import {UserRole} from "../static";
+import {AuthUser} from "../middleware/auth.middleware";
+
 
 
 // Multer configuration to manage uploaded files
@@ -69,7 +69,7 @@ export default class UserRoutes{
         // upload of an image
         this.router.post(
             "/dataset/:datasetId/upload/image",
-            //AuthUser,
+            AuthUser,
             validateParamIntGreaterThanZero('datasetId'),
             upload.single("image"),
             this.userController.uploadImage.bind(this.userController));
@@ -78,7 +78,7 @@ export default class UserRoutes{
         // upload of a zip file
         this.router.post(
             '/dataset/:datasetId/upload/zip',
-            //AuthUser,
+            AuthUser,
             validateParamIntGreaterThanZero('datasetId'),
             upload.single('zip'),
             this.userController.uploadZip.bind(this.userController));
@@ -88,9 +88,10 @@ export default class UserRoutes{
         // TODO: handle user tokens
         this.router.post(
             '/dataset/:datasetId/upload/file',
-            //validateParamIntGreaterThanZero('datasetId'),
+            AuthUser,
+            validateParamIntGreaterThanZero('datasetId'),
             upload.single('file'),
-            //validateFileUpload,
+            validateFileUpload,
             this.userController.uploadFile.bind(this.userController)
         );
 
