@@ -59,7 +59,7 @@ export default class UserRoutes{
         // finds an inference result given its id
         // todo: we have to change this route because we have to find the result given the id of the inference
         this.router.get(
-            "/inference/state/:resultId",
+            "/inference/result/:resultId",
             AuthUser,
             validateParamIntGreaterThanZero('resultId'),
             this.userController.findResultById.bind(this.userController)
@@ -67,28 +67,35 @@ export default class UserRoutes{
 
 
         // esegue l'upload di un'immagine
-        this.router.post("/dataset/:datasetId/upload/image", upload.single("image"), this.userController.uploadImage.bind(this.userController));
+        this.router.post(
+            "/dataset/:datasetId/upload/image",
+            //AuthUser,
+            validateParamIntGreaterThanZero('datasetId'),
+            upload.single("image"),
+            this.userController.uploadImage.bind(this.userController));
 
 
         // esegue l'upload di un file zip
-        this.router.post('/dataset/:datasetId/upload/zip', upload.single('zip'), this.userController.uploadZip.bind(this.userController));
+        this.router.post(
+            '/dataset/:datasetId/upload/zip',
+            //AuthUser,
+            validateParamIntGreaterThanZero('datasetId'),
+            upload.single('zip'),
+            this.userController.uploadZip.bind(this.userController));
 
 
         // esegue l'upload di un file( zip o immagine)
         this.router.post(
             '/dataset/:datasetId/upload/file',
-            validateParamIntGreaterThanZero('datasetId'),
+            //validateParamIntGreaterThanZero('datasetId'),
             upload.single('file'),
-            validateFileUpload,
+            //validateFileUpload,
             this.userController.uploadFile.bind(this.userController)
         );
 
 
-
-
-
         /**
-        // todo get /inference/result/:resultId
+        // todo get /inference/state/:resultId
         // autenticazione
         // autorizzazione "user"
         this.router.get("/inference/result/:resultId", this.userController.TOIMPLEMENT);
@@ -102,7 +109,8 @@ export default class UserRoutes{
             '/dataset/list',
             AuthUser,
             this.userController.datasetListByUserId.bind(this.userController));
-/**
+
+        /**
         // todo get /dataset/:datasetId
         // autenticazione
         // autorizzazione "user"
@@ -115,7 +123,5 @@ export default class UserRoutes{
         // autorizzazione "user"
         this.router.post("/inference/:datasetId/:aiId/", this.userController.TOIMPLEMENT);
         */
-
-
     }
 }

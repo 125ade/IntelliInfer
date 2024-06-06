@@ -1,6 +1,5 @@
 import { DataTypes, Model, Association } from 'sequelize';
 import { SequelizeConnection } from '../db/SequelizeConnection';
-import Tag from './tag';
 import User from './user';
 import DatasetTags from './datasettag';
 
@@ -87,18 +86,7 @@ Dataset.init(
 
 
 
-/** 
-Dataset.belongsTo(User, {
-  foreignKey: 'userId',
-  as: 'user',
-});
 
-User.hasMany(Dataset, {
-  sourceKey: 'id',
-  foreignKey: 'userId',
-  as: 'datasets',
-});
-*/
 
 
 

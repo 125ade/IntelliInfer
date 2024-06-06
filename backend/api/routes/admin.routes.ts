@@ -20,8 +20,6 @@ export default class AdminRoutes{
         // this.router.put("/credit/recharge/:userId", this.adminController.rechargeTokens);
 
     }
-    
-
 }
 
 
