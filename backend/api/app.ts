@@ -12,10 +12,10 @@ import { ExpressAdapter } from "@bull-board/express";
 import { setupLogging } from "./middleware/logger.middleware";
 import { Queue } from "./queues/Queue";
 import { RedisConnection } from "./queues/RedisConnection";
-import {SystemRoutes, UserRoutes} from "./routes/index.routes";
+import {SystemRoutes, UserRoutes, AdminRoutes} from "./routes/index.routes";
 import { syncDb } from "./db/dbSync";
 import * as process from "node:process";
-import AdminRoutes from './routes/admin.routes';
+
 
 import {AuthUser, verifyTokenExpiration, verifyTokenSignature, verifyUserRole} from "./middleware/auth.middleware";
 import {UserRole} from "./static";
