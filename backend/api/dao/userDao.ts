@@ -3,7 +3,7 @@ import User from '../models/user';
 import { ConcreteErrorCreator } from '../factory/ErrorCreator';
 import {ErrorCode} from "../factory/ErrorCode";
 
-export default class UserDAO implements IDao<User> {
+export default class UserDao implements IDao<User> {
 
     constructor() {}
     
@@ -27,16 +27,12 @@ export default class UserDAO implements IDao<User> {
     }
 
     async findByEmail(email: string): Promise<User | ConcreteErrorCreator> {
-         try {
             let user: User | null = await User.findOne({ where: { email } });
-            if (user === null) {
+            if (!user) {
                 throw new ConcreteErrorCreator().createNotFoundError().setNoUser();
             } else {
                 return user;
             }
-         } catch (error) {
-             throw new ConcreteErrorCreator().createNotFoundError().setNoUser();
-         }
     }
     
     // I suppose the admin could create and delete users (??)

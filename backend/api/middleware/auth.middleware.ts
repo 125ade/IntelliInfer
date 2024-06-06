@@ -16,20 +16,23 @@ export const verifyTokenSignature = async (req: Request, res: Response, next: Ne
 
 
         if (!jwt) {
-          next(new ConcreteErrorCreator().createAuthenticationError().setInvalidToken().send(res));
+          return next(new ConcreteErrorCreator().createAuthenticationError().setInvalidToken().send(res));
 
         }
 
         if (jwt && jwt.toLowerCase().startsWith('bearer')) {
           jwt = jwt.slice('bearer'.length).trim();
-          await validateToken(jwt);
+          const decodedToken = await validateToken(jwt);
+
+          req.userEmail = decodedToken.email;
+          req.userRole = decodedToken.role;
           next();
         } else {
-          next(new ConcreteErrorCreator().createAuthenticationError().setInvalidSignature().send(res));
+          return next(new ConcreteErrorCreator().createAuthenticationError().setInvalidSignature().send(res));
 
         }
   } catch (error: any) {
-    next(new ConcreteErrorCreator().createAuthenticationError().setInvalidToken().send(res));
+    return next(new ConcreteErrorCreator().createAuthenticationError().setInvalidToken().send(res));
 
   }
 };
