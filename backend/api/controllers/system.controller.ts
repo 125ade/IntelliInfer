@@ -39,6 +39,24 @@ export default class SystemController {
     }
 
     async startInference(req: Request, res: Response, next: NextFunction) {
+        try {
+            // quantificare le immagini del dataset => attraverso datasetId
+            // calcolo dei token necessari => attraverso jwt
+            // verifica credito dei token sia sufficiente
+            // raccolta dati
+            // generare il codice result preliminare e prendere l'id
+            // invio del job a redis {dataset id_postgres}
+
+
+
+
+        }catch (error){
+            if (error instanceof ErrorCode) {
+                error.send(res);
+            }else{
+                new ConcreteErrorCreator().createServerError().setFailedStartInference().send(res);
+            }
+        }
 
     }
 

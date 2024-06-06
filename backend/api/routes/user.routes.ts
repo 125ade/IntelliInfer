@@ -96,7 +96,7 @@ export default class UserRoutes{
         );
 
 
-        // todo get /dataset/list
+
         // autenticazione
         // autorizzazione "user"
         this.router.get(
@@ -105,7 +105,7 @@ export default class UserRoutes{
             this.userController.datasetListByUserId.bind(this.userController));
 
 
-        // todo get /dataset/:datasetId
+
         // autenticazione
         // autorizzazione "user"
         this.router.get(

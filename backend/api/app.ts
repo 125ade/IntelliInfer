@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import Redis from "ioredis";
+
 require('dotenv').config();
 import express, {Express} from "express";
 import bodyParser from 'body-parser';
@@ -10,12 +10,12 @@ import { createBullBoard } from '@bull-board/api';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { ExpressAdapter } from "@bull-board/express";
 import { setupLogging } from "./middleware/logger.middleware";
-import { Queue } from "./queues/Queue";
-import { RedisConnection } from "./queues/RedisConnection";
+
 import {SystemRoutes, UserRoutes, AdminRoutes} from "./routes/index.routes";
 import { syncDb } from "./db/dbSync";
 import * as process from "node:process";
 import {handleRouteNotFound} from "./middleware/route.middleware";
+import {TaskQueue} from "./queues/Worker";
 
 
 // api variable
@@ -45,48 +45,24 @@ syncDb().then(():void=>{console.log("\t--> SYNC BD DONE")})
 
 // manage job
 try {
-  // Ottieni la connessione Redis dalla classe singleton
-  const connection :Redis = RedisConnection.getInstance().redis;
+    const taskQueue: TaskQueue = new TaskQueue();
+    const serverAdapter = new ExpressAdapter();
+    serverAdapter.setBasePath('/admin/queues');
+    const bullBoard = createBullBoard({
+        queues: [new BullMQAdapter(taskQueue.getQueue()['queue'])],
+        serverAdapter: serverAdapter
+    });
 
-  // Inizializza la coda con la connessione
-  const dockerTaskQueue = new Queue(QUEUE_TASK_DOCKER);
-
-  // Definizione del worker
-  dockerTaskQueue.process(1, async (job) => {
-    await job.log("[log] inizio work");
-    await job.updateProgress(1);
-
-    await job.updateProgress(40);
-
-    try {
-      await job.updateProgress(50);
-    } catch (err) {
-      await job.log(`[log] Errore: ${err}`);
-    }
-
-    await job.updateProgress(100);
-    await job.log("[log] fine work");
-  });
-
-  // Configura Bull Board per gestire le code
-  const serverAdapter = new ExpressAdapter();
-  serverAdapter.setBasePath('/admin/queues');
-
-  const bullBoard = createBullBoard({
-    queues: [new BullMQAdapter(dockerTaskQueue['queue'])], // Passa la proprietà queue della classe Queue
-    serverAdapter: serverAdapter
-  });
-
-  app.use('/admin/queues', serverAdapter.getRouter());
+    app.use('/admin/queues', serverAdapter.getRouter());
 
 } catch (err) {
-  // todo handle log
-  console.error(err);
+    // todo handle log
+    console.error(err);
 }
 
 
 
-// manage job
+// manage open API
 try {
   const openApiSpec = JSON.parse(fs.readFileSync(path.join(__dirname, 'openapi.json'), 'utf8'));
   app.use('/admin/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
@@ -94,8 +70,6 @@ try {
   // todo handle log
   console.error(err);
 }
-
-
 
 
 // Inizializza le rotte
