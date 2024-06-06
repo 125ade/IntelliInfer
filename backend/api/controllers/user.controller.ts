@@ -7,7 +7,8 @@ import path from 'path';
 import AdmZip, { IZipEntry }  from 'adm-zip';
 import User from "../models/user";
 import {decodeToken} from "../token";
-import UserDao from "../dao/userDao";
+import mime from 'mime-types';
+
 
 
 export default class UserController {
@@ -224,6 +225,42 @@ export default class UserController {
         try{
             if (!req.file) {
                 throw new ConcreteErrorCreator().createBadRequestError().setAbsentFile();
+            }
+
+            // Calcola il costo totale dei file da caricare
+            let totalCost = 0;
+            if (req.file.mimetype.startsWith('image/')) {
+                totalCost += 0.75;
+            } else if (req.file.mimetype.startsWith('application/zip')) {
+                const zip = new AdmZip(req.file.buffer);
+                const zipEntries: IZipEntry[] = zip.getEntries();
+                for (const entry of zipEntries) {
+                    const mimeType = mime.lookup(entry.entryName);
+                    if (mimeType && mimeType.startsWith('image/')) {
+                        totalCost += 0.8;
+                    }
+                }
+            } else {
+                throw new ConcreteErrorCreator().createBadRequestError().setNotSupportedFile();
+            }
+            
+            const userEmail = req.userEmail;
+
+            if (!userEmail) {
+                throw new ConcreteErrorCreator().createBadRequestError().setMissingEmail();
+            }
+            
+            const user = await this.repository.getUserByEmail(userEmail);
+            
+            if( user instanceof User){
+                // Verifica se l'utente ha abbastanza token disponibili
+                if (user.token < totalCost) {
+                    throw new ConcreteErrorCreator().createForbiddenError().setInsufficientToken();
+                }  else {
+                    // Sottrai il costo totale dai token dell'utente
+                    user.token -= totalCost;
+                    await user.save(); // Salva l'utente con il saldo aggiornato
+                }
             }
 
             const destination = await this.repository.createDestinationRepo(Number(req.params.datasetId));
