@@ -11,6 +11,7 @@ import { checkMimeType } from "../utils/utils";
 import AdmZip, { IZipEntry }  from 'adm-zip';
 import mime from 'mime-types';
 import ImageDao from "../dao/imageDao";
+import User from "../models/user";
 
 
 export default class UserController {
@@ -35,12 +36,25 @@ export default class UserController {
     }
 
     async datasetListByUserId(req: Request, res: Response): Promise<void> {
-        // try {
-        //     const userId =
-        // }catch (error){
-        //
-        // }
+        try {
+            const userEmail: string | undefined = req.userEmail;
+
+            if (userEmail) {
+                const user = await this.repository.getUserByEmail(userEmail);
+                if (user && user instanceof User) {
+                    const datasetList = await this.repository.getDatasetListByUserId(user.id);
+                    res.status(200).json(datasetList);
+                } else {
+                    res.status(404).json({ error: 'User not found or invalid user type' });
+                }
+            } else {
+                res.status(400).json({ error: 'User email is undefined' });
+            }
+        } catch (error) {
+            res.status(500).json({ error: 'Internal server error' });
+        }
     }
+
 
     async findModelById(req: Request, res: Response) {
         try {
