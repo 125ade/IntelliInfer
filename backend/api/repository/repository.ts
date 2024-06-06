@@ -21,6 +21,10 @@ import {ErrorCode} from "../factory/ErrorCode";
 
 
 export interface IRepository {
+    getUserById(userId: number): Promise<User | ConcreteErrorCreator>;
+    getUserByEmail(userEmail: string): Promise<User | ConcreteErrorCreator>;
+    getDatasetListByUserId(userId: number): Promise<Dataset[] | ConcreteErrorCreator>;
+    createTags(tags: string[], datasetId: number): Promise<Tag[]>;
     listAiModels(): Promise<Ai[] | null>;
     findModel(modelId: number): Promise<Ai | null>;
     findResult(resultId: number): Promise<Result | null>;
@@ -28,8 +32,13 @@ export interface IRepository {
     getDatasetDetail(datasetId: number): Promise<Dataset | ErrorCode> ;
     logicallyDelete(datasetId: number): Promise<Object | null>;
     updateModelWeights(modelId: number, weights: string ): Promise<Ai | null>;
+    findDatasetById(datasetId: number): Promise<Dataset | null>;
+    createImage(data: any): Promise<Image | null>;
     createDestinationRepo(datasetId: number): Promise<string | ConcreteErrorCreator> ;
-    processZipEntries(datasetId: number, zipEntries: IZipEntry[], destination: string): Promise<void | ConcreteErrorCreator>
+    processZipEntries(datasetId: number, zipEntries: IZipEntry[], destination: string): Promise<void | ConcreteErrorCreator>;
+    updateUserTokenByCost(userId: number, cost: number): Promise<void>;
+    checkUserToken(userId: number, amount: number): Promise<void>;
+    updateUserToken(userId: number, token: number): Promise<Object>
 }
 
 
@@ -37,7 +46,7 @@ export class Repository implements IRepository {
 
     constructor() {};
 
-    public async getUserById(userId: number): Promise<User | null> {
+    public async getUserById(userId: number): Promise<User | ConcreteErrorCreator> {
         const user: UserDao = new UserDao();
         return user.findById(userId);
     }
@@ -211,7 +220,7 @@ export class Repository implements IRepository {
         const userDao = new UserDao();
         const user = await userDao.findById(userId);
         this.checkUserToken(userId, cost);
-        if(user !== null){
+        if(user instanceof User){
             try {
                 await user.set({ token: user.token - cost }).save();
              } catch {
@@ -226,7 +235,7 @@ export class Repository implements IRepository {
     async checkUserToken(userId: number, amount: number): Promise<void> {
         const userDao = new UserDao();
         const user = await userDao.findById(userId);
-        if (user !== null && user.token < amount)
+        if (user instanceof User && user.token < amount)
             throw new ConcreteErrorCreator().createForbiddenError().setInsufficientToken();
     }
 
@@ -235,7 +244,7 @@ export class Repository implements IRepository {
     async updateUserToken(userId: number, token: number): Promise<Object> {
         const userDao = new UserDao();
         const user = await userDao.findById(userId);
-        if(user){
+        if(user instanceof User){
             await user.set({ token: token }).save();
         }else{
             throw new ConcreteErrorCreator().createNotFoundError().setNoUser();
