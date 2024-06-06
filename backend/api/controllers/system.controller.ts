@@ -22,14 +22,18 @@ export default class SystemController {
 
             const user: User | null = await this.repository.getUserById(userId);
             if (user !== null) {
+
                 const token = generateToken(user);
                 res.status(200).json({ token });
+
+
             }else{
                 new ConcreteErrorCreator().createNotFoundError().setNoUser().send(res)
             }
 
 
         } catch (error) {
+            //console.log(error)
             new ConcreteErrorCreator().createServerError().setFailedGenToken().send(res)
         }
     }
