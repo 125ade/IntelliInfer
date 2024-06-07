@@ -17,7 +17,7 @@ import fs from 'fs';
 import { IZipEntry }  from 'adm-zip';
 import mime from 'mime-types';
 import { v4 as uuidv4 } from 'uuid';
-import {SuccessResponse} from "../utils/utils";
+import {generatePath, SuccessResponse} from "../utils/utils";
 import DatasetTagDAO from "../dao/datasetTagDao";
 import datasettag from "../models/datasettag";
 
@@ -44,6 +44,7 @@ export interface IRepository {
     updateUserToken(userId: number, token: number): Promise<Object>
     generateUUID(): Promise<string>;
     getTags(datasetId: number): Promise<string[]>;
+    updateCountDataset(datasetId: number, num: number): Promise<Dataset|ConcreteErrorCreator>;
 }
 
 
@@ -78,16 +79,16 @@ export class Repository implements IRepository {
 
     // used into the route to create a dataset
     async createDatasetWithTags(data: any, user: User): Promise<Dataset>  {
-        const datasetDao = new DatasetDao();
-        const tagDao = new TagDao();
+        const datasetDao: DatasetDao = new DatasetDao();
+        const tagDao: TagDao = new TagDao();
 
         const { name, description, tags } = data; // quando avremo userid ci sarà anche quello
 
         // Generate the path
-        const path = this.generatePath(name);
+        const path: string = generatePath(name);
 
         // Create the dataset
-        const newDataset = await datasetDao.create({
+        const newDataset: Dataset = await datasetDao.create({
           name,
           description,
           path,
@@ -98,7 +99,7 @@ export class Repository implements IRepository {
 
         // Associate tags with the dataset
         for (const tagName of tags) {
-            const tagInstance = await tagDao.create({ name: tagName });
+            const tagInstance: Tag = await tagDao.create({ name: tagName });
             // Crea un'istanza della tabella di associazione DatasetTags
             await DatasetTags.create({
                 datasetId: newDataset.id,
@@ -110,44 +111,30 @@ export class Repository implements IRepository {
     }
 
 
-    // NB: to move into utils.ts
-    generatePath(name: string) {
-
-        // Rimuove spazi vuoti e caratteri speciali dal nome
-        const sanitizedName = name.replace(/[^a-zA-Z0-9]/g, '');
-
-        // Converte il nome in lowercase e sostituisci gli spazi con trattini
-        const formattedName = sanitizedName.toLowerCase().replace(/\s+/g, '-');
-
-        // Costruisce il percorso con il nome formattato
-        const path = `/path/${formattedName}`;
-
-        return path;
-    }
 
 
     // lists all available Ai models
     async listAiModels(): Promise<Ai[] | ConcreteErrorCreator>{
-        const aiDao = new AiDao();
+        const aiDao: AiDao = new AiDao();
         return aiDao.findAll();
     }
 
     // find an Ai model by id
     async findModel(modelId: number): Promise<Ai | ConcreteErrorCreator>{
-        const aiDao = new AiDao();
+        const aiDao: AiDao = new AiDao();
         return aiDao.findById(modelId);
     }
 
     // find an inference result by id
     async findResult(resultId: number): Promise<Result | ConcreteErrorCreator>{
-        const resultDao = new ResultDao();
+        const resultDao: ResultDao = new ResultDao();
         return resultDao.findById(resultId);
     }
 
     // Given the datasetId, deletes logically the dataset
     async logicallyDelete(datasetId: number): Promise<ConcreteErrorCreator| SuccessResponse>{
         try{
-            const datasetDao = new DatasetDao();
+            const datasetDao: DatasetDao = new DatasetDao();
             return datasetDao.logicallyDelete(datasetId);
         } catch {
             throw new ConcreteErrorCreator().createServerError().setFailedUpdatingItem();
@@ -156,7 +143,7 @@ export class Repository implements IRepository {
 
     // takes an ai model identified by its id and update its property pathWeigths with the path of the new weights
     async updateModelWeights(modelId: number, path: string ): Promise<Ai | ConcreteErrorCreator>  {
-        const aiDao = new AiDao();
+        const aiDao: AiDao = new AiDao();
         return aiDao.updateItem(modelId, path);
     }
 
@@ -228,15 +215,10 @@ export class Repository implements IRepository {
     async checkUserToken(userId: number, amount: number): Promise<boolean> {
         const userDao = new UserDao();
         const user = await userDao.findById(userId);
-        if (user instanceof User && user.token < amount){
-            return false
-        } else return true;
+        return !(user instanceof User && user.token < amount);
     }
 
-
-
-    // updates the token amount of a specified user
-    // returns the updated user
+    // updates the token amount of a specified user returns the updated user
     async updateUserToken(userId: number, token: number): Promise<Object> {
         const userDao = new UserDao();
         const user = await userDao.findById(userId);
@@ -265,7 +247,7 @@ export class Repository implements IRepository {
 
     
     // updates the number of elements of a dataset
-    public async updateCountDataset(datasetId: number, num: number) {
+    public async updateCountDataset(datasetId: number, num: number): Promise<Dataset|ConcreteErrorCreator> {
         const datasetDao = new DatasetDao();
         return datasetDao.updateCount(datasetId, num);
     }
