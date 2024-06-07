@@ -49,14 +49,18 @@ export default class DatasetDao implements IDao<Dataset> {
    
     // find a dataset by datasetId
     // NB we have to handle errors
-    async findById(datasetId: number): Promise<Dataset | null> {
+    async findById(datasetId: number): Promise<Dataset | ConcreteErrorCreator> {
         try {
-            return await Dataset.findOne({
+            const dataset = await Dataset.findOne({
                 where: {
                     id: datasetId,
                     isDeleted: false
                 }
             });
+            if( dataset instanceof Dataset){
+                return dataset;
+            }
+            else  throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
         } catch (error) {
             throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
         }
@@ -87,6 +91,22 @@ export default class DatasetDao implements IDao<Dataset> {
             return new ConcreteErrorCreator().createNotFoundError().setAbstentDataset();
         }
         
+    }
+
+    // find a dataset by datasetId
+    // NB we have to handle errors
+    async updateCount(datasetId: number, num: number): Promise<Dataset | ConcreteErrorCreator> {
+        try {
+            const dataset = await Dataset.findByPk(datasetId);
+            if( dataset instanceof Dataset) {
+                dataset.countElements += num;
+                dataset.save();
+                return dataset;
+            }
+            else throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
+        } catch (error) {
+            throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
+        }
     }
     
 }

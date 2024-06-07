@@ -228,24 +228,26 @@ export default class UserController {
             }
 
             // Calcola il costo totale dei file da caricare
+            let totalNumber = 0;
             let totalCost = 0;
             if (req.file.mimetype.startsWith('image/')) {
-                totalCost += 0.75;
+                totalNumber = 1;
+                totalCost = 0.75;
             } else if (req.file.mimetype.startsWith('application/zip')) {
                 const zip = new AdmZip(req.file.buffer);
                 const zipEntries: IZipEntry[] = zip.getEntries();
                 for (const entry of zipEntries) {
                     const mimeType = mime.lookup(entry.entryName);
                     if (mimeType && mimeType.startsWith('image/')) {
-                        totalCost += 0.8;
+                        totalNumber += 1;
                     }
                 }
+                totalCost = totalNumber * 0.8;
             } else {
                 throw new ConcreteErrorCreator().createBadRequestError().setNotSupportedFile();
             }
             
             const userEmail = req.userEmail;
-
             if (!userEmail) {
                 throw new ConcreteErrorCreator().createBadRequestError().setMissingEmail();
             }
@@ -254,13 +256,11 @@ export default class UserController {
             
             if( user instanceof User){
                 // Verifica se l'utente ha abbastanza token disponibili
-                if (user.token < totalCost) {
+                if( await this.repository.checkUserToken(user.id, totalCost)){
+                    this.repository.updateUserTokenByCost(user, totalCost);
+                } else {
                     throw new ConcreteErrorCreator().createForbiddenError().setInsufficientToken();
-                }  else {
-                    // Sottrai il costo totale dai token dell'utente
-                    user.token -= totalCost;
-                    await user.save(); // Salva l'utente con il saldo aggiornato
-                }
+                }  
             }
 
             const destination = await this.repository.createDestinationRepo(Number(req.params.datasetId));
@@ -285,6 +285,9 @@ export default class UserController {
                 } else {
                     throw new ConcreteErrorCreator().createBadRequestError().setNotSupportedFile();
                 }
+
+                this.repository.updateCountDataset(Number(req.params.datasetId), totalNumber);
+
                 res.status(200).json( { Result: 'File uploaded successfully'}); // todo: success interface
             }
         } catch(error){
