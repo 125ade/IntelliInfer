@@ -19,38 +19,37 @@ export default class DatasetDao implements IDao<Dataset> {
     }
     
     // returns all datasets on database
-    async findAll(): Promise<Dataset[] | null> {
-        try {
+    async findAll(): Promise<Dataset[] | ConcreteErrorCreator> {
           const datasets: Dataset[] = await Dataset.findAll({
             where: {
               isDeleted: false
             }
           });
-          return datasets;
-        } catch {
+          if( datasets.length !== 0){
+            return datasets;
+          } else {
             throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
-        }
+          }
     }
     
     // returns all datasets associated to a specific userId on database
     async findAllByUserId(user_id: number): Promise<Dataset[] | ConcreteErrorCreator> {
-        try {
-            return await Dataset.findAll({
+        const datasets = await Dataset.findAll({
                 where: {
                     userId: user_id,
                     isDeleted: false
                 }
             });
-        } catch {
+        if( datasets.length !== 0){
+            return datasets;
+        } else{
             throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
         }
     }
     
    
     // find a dataset by datasetId
-    // NB we have to handle errors
     async findById(datasetId: number): Promise<Dataset | ConcreteErrorCreator> {
-        try {
             const dataset = await Dataset.findOne({
                 where: {
                     id: datasetId,
@@ -61,9 +60,6 @@ export default class DatasetDao implements IDao<Dataset> {
                 return dataset;
             }
             else  throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
-        } catch (error) {
-            throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
-        }
     }
     
 

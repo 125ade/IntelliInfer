@@ -25,9 +25,9 @@ export interface IRepository {
     getUserByEmail(userEmail: string): Promise<User | ConcreteErrorCreator>;
     getDatasetListByUserId(userId: number): Promise<Dataset[] | ConcreteErrorCreator>;
     createTags(tags: string[], datasetId: number): Promise<Tag[]>;
-    listAiModels(): Promise<Ai[] | null>;
+    listAiModels(): Promise<Ai[] | ConcreteErrorCreator>;
     findModel(modelId: number): Promise<Ai | ConcreteErrorCreator>;
-    findResult(resultId: number): Promise<Result | null>;
+    findResult(resultId: number): Promise<Result | ConcreteErrorCreator>;
     createDatasetWithTags(data: any, user: User): Promise<Dataset> ;
     getDatasetDetail(datasetId: number): Promise<Dataset | ConcreteErrorCreator> ;
     logicallyDelete(datasetId: number): Promise<Object | null>;
@@ -104,7 +104,7 @@ export class Repository implements IRepository {
         return newDataset;
     }
 
-
+     
     // NB: to move into utils.ts
     generatePath(name: string) {
 
@@ -119,9 +119,10 @@ export class Repository implements IRepository {
 
         return path;
     }
+    
 
     // lists all available Ai models
-    async listAiModels(): Promise<Ai[] | null>{
+    async listAiModels(): Promise<Ai[] | ConcreteErrorCreator>{
         const aiDao = new AiDao();
         return aiDao.findAll();
     }
@@ -133,7 +134,7 @@ export class Repository implements IRepository {
     }
 
     // find an inference result by id
-    async findResult(resultId: number): Promise<Result | null>{
+    async findResult(resultId: number): Promise<Result | ConcreteErrorCreator>{
         const resultDao = new ResultDao();
         return resultDao.findById(resultId);
     }
