@@ -18,6 +18,8 @@ import { IZipEntry }  from 'adm-zip';
 import mime from 'mime-types';
 import { v4 as uuidv4 } from 'uuid';
 import {SuccessResponse} from "../utils/utils";
+import DatasetTagDAO from "../dao/datasetTagDao";
+import datasettag from "../models/datasettag";
 
 
 
@@ -40,6 +42,8 @@ export interface IRepository {
     updateUserTokenByCost(user: User, cost: number): Promise<void>;
     checkUserToken(userId: number, amount: number): Promise<boolean>;
     updateUserToken(userId: number, token: number): Promise<Object>
+    generateUUID(): Promise<string>;
+    getTags(datasetId: number): Promise<string[]>;
 }
 
 
@@ -267,7 +271,26 @@ export class Repository implements IRepository {
     }
 
     async generateUUID(): Promise<string> {
-        return uuidv4();
+        let unique: boolean = false;
+        let uuid: string = "";
+        while (!unique) {
+            uuid = uuidv4();
+            const existingRecord: Result | null = await Result.findOne({
+                where: {
+                    requestId: uuid
+                }
+            });
+            if (!existingRecord) {
+                unique = true;
+            }
+        }
+        return uuid;
+    }
+
+
+    async getTags(datasetId: number): Promise<string[]> {
+        const datasetTagDao = new DatasetTagDAO();
+        return await datasetTagDao.findAllByDatasetId(datasetId);
     }
 }
 
