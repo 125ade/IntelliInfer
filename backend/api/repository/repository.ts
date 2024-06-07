@@ -19,8 +19,6 @@ import mime from 'mime-types';
 import { v4 as uuidv4 } from 'uuid';
 import {generatePath, SuccessResponse} from "../utils/utils";
 import DatasetTagDAO from "../dao/datasetTagDao";
-import datasettag from "../models/datasettag";
-
 
 
 export interface IRepository {
@@ -34,7 +32,7 @@ export interface IRepository {
     listImageFromDataset(datasetId: number): Promise<Image[] | ConcreteErrorCreator>;
     createDatasetWithTags(data: any, user: User): Promise<Dataset> ;
     getDatasetDetail(datasetId: number): Promise<Dataset | ConcreteErrorCreator> ;
-    logicallyDelete(datasetId: number): Promise<Object | ConcreteErrorCreator>;
+    logicallyDelete(datasetId: number): Promise<SuccessResponse | ConcreteErrorCreator>;
     updateModelWeights(modelId: number, weights: string ): Promise<Ai | ConcreteErrorCreator>;
     findDatasetById(datasetId: number): Promise<Dataset | ConcreteErrorCreator>;
     createImage(data: any): Promise<Image | null>;
@@ -42,7 +40,6 @@ export interface IRepository {
     processZipEntries(datasetId: number, zipEntries: IZipEntry[], destination: string): Promise<void | ConcreteErrorCreator>;
     updateUserTokenByCost(user: User, cost: number): Promise<void>;
     checkUserToken(userId: number, amount: number): Promise<boolean>;
-    updateUserToken(userId: number, token: number): Promise<Object>
     generateUUID(): Promise<string>;
     getTags(datasetId: number): Promise<string[]>;
     updateCountDataset(datasetId: number, num: number): Promise<Dataset|ConcreteErrorCreator>;
@@ -217,18 +214,6 @@ export class Repository implements IRepository {
         const userDao = new UserDao();
         const user = await userDao.findById(userId);
         return !(user instanceof User && user.token < amount);
-    }
-
-    // updates the token amount of a specified user returns the updated user
-    async updateUserToken(userId: number, token: number): Promise<Object> {
-        const userDao = new UserDao();
-        const user = await userDao.findById(userId);
-        if(user instanceof User){
-            await user.set({ token: token }).save();
-        }else{
-            throw new ConcreteErrorCreator().createNotFoundError().setNoUser();
-        }
-        return { updatedUser: user };
     }
 
 
