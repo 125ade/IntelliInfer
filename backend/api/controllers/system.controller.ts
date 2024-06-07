@@ -66,7 +66,7 @@ export default class SystemController {
                         const user: User | ConcreteErrorCreator = await this.repository.getUserByEmail(decode.email);
                         if (user instanceof User) {
                             const amountInference: number = Number(dataset.countElements * costoInferenza);
-                            if(await this.repository.checkUserToken(user.id, dataset.countElements * costoInferenza )){
+                            if(await this.repository.checkUserToken(user.id, amountInference )){
 
                                 const dataJob: JobData = {
                                     userEmail: user.email,
