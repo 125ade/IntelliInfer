@@ -26,7 +26,7 @@ export default class AiDao implements IDao<Ai> {
     }
     
    
-    async findById(id: number): Promise<Ai | null> {
+    async findById(id: number): Promise<Ai | ConcreteErrorCreator> {
             const model = await Ai.findByPk(id);
             if(!model){
                 throw new ConcreteErrorCreator().createNotFoundError().setAbstentModel();

@@ -2,8 +2,14 @@ import {Response, Request, NextFunction} from "express";
 import { Repository } from '../repository/repository';
 import  { ErrorCode } from "../factory/ErrorCode";
 import { ConcreteErrorCreator } from "../factory/ErrorCreator";
-import {generateToken} from "../token";
+import {decodeToken, generateToken} from "../token";
 import User from "../models/user";
+import Dataset from "../models/dataset";
+import Ai from "../models/ai";
+import process from "node:process";
+import {TaskQueue} from "../queues/Worker";
+import {JobData} from "../queues/jobData";
+
 
 export default class SystemController {
 
@@ -38,16 +44,57 @@ export default class SystemController {
 
     async startInference(req: Request, res: Response, next: NextFunction) {
         try {
-            // quantificare le immagini del dataset => attraverso datasetId
-            // calcolo dei token necessari => attraverso jwt
-            // verifica credito dei token sia sufficiente
-            // raccolta dati
-            // generare il codice result preliminare e prendere l'id
-            // invio del job a redis {dataset id_postgres}
+            const costoInferenza: number = Number(process.env.INFERENCE_COST || '2.5');
+            const datasetId: number = Number(req.params.datasetId);
+            if (datasetId !== undefined) {
+                const dataset: Dataset | ConcreteErrorCreator = await this.repository.getDatasetDetail(datasetId)
+                if (dataset instanceof ConcreteErrorCreator) {
+                    throw dataset;
+                }
+                const aiId: number = Number(req.params.aiId);
+                if (aiId !== undefined) {
+                    const ai: Ai | ConcreteErrorCreator = await this.repository.findModel(aiId);
+                    if (ai instanceof ConcreteErrorCreator) {
+                        throw ai;
+                    }
+                    const token:string | undefined = req.headers.authorization
+                    if (token === undefined || token === "") {
+                        throw new ConcreteErrorCreator().createAuthenticationError().setNoToken();
+                    }
+                    const decode = decodeToken(token.split(' ')[1]);
+                    if (decode.email !== undefined) {
+                        const user: User | ConcreteErrorCreator = await this.repository.getUserByEmail(decode.email);
+                        if (user instanceof User) {
+                            const amountInference: number = Number(dataset.countElements * costoInferenza);
+                            if(await this.repository.checkUserToken(user.id, dataset.countElements * costoInferenza )){
+                                // todo completare
+                                const dataJob: JobData = {
+                                    userEmail: user.email,
+                                    callCost: amountInference,
+                                    resultUUID: await this.repository.generateUUID(),
+                                    images: [],
+                                    result: [],
+                                }
+                                // raccolta dati: cartella utente e codice resultId
+                                // generare il codice resultId tramite ResInf<data.toString()> preliminare e prendere l'id
+                                // invio del job
+                                const x = await TaskQueue.getInstance().getQueue().addJob({})
+                            }else{
+                                throw new ConcreteErrorCreator().createForbiddenError().setInsufficientToken();
+                            }
+                        }else{
+                            throw new ConcreteErrorCreator().createNotFoundError().setNoUser();
+                        }
 
-
-
-
+                    }else{
+                        throw new ConcreteErrorCreator().createServerError().setFailedStartInference();
+                    }
+                }else{
+                    throw new ConcreteErrorCreator().createBadRequestError().setNoModelId();
+                }
+            }else{
+                throw new ConcreteErrorCreator().createBadRequestError().setNoDatasetId();
+            }
         }catch (error){
             if (error instanceof ErrorCode) {
                 error.send(res);
@@ -55,7 +102,6 @@ export default class SystemController {
                 new ConcreteErrorCreator().createServerError().setFailedStartInference().send(res);
             }
         }
-
     }
 
     async checkStatusInference(req: Request, res: Response, next: NextFunction) {

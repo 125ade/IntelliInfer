@@ -16,7 +16,8 @@ import path from 'path';
 import fs from 'fs';
 import { IZipEntry }  from 'adm-zip';
 import mime from 'mime-types';
-import {ErrorCode} from "../factory/ErrorCode";
+import { v4 as uuidv4 } from 'uuid';
+import {SuccessResponse} from "../utils/utils";
 
 
 
@@ -26,11 +27,11 @@ export interface IRepository {
     getDatasetListByUserId(userId: number): Promise<Dataset[] | ConcreteErrorCreator>;
     createTags(tags: string[], datasetId: number): Promise<Tag[]>;
     listAiModels(): Promise<Ai[] | null>;
-    findModel(modelId: number): Promise<Ai | null>;
-    findResult(resultId: number): Promise<Result | null>;
+    findModel(modelId: number): Promise<Ai | ConcreteErrorCreator>;
+    findResult(resultId: number): Promise<Result | ConcreteErrorCreator>;
     createDatasetWithTags(data: any, user: User): Promise<Dataset> ;
     getDatasetDetail(datasetId: number): Promise<Dataset | ConcreteErrorCreator> ;
-    logicallyDelete(datasetId: number): Promise<Object | null>;
+    logicallyDelete(datasetId: number): Promise<Object | ConcreteErrorCreator>;
     updateModelWeights(modelId: number, weights: string ): Promise<Ai | null>;
     findDatasetById(datasetId: number): Promise<Dataset | ConcreteErrorCreator>;
     createImage(data: any): Promise<Image | null>;
@@ -127,19 +128,19 @@ export class Repository implements IRepository {
     }
 
     // find an Ai model by id
-    async findModel(modelId: number): Promise<Ai | null>{
+    async findModel(modelId: number): Promise<Ai | ConcreteErrorCreator>{
         const aiDao = new AiDao();
         return aiDao.findById(modelId);
     }
 
     // find an inference result by id
-    async findResult(resultId: number): Promise<Result | null>{
+    async findResult(resultId: number): Promise<Result | ConcreteErrorCreator>{
         const resultDao = new ResultDao();
         return resultDao.findById(resultId);
     }
 
     // Given the datasetId, deletes logically the dataset
-    async logicallyDelete(datasetId: number){
+    async logicallyDelete(datasetId: number): Promise<ConcreteErrorCreator| SuccessResponse>{
         try{
             const datasetDao = new DatasetDao();
             return datasetDao.logicallyDelete(datasetId);
@@ -232,6 +233,8 @@ export class Repository implements IRepository {
         } else return true;
     }
 
+
+
     // updates the token amount of a specified user
     // returns the updated user
     async updateUserToken(userId: number, token: number): Promise<Object> {
@@ -265,6 +268,10 @@ export class Repository implements IRepository {
     public async updateCountDataset(datasetId: number, num: number) {
         const datasetDao = new DatasetDao();
         return datasetDao.updateCount(datasetId, num);
+    }
+
+    async generateUUID(): Promise<string> {
+        return uuidv4();
     }
 }
 

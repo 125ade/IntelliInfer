@@ -16,6 +16,7 @@ import { syncDb } from "./db/dbSync";
 import * as process from "node:process";
 import {handleRouteNotFound} from "./middleware/route.middleware";
 import {TaskQueue} from "./queues/Worker";
+import {Queue} from "bullmq";
 
 
 // api variable
@@ -45,11 +46,11 @@ syncDb().then(():void=>{console.log("\t--> SYNC BD DONE")})
 
 // manage job
 try {
-    const taskQueue: TaskQueue = new TaskQueue();
-    const serverAdapter = new ExpressAdapter();
+    const taskQueue = TaskQueue.getInstance().getQueue();
+    const serverAdapter: ExpressAdapter = new ExpressAdapter();
     serverAdapter.setBasePath('/admin/queues');
     const bullBoard = createBullBoard({
-        queues: [new BullMQAdapter(taskQueue.getQueue()['queue'])],
+        queues: [new BullMQAdapter(taskQueue['queue'])],
         serverAdapter: serverAdapter
     });
 

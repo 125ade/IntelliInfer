@@ -69,7 +69,7 @@ export default class DatasetDao implements IDao<Dataset> {
 
     // logically deletes a dataset (sets isDeleted to true)
     // da fare gestione migliore degli errori, vorrei gestire anche la possibilità che il dataset con l'id specificato non sia presente nel db
-    async logicallyDelete(datasetId: number): Promise<ErrorCode | SuccessResponse>{
+    async logicallyDelete(datasetId: number): Promise<ConcreteErrorCreator | SuccessResponse>{
         try{
             const [numberOfAffectedRows, affectedRows] = await Dataset.update(
                 { isDeleted: true },
@@ -87,8 +87,13 @@ export default class DatasetDao implements IDao<Dataset> {
                 message: "deleted successfully",
                 obj: affectedRows[0]
             };
-        } catch {
-            return new ConcreteErrorCreator().createNotFoundError().setAbstentDataset();
+        } catch (error) {
+            if(error instanceof ConcreteErrorCreator){
+                throw error;
+            }else{
+                throw new ConcreteErrorCreator().createNotFoundError().setAbstentDataset();
+            }
+
         }
         
     }
