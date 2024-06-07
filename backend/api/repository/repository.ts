@@ -267,7 +267,20 @@ export class Repository implements IRepository {
     }
 
     async generateUUID(): Promise<string> {
-        return uuidv4();
+        let unique: boolean = false;
+        let uuid: string = "";
+        while (!unique) {
+            uuid = uuidv4();
+            const existingRecord: Result | null = await Result.findOne({
+                where: {
+                    requestId: uuid
+                }
+            });
+            if (!existingRecord) {
+                unique = true;
+            }
+        }
+        return uuid;
     }
 }
 
