@@ -1,7 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-
-require('dotenv').config();
 import express, {Express} from "express";
 import bodyParser from 'body-parser';
 import { Request, Response } from 'express';
@@ -10,22 +8,17 @@ import { createBullBoard } from '@bull-board/api';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { ExpressAdapter } from "@bull-board/express";
 import { setupLogging } from "./middleware/logger.middleware";
-
 import {SystemRoutes, UserRoutes, AdminRoutes} from "./routes/index.routes";
 import { syncDb } from "./db/dbSync";
 import * as process from "node:process";
 import {handleRouteNotFound} from "./middleware/route.middleware";
 import {TaskQueue} from "./queues/Worker";
-import {Queue} from "bullmq";
 
+
+require('dotenv').config();
 
 // api variable
 const port: number = parseInt(process.env.API_PORT || "3000");
-const host: string = process.env.API_HOST || "localhost";
-// redis definition
-const redis_port: number = parseInt(process.env.REDIS_PORT || "6379");
-const redis_host: string = process.env.REDIS_HOST || 'localhost';
-const redisUrl: string = `redis://${redis_host}:${redis_port}/0`;
 // job queue name definition taken from env
 const QUEUE_TASK_DOCKER: string = process.env.DOKER_QUEUE_NAME || 'dockerTaskQueue';
 
