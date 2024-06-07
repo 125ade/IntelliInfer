@@ -31,6 +31,7 @@ export interface IRepository {
     listAiModels(): Promise<Ai[] | ConcreteErrorCreator>;
     findModel(modelId: number): Promise<Ai | ConcreteErrorCreator>;
     findResult(resultId: number): Promise<Result | ConcreteErrorCreator>;
+    listImageFromDataset(datasetId: number): Promise<Image[] | ConcreteErrorCreator>;
     createDatasetWithTags(data: any, user: User): Promise<Dataset> ;
     getDatasetDetail(datasetId: number): Promise<Dataset | ConcreteErrorCreator> ;
     logicallyDelete(datasetId: number): Promise<Object | ConcreteErrorCreator>;
@@ -233,8 +234,8 @@ export class Repository implements IRepository {
 
     async getDatasetDetail(datasetId: number): Promise<Dataset | ConcreteErrorCreator> {
         try{
-            const datasetDao = new DatasetDao();
-            const dataset = await datasetDao.findById(datasetId);
+            const datasetDao: DatasetDao = new DatasetDao();
+            const dataset: Dataset | ConcreteErrorCreator = await datasetDao.findById(datasetId);
             if( dataset !== null && dataset !== undefined ){
                 return dataset
             }else{
@@ -273,6 +274,12 @@ export class Repository implements IRepository {
     async getTags(datasetId: number): Promise<string[]> {
         const datasetTagDao = new DatasetTagDAO();
         return await datasetTagDao.findAllByDatasetId(datasetId);
+    }
+
+
+    public async listImageFromDataset(datasetId: number): Promise<Image[] | ConcreteErrorCreator> {
+        const imageDao: ImageDao = new ImageDao();
+        return imageDao.findAllImmagineByDatasetId(datasetId);
     }
 }
 

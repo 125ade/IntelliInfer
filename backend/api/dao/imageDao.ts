@@ -22,5 +22,19 @@ export default class ImageDao implements IDao<Image> {
         }
         return image;
     }
-    
+    async findAllImmagineByDatasetId(datasetId: number): Promise<Image[] | ConcreteErrorCreator> {
+
+      const images: Image[] = await Image.findAll({
+        where: {
+          datasetId: datasetId
+        }
+      });
+      if(images.length === 0){
+          throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
+      }
+
+      return images;
+
+  }
+
 }
