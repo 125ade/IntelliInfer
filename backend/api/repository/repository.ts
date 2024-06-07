@@ -26,12 +26,12 @@ export interface IRepository {
     getDatasetListByUserId(userId: number): Promise<Dataset[] | ConcreteErrorCreator>;
     createTags(tags: string[], datasetId: number): Promise<Tag[]>;
     listAiModels(): Promise<Ai[] | null>;
-    findModel(modelId: number): Promise<Ai | null>;
+    findModel(modelId: number): Promise<Ai | ConcreteErrorCreator>;
     findResult(resultId: number): Promise<Result | null>;
     createDatasetWithTags(data: any, user: User): Promise<Dataset> ;
     getDatasetDetail(datasetId: number): Promise<Dataset | ConcreteErrorCreator> ;
     logicallyDelete(datasetId: number): Promise<Object | null>;
-    updateModelWeights(modelId: number, weights: string ): Promise<Ai | null>;
+    updateModelWeights(modelId: number, weights: string ): Promise<Ai | ConcreteErrorCreator>;
     findDatasetById(datasetId: number): Promise<Dataset | ConcreteErrorCreator>;
     createImage(data: any): Promise<Image | null>;
     createDestinationRepo(datasetId: number): Promise<string | ConcreteErrorCreator> ;
@@ -127,7 +127,7 @@ export class Repository implements IRepository {
     }
 
     // find an Ai model by id
-    async findModel(modelId: number): Promise<Ai | null>{
+    async findModel(modelId: number): Promise<Ai | ConcreteErrorCreator>{
         const aiDao = new AiDao();
         return aiDao.findById(modelId);
     }
@@ -149,13 +149,8 @@ export class Repository implements IRepository {
     };
 
     // takes an ai model identified by its id and update its property pathWeigths with the path of the new weights
-    async updateModelWeights(modelId: number, weights: string ): Promise<Ai | null>  {
+    async updateModelWeights(modelId: number, path: string ): Promise<Ai | ConcreteErrorCreator>  {
         const aiDao = new AiDao();
-        const weightsString = String(weights);
-
-        // Generate pathWeights
-        const path = this.generatePath(weightsString);
-
         return aiDao.updateItem(modelId, path);
     }
 

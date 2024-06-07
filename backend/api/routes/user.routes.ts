@@ -8,7 +8,7 @@ import {AuthUser} from "../middleware/auth.middleware";
 
 // Multer configuration to manage uploaded files
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+export const upload = multer({ storage: storage });
 
 
 export default class UserRoutes{
@@ -94,7 +94,6 @@ export default class UserRoutes{
             validateFileUpload,
             this.userController.uploadFile.bind(this.userController)
         );
-
 
 
         // autenticazione

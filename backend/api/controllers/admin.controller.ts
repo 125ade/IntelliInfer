@@ -3,6 +3,8 @@ import { Repository } from '../repository/repository'
 import { ConcreteErrorCreator } from "../factory/ErrorCreator";
 import { ErrorCode } from "../factory/ErrorCode";
 import User from "../models/user";
+import fs from 'fs';
+import path from 'path';
 
 export default class AdminController {
 
@@ -14,21 +16,37 @@ export default class AdminController {
 
     async updateWeights(req: Request, res: Response) {
         try{
-            const aiId: number = Number(req.params.aiId);
-            const weights: string = String(req.body.weights);
+            if (!req.file) {
+                throw new ConcreteErrorCreator().createBadRequestError().setAbsentFile();
+            }
+            
+            const destination = '/app/media/weights';
+            if (!fs.existsSync(destination)) {
+                fs.mkdirSync(destination, { recursive: true });
+            }
 
-            const model = await this.repository.updateModelWeights(aiId, weights);
-            res.status(200).json(model);
-        } catch (error){
-            if (error instanceof ErrorCode) {
+            const fileExtension = path.extname(req.file.originalname).toLowerCase();
+            if (fileExtension === '.pt') { // extension based control
+                const filePath = path.join(destination, `${req.file.originalname}`);
+                fs.writeFileSync(filePath, req.file.buffer);
+
+                this.repository.updateModelWeights(Number(req.params.aiId), filePath);
+
+            } else {
+                throw new ConcreteErrorCreator().createBadRequestError().setNotSupportedFile();
+            }
+            res.status(200).json( { Result: 'Weights uploaded successfully'});
+        } catch(error){
+            if( error instanceof ErrorCode){
                 error.send(res);
             } else {
-                console.log(error);
-                new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
+                new ConcreteErrorCreator().createServerError().setFailedUploadFile().send(res);
             }
         }
     }
-    
+
+            
+
     // recharges user credit 
     async rechargeTokens(req: Request, res: Response) {
         try {
