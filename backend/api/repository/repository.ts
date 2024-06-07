@@ -29,15 +29,15 @@ export interface IRepository {
     findModel(modelId: number): Promise<Ai | null>;
     findResult(resultId: number): Promise<Result | null>;
     createDatasetWithTags(data: any, user: User): Promise<Dataset> ;
-    getDatasetDetail(datasetId: number): Promise<Dataset | ErrorCode> ;
+    getDatasetDetail(datasetId: number): Promise<Dataset | ConcreteErrorCreator> ;
     logicallyDelete(datasetId: number): Promise<Object | null>;
     updateModelWeights(modelId: number, weights: string ): Promise<Ai | null>;
-    findDatasetById(datasetId: number): Promise<Dataset | null>;
+    findDatasetById(datasetId: number): Promise<Dataset | ConcreteErrorCreator>;
     createImage(data: any): Promise<Image | null>;
     createDestinationRepo(datasetId: number): Promise<string | ConcreteErrorCreator> ;
     processZipEntries(datasetId: number, zipEntries: IZipEntry[], destination: string): Promise<void | ConcreteErrorCreator>;
-    updateUserTokenByCost(userId: number, cost: number): Promise<void>;
-    checkUserToken(userId: number, amount: number): Promise<void>;
+    updateUserTokenByCost(user: User, cost: number): Promise<void>;
+    checkUserToken(userId: number, amount: number): Promise<boolean>;
     updateUserToken(userId: number, token: number): Promise<Object>
 }
 
@@ -159,7 +159,7 @@ export class Repository implements IRepository {
         return aiDao.updateItem(modelId, path);
     }
 
-    async findDatasetById(datasetId: number): Promise<Dataset | null> {
+    async findDatasetById(datasetId: number): Promise<Dataset | ConcreteErrorCreator> {
         const datasetDao = new DatasetDao();
         return datasetDao.findById(datasetId);
     }
@@ -173,18 +173,20 @@ export class Repository implements IRepository {
         const datasetDao = new DatasetDao();
         //const dataset = await Dataset.findByPk(datasetId);
         const dataset = await datasetDao.findById(datasetId);
-        const datasetPath = dataset?.path;
-        if(typeof datasetPath === 'string'){
-            const destination = path.join('/app/media', datasetPath, 'img');
+        if( dataset instanceof Dataset){
+            const datasetPath = dataset?.path;
+            if(typeof datasetPath === 'string'){
+                const destination = path.join('/app/media', datasetPath, 'img');
 
-            // Assicurati che la cartella di destinazione esista
-            if (!fs.existsSync(destination)) {
-                fs.mkdirSync(destination, { recursive: true });
+                // Assicurati che la cartella di destinazione esista
+                if (!fs.existsSync(destination)) {
+                    fs.mkdirSync(destination, { recursive: true });
+                }
+                return destination;
+            } else {
+                throw new ConcreteErrorCreator().createServerError().setFailedCreationRepo();
             }
-            return destination;
-        } else {
-            throw new ConcreteErrorCreator().createServerError().setFailedCreationRepo();
-        }
+        } else  throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
     }
 
     async processZipEntries(datasetId: number, zipEntries: IZipEntry[], destination: string): Promise<void | ConcreteErrorCreator> {
@@ -216,27 +218,18 @@ export class Repository implements IRepository {
     
     // updates the user token amount subtracting a cost
     // checks if the user has the available amount
-    public async updateUserTokenByCost(userId: number, cost: number): Promise<void> {
-        const userDao = new UserDao();
-        const user = await userDao.findById(userId);
-        this.checkUserToken(userId, cost);
-        if(user instanceof User){
-            try {
-                await user.set({ token: user.token - cost }).save();
-             } catch {
-                throw new ConcreteErrorCreator().createServerError().setUpdatingToken();
-             }
-        } else{ 
-            throw new ConcreteErrorCreator().createNotFoundError().setNoUser();
-        }
+    public async updateUserTokenByCost(user: User, cost: number): Promise<void>{
+        user.token -= cost;
+        await user.save();
     }
 
     // checks if the user token amount is >= requested amount
-    async checkUserToken(userId: number, amount: number): Promise<void> {
+    async checkUserToken(userId: number, amount: number): Promise<boolean> {
         const userDao = new UserDao();
         const user = await userDao.findById(userId);
-        if (user instanceof User && user.token < amount)
-            throw new ConcreteErrorCreator().createForbiddenError().setInsufficientToken();
+        if (user instanceof User && user.token < amount){
+            return false
+        } else return true;
     }
 
     // updates the token amount of a specified user
@@ -253,18 +246,25 @@ export class Repository implements IRepository {
     }
 
 
-    async getDatasetDetail(datasetId: number): Promise<Dataset | ErrorCode> {
+    async getDatasetDetail(datasetId: number): Promise<Dataset | ConcreteErrorCreator> {
         try{
             const datasetDao = new DatasetDao();
             const dataset = await datasetDao.findById(datasetId);
             if( dataset !== null && dataset !== undefined ){
                 return dataset
             }else{
-                return new ConcreteErrorCreator().createNotFoundError().setAbstentDataset();
+                throw new ConcreteErrorCreator().createNotFoundError().setAbstentDataset();
             }
         } catch {
-            return new ConcreteErrorCreator().createNotFoundError().setAbstentDataset();
+            throw new ConcreteErrorCreator().createNotFoundError().setAbstentDataset();
         }
+    }
+
+    
+    // updates the number of elements of a dataset
+    public async updateCountDataset(datasetId: number, num: number) {
+        const datasetDao = new DatasetDao();
+        return datasetDao.updateCount(datasetId, num);
     }
 }
 
