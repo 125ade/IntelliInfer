@@ -1,7 +1,8 @@
 import {Router} from "express";
 import AdminController from "../controllers/admin.controller";
 import { AuthAdmin } from "../middleware/auth.middleware";
-import { validateRechargeRequest } from "../middleware/validation.middleware";
+import { validateParamIntGreaterThanZero, validateRechargeRequest } from "../middleware/validation.middleware";
+import { upload } from "./user.routes";
 
 export default class AdminRoutes{
     router:Router = Router();
@@ -18,7 +19,9 @@ export default class AdminRoutes{
         // route to update neural network model weights
         this.router.put(
             "/model/:aiId/change/weights",
-            AuthAdmin, 
+            AuthAdmin,
+            validateParamIntGreaterThanZero('aiId'),
+            upload.single("image"), 
             this.adminController.updateWeights.bind(this.adminController)
         );
 
