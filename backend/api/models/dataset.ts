@@ -1,4 +1,4 @@
-import { DataTypes, Model, Association } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import { SequelizeConnection } from '../db/SequelizeConnection';
 import User from './user';
 import DatasetTags from './datasettag';

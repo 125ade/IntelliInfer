@@ -7,7 +7,7 @@ export abstract class ErrorCode {
 * Server Error Class
 */
 export class ServerError extends ErrorCode {
-    private message!: Object;
+    private message!: object;
   
     set(message: string): ErrorCode {
       this.message = { error: message };
@@ -84,7 +84,7 @@ export class ServerError extends ErrorCode {
  * Authentication Error Class
  */  
 export class AuthenticationError extends ErrorCode {
-    private message!: Object;
+    private message!: object;
   
     set(message: string): ErrorCode {
       this.message = { error: message };
@@ -144,7 +144,7 @@ export class AuthenticationError extends ErrorCode {
  * Bad Request Error Class
  */
 export class BadRequestError extends ErrorCode {
-    private message!: Object;
+    private message!: object;
   
     set(message: string): ErrorCode {
       this.message = { error: message };
@@ -217,7 +217,7 @@ export class BadRequestError extends ErrorCode {
  * Forbidden Error Class
  */
 export class ForbiddenError extends ErrorCode {
-    private message!: Object;
+    private message!: object;
   
     set(message: string): ErrorCode {
       this.message = { error: message };
@@ -242,7 +242,7 @@ export class ForbiddenError extends ErrorCode {
  * Not Found Error Class
  */
 export class NotFoundError extends ErrorCode {
-    private message!: Object;
+    private message!: object;
   
     set(message: string): ErrorCode {
       this.message = { error: message };

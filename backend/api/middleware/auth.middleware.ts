@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ConcreteErrorCreator} from "../factory/ErrorCreator";
-import {decodeToken, ITokenPayload, validateToken} from '../token'
+import {decodeToken, validateToken} from '../token'
 import {UserRole} from "../static";
 
 declare module 'express' {

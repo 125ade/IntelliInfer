@@ -1,7 +1,6 @@
 import { IDao } from './daoInterface';
 import User from '../models/user';
 import { ConcreteErrorCreator } from '../factory/ErrorCreator';
-import {ErrorCode} from "../factory/ErrorCode";
 
 export default class UserDao implements IDao<User> {
 
@@ -27,7 +26,7 @@ export default class UserDao implements IDao<User> {
     }
 
     async findByEmail(email: string): Promise<User | ConcreteErrorCreator> {
-            let user: User | null = await User.findOne({ where: { email } });
+            const user: User | null = await User.findOne({ where: { email } });
             if (!user) {
                 throw new ConcreteErrorCreator().createNotFoundError().setNoUser();
             } else {
