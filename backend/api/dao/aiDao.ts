@@ -16,13 +16,13 @@ export default class AiDao implements IDao<Ai> {
     }
     
     
-    async findAll(): Promise<Ai[] | null> {
-        try {
+    async findAll(): Promise<Ai[] | ConcreteErrorCreator> {
           const models = await Ai.findAll();
-          return models;
-        } catch {
+          if( models.length !== 0){
+            return models;
+          } else {
             throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
-        }
+          }
     }
     
    
@@ -33,23 +33,14 @@ export default class AiDao implements IDao<Ai> {
             }
             return model;
     }
-    
 
-    async delete(id: number): Promise<boolean> {
-        const ai = await Ai.findByPk(id);
-        if (ai) {
-            await ai.destroy();
-            return true;
-        }
-        return false;
-    }
-
-    async updateItem(id: number, weights: any): Promise<Ai | null> {
+    async updateItem(id: number, weights: any): Promise<Ai | ConcreteErrorCreator> {
         const model = await Ai.findByPk(id);
             if(!model){
                 throw new ConcreteErrorCreator().createNotFoundError().setAbstentModel();
             }
             model.pathweights = weights;
+            model.save();
             return model;
     }
     

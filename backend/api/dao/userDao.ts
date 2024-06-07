@@ -34,15 +34,5 @@ export default class UserDao implements IDao<User> {
                 return user;
             }
     }
-    
-    // I suppose the admin could create and delete users (??)
-    async delete(id: number): Promise<boolean> {
-        const user = await User.findByPk(id);
-        if (user) {
-            await user.destroy();
-            return true;
-        }
-        return false;
-    }
 }
 
