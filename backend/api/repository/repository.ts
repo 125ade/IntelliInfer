@@ -29,6 +29,7 @@ export interface IRepository {
     listAiModels(): Promise<Ai[] | ConcreteErrorCreator>;
     findModel(modelId: number): Promise<Ai | ConcreteErrorCreator>;
     findResult(resultId: number): Promise<Result | ConcreteErrorCreator>;
+    listImageFromDataset(datasetId: number): Promise<Image[] | ConcreteErrorCreator>;
     createDatasetWithTags(data: any, user: User): Promise<Dataset> ;
     getDatasetDetail(datasetId: number): Promise<Dataset | ConcreteErrorCreator> ;
     logicallyDelete(datasetId: number): Promise<SuccessResponse | ConcreteErrorCreator>;
@@ -42,6 +43,7 @@ export interface IRepository {
     generateUUID(): Promise<string>;
     getTags(datasetId: number): Promise<string[]>;
     updateCountDataset(datasetId: number, num: number): Promise<Dataset|ConcreteErrorCreator>;
+    createListResult(imageList: Image[], aiID: number, UUID: string): Promise<Result[] | ConcreteErrorCreator>;
 }
 
 
@@ -218,8 +220,8 @@ export class Repository implements IRepository {
 
     async getDatasetDetail(datasetId: number): Promise<Dataset | ConcreteErrorCreator> {
         try{
-            const datasetDao = new DatasetDao();
-            const dataset = await datasetDao.findById(datasetId);
+            const datasetDao: DatasetDao = new DatasetDao();
+            const dataset: Dataset | ConcreteErrorCreator = await datasetDao.findById(datasetId);
             if( dataset !== null && dataset !== undefined ){
                 return dataset
             }else{
@@ -258,6 +260,36 @@ export class Repository implements IRepository {
     async getTags(datasetId: number): Promise<string[]> {
         const datasetTagDao = new DatasetTagDAO();
         return await datasetTagDao.findAllByDatasetId(datasetId);
+    }
+
+
+    async listImageFromDataset(datasetId: number): Promise<Image[] | ConcreteErrorCreator> {
+        const imageDao: ImageDao = new ImageDao();
+        return imageDao.findAllImmagineByDatasetId(datasetId);
+    }
+
+
+
+    async createListResult(imageList: Image[], aiID: number, UUID: string): Promise<Result[] | ConcreteErrorCreator> {
+        const results: Result[] = [];
+        for (const image of imageList) {
+            try {
+                const res: ResultDao = new ResultDao()
+                const result: Result | ConcreteErrorCreator = await res.initCreation(image.id, aiID, UUID);
+                if (result instanceof ConcreteErrorCreator) {
+                    throw result;
+                }
+                results.push(result);
+            } catch (error) {
+                if (error instanceof ConcreteErrorCreator) {
+                    return error;
+                } else {
+                    throw new ConcreteErrorCreator().createServerError().setFailedCreationResult();
+                }
+            }
+        }
+
+        return results;
     }
 }
 

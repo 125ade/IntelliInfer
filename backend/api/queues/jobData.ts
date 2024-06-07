@@ -9,7 +9,7 @@ export interface JobData {
     callCost: number,
     resultUUID: string,
     model: {
-        aiid: number,
+        aiId: number,
         architecture: string,
         pathweights: string
     },

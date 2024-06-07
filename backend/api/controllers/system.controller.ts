@@ -9,6 +9,8 @@ import Ai from "../models/ai";
 import process from "node:process";
 import {TaskQueue} from "../queues/Worker";
 import {JobData} from "../queues/jobData";
+import Image from "../models/image";
+import Result from "../models/result";
 
 
 export default class SystemController {
@@ -68,10 +70,20 @@ export default class SystemController {
                             const amountInference: number = Number(dataset.countElements * costoInferenza);
                             if(await this.repository.checkUserToken(user.id, amountInference )){
 
+                                const img_list: Image[] | ConcreteErrorCreator = await this.repository.listImageFromDataset(dataset.id)
+                                if (img_list instanceof ConcreteErrorCreator) {
+                                    throw img_list;
+                                }
+                                const newUuid: string = await this.repository.generateUUID();
+
+                                const res: Result[] | ConcreteErrorCreator = await this.repository.createListResult(img_list,ai.id,newUuid);
+                                if (res instanceof ConcreteErrorCreator){
+                                    throw res;
+                                }
                                 const dataJob: JobData = {
                                     userEmail: user.email,
                                     callCost: amountInference,
-                                    resultUUID: await this.repository.generateUUID(),
+                                    resultUUID: newUuid,
                                     model: {
                                         aiId: ai.id,
                                         architecture: ai.architecture,
@@ -82,13 +94,13 @@ export default class SystemController {
                                         pathdir: dataset.path,
                                         tags: await this.repository.getTags(dataset.id),
                                     },
-                                    images: [],
-                                    results: [],
+                                    images: img_list,
+                                    results: res,
                                 }
                                 // raccolta dati: cartella utente e codice resultId
                                 // generare il codice resultId tramite ResInf<data.toString()> preliminare e prendere l'id
                                 // invio del job
-                                const x = await TaskQueue.getInstance().getQueue().addJob({})
+                                const x = await TaskQueue.getInstance().getQueue().addJob(dataJob)
                             }else{
                                 throw new ConcreteErrorCreator().createForbiddenError().setInsufficientToken();
                             }
