@@ -12,7 +12,7 @@ export default class Result extends Model {
   
   declare data: object;
 
-  declare requestId: number;
+  declare requestId: string;
 
 }
 
@@ -51,7 +51,7 @@ Result.init(
       allowNull: false
     },
     requestId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false
     }
   },

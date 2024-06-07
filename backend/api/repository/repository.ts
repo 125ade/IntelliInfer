@@ -16,7 +16,8 @@ import path from 'path';
 import fs from 'fs';
 import { IZipEntry }  from 'adm-zip';
 import mime from 'mime-types';
-import {ErrorCode} from "../factory/ErrorCode";
+import { v4 as uuidv4 } from 'uuid';
+import {SuccessResponse} from "../utils/utils";
 
 
 
@@ -30,7 +31,7 @@ export interface IRepository {
     findResult(resultId: number): Promise<Result | ConcreteErrorCreator>;
     createDatasetWithTags(data: any, user: User): Promise<Dataset> ;
     getDatasetDetail(datasetId: number): Promise<Dataset | ConcreteErrorCreator> ;
-    logicallyDelete(datasetId: number): Promise<Object | null>;
+    logicallyDelete(datasetId: number): Promise<Object | ConcreteErrorCreator>;
     updateModelWeights(modelId: number, weights: string ): Promise<Ai | ConcreteErrorCreator>;
     findDatasetById(datasetId: number): Promise<Dataset | ConcreteErrorCreator>;
     createImage(data: any): Promise<Image | null>;
@@ -104,7 +105,7 @@ export class Repository implements IRepository {
         return newDataset;
     }
 
-     
+
     // NB: to move into utils.ts
     generatePath(name: string) {
 
@@ -119,7 +120,7 @@ export class Repository implements IRepository {
 
         return path;
     }
-    
+
 
     // lists all available Ai models
     async listAiModels(): Promise<Ai[] | ConcreteErrorCreator>{
@@ -140,7 +141,7 @@ export class Repository implements IRepository {
     }
 
     // Given the datasetId, deletes logically the dataset
-    async logicallyDelete(datasetId: number){
+    async logicallyDelete(datasetId: number): Promise<ConcreteErrorCreator| SuccessResponse>{
         try{
             const datasetDao = new DatasetDao();
             return datasetDao.logicallyDelete(datasetId);
@@ -228,6 +229,8 @@ export class Repository implements IRepository {
         } else return true;
     }
 
+
+
     // updates the token amount of a specified user
     // returns the updated user
     async updateUserToken(userId: number, token: number): Promise<Object> {
@@ -261,6 +264,10 @@ export class Repository implements IRepository {
     public async updateCountDataset(datasetId: number, num: number) {
         const datasetDao = new DatasetDao();
         return datasetDao.updateCount(datasetId, num);
+    }
+
+    async generateUUID(): Promise<string> {
+        return uuidv4();
     }
 }
 

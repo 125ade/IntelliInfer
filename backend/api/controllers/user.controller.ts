@@ -8,6 +8,7 @@ import AdmZip, { IZipEntry }  from 'adm-zip';
 import User from "../models/user";
 import {decodeToken} from "../token";
 import mime from 'mime-types';
+import {SuccessResponse} from "../utils/utils";
 
 
 
@@ -149,13 +150,16 @@ export default class UserController {
 
     async deleteDatasetById(req: Request, res: Response) {
         try{
-            const result = await this.repository.logicallyDelete(Number(req.params.datasetId));
-            return res.status(201).json(result);
+            const result: SuccessResponse | ConcreteErrorCreator = await this.repository.logicallyDelete(Number(req.params.datasetId));
+            if(result instanceof ConcreteErrorCreator){
+                throw result;
+            }else{
+                return res.status(201).json(result);
+            }
         } catch (error) {
             if (error instanceof ErrorCode) {
                 error.send(res);
             } else {
-                // console.log(error);
                 throw new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
             }
         }

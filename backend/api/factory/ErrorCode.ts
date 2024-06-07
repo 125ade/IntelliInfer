@@ -74,6 +74,10 @@ export class ServerError extends ErrorCode {
     setFailedStartInference() {
         return this.set("Error. Inference can not start")
     }
+
+    setFailedCreationResult() {
+        return this.set("Error. Inference result can not be created");
+    }
 }
 
 /**
@@ -204,6 +208,9 @@ export class BadRequestError extends ErrorCode {
     }
 
 
+    setNoModelId() {
+        return this.set("There was an error. Model id not found.");
+    }
 }
 
 /**
