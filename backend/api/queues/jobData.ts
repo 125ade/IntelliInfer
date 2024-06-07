@@ -4,8 +4,10 @@ export interface JobData {
     userEmail: string;
     callCost: number,
     resultUUID: string,
+    model: Object,
+    dataset: Object,
     images: Object[],
-    result: Object[],
+    results: Object[],
 }
 
 
@@ -14,5 +16,5 @@ export interface JobReturnData {
     callCost: number,
     resultUUID: string,
     images: Object[],
-    result: Object[],
+    results: Object[],
 }

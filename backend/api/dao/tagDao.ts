@@ -18,17 +18,4 @@ export default class TagDAO implements IDao<Tag> {
         }
     }
     
-    // ho supposto che l'utente abbia la possibilità di visualizzare i tags per cercare quali classi di oggetti 
-    // cercare attraverso l'inferenza.
-    // il servizio potrebbe essere: visualizzo le classi disponibili -> scelgo la classe -> visualizzo i datasets dove è presente quella classe
-    // (cioè i datasets con stesso tag) -> scelgo il dataset da mandare in inferenza
-    async findAll(): Promise<Tag[] | ConcreteErrorCreator> {
-        const tags = await Tag.findAll();
-        if( tags.length !== 0){
-            return tags;
-        } else {
-            throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
-        }
-    }
-    
 }

@@ -67,13 +67,23 @@ export default class SystemController {
                         if (user instanceof User) {
                             const amountInference: number = Number(dataset.countElements * costoInferenza);
                             if(await this.repository.checkUserToken(user.id, dataset.countElements * costoInferenza )){
-                                // todo completare
+
                                 const dataJob: JobData = {
                                     userEmail: user.email,
                                     callCost: amountInference,
                                     resultUUID: await this.repository.generateUUID(),
+                                    model: {
+                                        aiId: ai.id,
+                                        architecture: ai.architecture,
+                                        pathweights: ai.pathweights,
+                                    },
+                                    dataset: {
+                                        datasetId: dataset.id,
+                                        pathdir: dataset.path,
+                                        tags: await this.repository.getTags(dataset.id),
+                                    },
                                     images: [],
-                                    result: [],
+                                    results: [],
                                 }
                                 // raccolta dati: cartella utente e codice resultId
                                 // generare il codice resultId tramite ResInf<data.toString()> preliminare e prendere l'id
