@@ -17,24 +17,22 @@ export default class SystemController {
         try {
             const userId: number = Number(req.params.userId);
             if (isNaN(userId)) {
-                new ConcreteErrorCreator().createBadRequestError().setNoUserId().send(res)
+                new ConcreteErrorCreator().createBadRequestError().setNoUserId().send(res);
             }
 
-            const user: User | null = await this.repository.getUserById(userId);
-            if (user !== null) {
-
+            const user: User | ConcreteErrorCreator = await this.repository.getUserById(userId);
+            if (user instanceof ConcreteErrorCreator ) {
+                new ConcreteErrorCreator().createNotFoundError().setNoUser().send(res);
+            }else{
                 const token = generateToken(user);
                 res.status(200).json({ token });
-
-
-            }else{
-                new ConcreteErrorCreator().createNotFoundError().setNoUser().send(res)
             }
-
-
         } catch (error) {
-            //console.log(error)
-            new ConcreteErrorCreator().createServerError().setFailedGenToken().send(res)
+            if (error instanceof ErrorCode){
+                error.send(res);
+            }else{
+                new ConcreteErrorCreator().createServerError().setFailedGenToken().send(res);
+            }
         }
     }
 
