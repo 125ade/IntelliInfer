@@ -10,6 +10,7 @@ import process from "node:process";
 import {TaskQueue} from "../queues/Worker";
 import {JobData} from "../queues/jobData";
 import Image from "../models/image";
+import Result from "../models/result";
 
 
 export default class SystemController {
@@ -75,6 +76,10 @@ export default class SystemController {
                                 }
                                 const newUuid: string = await this.repository.generateUUID();
 
+                                const res: Result[] | ConcreteErrorCreator = await this.repository.createListResult(img_list,ai.id,newUuid);
+                                if (res instanceof ConcreteErrorCreator){
+                                    throw res;
+                                }
                                 const dataJob: JobData = {
                                     userEmail: user.email,
                                     callCost: amountInference,
@@ -90,7 +95,7 @@ export default class SystemController {
                                         tags: await this.repository.getTags(dataset.id),
                                     },
                                     images: img_list,
-                                    results: [],
+                                    results: res,
                                 }
                                 // raccolta dati: cartella utente e codice resultId
                                 // generare il codice resultId tramite ResInf<data.toString()> preliminare e prendere l'id

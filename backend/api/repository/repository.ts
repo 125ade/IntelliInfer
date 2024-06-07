@@ -43,6 +43,7 @@ export interface IRepository {
     generateUUID(): Promise<string>;
     getTags(datasetId: number): Promise<string[]>;
     updateCountDataset(datasetId: number, num: number): Promise<Dataset|ConcreteErrorCreator>;
+    createListResult(imageList: Image[], aiID: number, UUID: string): Promise<Result[] | ConcreteErrorCreator>;
 }
 
 
@@ -262,9 +263,33 @@ export class Repository implements IRepository {
     }
 
 
-    public async listImageFromDataset(datasetId: number): Promise<Image[] | ConcreteErrorCreator> {
+    async listImageFromDataset(datasetId: number): Promise<Image[] | ConcreteErrorCreator> {
         const imageDao: ImageDao = new ImageDao();
         return imageDao.findAllImmagineByDatasetId(datasetId);
+    }
+
+
+
+    async createListResult(imageList: Image[], aiID: number, UUID: string): Promise<Result[] | ConcreteErrorCreator> {
+        const results: Result[] = [];
+        for (const image of imageList) {
+            try {
+                const res: ResultDao = new ResultDao()
+                const result: Result | ConcreteErrorCreator = await res.initCreation(image.id, aiID, UUID);
+                if (result instanceof ConcreteErrorCreator) {
+                    throw result;
+                }
+                results.push(result);
+            } catch (error) {
+                if (error instanceof ConcreteErrorCreator) {
+                    return error;
+                } else {
+                    throw new ConcreteErrorCreator().createServerError().setFailedCreationResult();
+                }
+            }
+        }
+
+        return results;
     }
 }
 

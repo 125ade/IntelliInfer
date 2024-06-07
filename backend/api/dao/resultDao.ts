@@ -12,12 +12,12 @@ export default class ResultDAO implements IDao<Result> {
 
     constructor() {}
 
-    async initCreation(imageID: number, aiID: number, initData: object = initCreationData, UUID: string ): Promise<Result | ConcreteErrorCreator> {
+    async initCreation(imageID: number, aiID: number, UUID: string ): Promise<Result | ConcreteErrorCreator> {
         try {
             return await Result.create({
                 imageId: imageID,
                 aiId: aiID,
-                data: initData,
+                data: initCreationData,
                 requestId: UUID,
             });
         }catch (error){
