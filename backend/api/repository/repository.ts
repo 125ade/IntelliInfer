@@ -46,7 +46,7 @@ export class Repository implements IRepository {
 
     constructor() {};
 
-    public async getUserById(userId: number): Promise<User | ConcreteErrorCreator> {
+    public async getUserById(userId: number) {
         const user: UserDao = new UserDao();
         return user.findById(userId);
     }
