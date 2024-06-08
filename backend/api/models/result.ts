@@ -36,7 +36,8 @@ Result.init(
       references: {
         model: Image,
         key: 'id'
-      }
+      },
+      field: 'image_id',
     },
     aiId: {
       type: DataTypes.INTEGER,
@@ -44,7 +45,8 @@ Result.init(
       references: {
         model: Ai,
         key: 'id'
-      }
+      },
+      field: 'ai_id',
     },
     data: {
       type: DataTypes.JSONB,
@@ -52,7 +54,8 @@ Result.init(
     },
     requestId: {
       type: DataTypes.UUID,
-      allowNull: false
+      allowNull: false,
+      field: 'request_id',
     }
   },
   {

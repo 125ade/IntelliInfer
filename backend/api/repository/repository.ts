@@ -240,16 +240,12 @@ export class Repository implements IRepository {
     }
 
     async generateUUID(): Promise<string> {
+        const resuldDao = new ResultDao();
         let unique: boolean = false;
         let uuid: string = "";
         while (!unique) {
             uuid = uuidv4();
-            const existingRecord: Result | null = await Result.findOne({
-                where: {
-                    requestId: uuid
-                }
-            });
-            if (!existingRecord) {
+            if(!(await resuldDao.findOneByResultId(uuid))){
                 unique = true;
             }
         }

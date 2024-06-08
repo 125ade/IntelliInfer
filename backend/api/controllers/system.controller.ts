@@ -11,6 +11,7 @@ import {TaskQueue} from "../queues/Worker";
 import {JobData} from "../queues/jobData";
 import Image from "../models/image";
 import Result from "../models/result";
+import {SuccessResponse} from "../utils/utils";
 
 
 export default class SystemController {
@@ -49,7 +50,7 @@ export default class SystemController {
             const costoInferenza: number = Number(process.env.INFERENCE_COST || '2.5');
             const datasetId: number = Number(req.params.datasetId);
             if (datasetId !== undefined) {
-                const dataset: Dataset | ConcreteErrorCreator = await this.repository.getDatasetDetail(datasetId)
+                const dataset: Dataset | ConcreteErrorCreator = await this.repository.getDatasetDetail(datasetId);
                 if (dataset instanceof ConcreteErrorCreator) {
                     throw dataset;
                 }
@@ -69,16 +70,14 @@ export default class SystemController {
                         if (user instanceof User) {
                             const amountInference: number = Number(dataset.countElements * costoInferenza);
                             if(await this.repository.checkUserToken(user.id, amountInference )){
-
-                                const img_list: Image[] | ConcreteErrorCreator = await this.repository.listImageFromDataset(dataset.id)
-                                if (img_list instanceof ConcreteErrorCreator) {
-                                    throw img_list;
+                                const imageList: Image[] | ConcreteErrorCreator = await this.repository.listImageFromDataset(dataset.id)
+                                if (imageList instanceof ConcreteErrorCreator) {
+                                    throw imageList;
                                 }
                                 const newUuid: string = await this.repository.generateUUID();
-
-                                const res: Result[] | ConcreteErrorCreator = await this.repository.createListResult(img_list,ai.id,newUuid);
-                                if (res instanceof ConcreteErrorCreator){
-                                    throw res;
+                                const resultList: Result[] | ConcreteErrorCreator = await this.repository.createListResult(imageList,ai.id,newUuid);
+                                if (resultList instanceof ConcreteErrorCreator){
+                                    throw resultList;
                                 }
                                 const dataJob: JobData = {
                                     userEmail: user.email,
@@ -94,13 +93,20 @@ export default class SystemController {
                                         pathdir: dataset.path,
                                         tags: await this.repository.getTags(dataset.id),
                                     },
-                                    images: img_list,
-                                    results: res,
+                                    images: imageList,
+                                    results: resultList,
                                 }
-                                // raccolta dati: cartella utente e codice resultId
-                                // generare il codice resultId tramite ResInf<data.toString()> preliminare e prendere l'id
-                                // invio del job
-                                const x = await TaskQueue.getInstance().getQueue().addJob(dataJob)
+                                const successResult: SuccessResponse={
+                                        success: true,
+                                        message: "start inference on your dataset",
+                                        obj: {
+                                             resultId: newUuid,
+                                             datasetId: dataset.name,
+                                             architecture: ai.architecture,
+                                        }
+                                }
+                                await TaskQueue.getInstance().getQueue().addJob(dataJob)
+                                res.status(200).json(successResult);
                             }else{
                                 throw new ConcreteErrorCreator().createForbiddenError().setInsufficientToken();
                             }
