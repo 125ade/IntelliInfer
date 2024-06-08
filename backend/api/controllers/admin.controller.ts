@@ -6,8 +6,10 @@ import User from "../models/user";
 import fs from 'fs';
 import path from 'path';
 import {SuccessResponse} from "../utils/utils";
+import process from "node:process";
 
-
+const destination: string = process.env.DESTINATION_PATH_WEIGHTS || "/weights";
+const file_extension: string = process.env.FILE_WEIGHTS_EXTENSION || ".pt";
 
 export default class AdminController {
 
@@ -22,23 +24,27 @@ export default class AdminController {
             if (!req.file) {
                 throw new ConcreteErrorCreator().createBadRequestError().setAbsentFile();
             }
-            // todo fix hard coded
-            const destination = '/app/media/weights';
+
             if (!fs.existsSync(destination)) {
                 fs.mkdirSync(destination, { recursive: true });
             }
 
-            const fileExtension = path.extname(req.file.originalname).toLowerCase();
-            if (fileExtension === '.pt') { // extension based control
-                const filePath = path.join(destination, `${req.file.originalname}`);
+            const fileExtension: string = path.extname(req.file.originalname).toLowerCase();
+            if (fileExtension === file_extension) {
+                const filePath: string = path.join(destination, `${req.file.originalname}`);
                 fs.writeFileSync(filePath, req.file.buffer);
 
                 await this.repository.updateModelWeights(Number(req.params.aiId), filePath);
 
+                const dataResult: SuccessResponse = {
+                    success: true,
+                    message: 'Weights uploaded successfully',
+                }
+                res.status(200).json( dataResult);
             } else {
                 throw new ConcreteErrorCreator().createBadRequestError().setNotSupportedFile();
             }
-            res.status(200).json( { Result: 'Weights uploaded successfully'});
+
         } catch(error){
             if( error instanceof ErrorCode){
                 error.send(res);
