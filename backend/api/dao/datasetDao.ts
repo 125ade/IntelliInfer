@@ -93,8 +93,7 @@ export default class DatasetDao implements IDao<Dataset> {
         
     }
 
-    // find a dataset by datasetId
-    // NB we have to handle errors
+    // update the number of images of a dataset, given the number of elements to sum
     async updateCount(datasetId: number, num: number): Promise<Dataset | ConcreteErrorCreator> {
         try {
             const dataset = await Dataset.findByPk(datasetId);
@@ -105,6 +104,21 @@ export default class DatasetDao implements IDao<Dataset> {
             }
             else throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
         } catch (error) {
+            throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
+        }
+    }
+
+    async updateName(datasetId: number, newName: string): Promise<Dataset | ConcreteErrorCreator> {
+        try {
+            const dataset = await Dataset.findByPk(datasetId);
+            if( dataset instanceof Dataset) {
+                dataset.name = newName;
+                dataset.save();
+                return dataset;
+            } else {
+                throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
+            }
+        } catch {
             throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
         }
     }
