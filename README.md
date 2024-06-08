@@ -94,6 +94,53 @@ The main goal of IntelliInfer is to provide an API for loading datasets, managin
   <img src="documents/UsesCaseDiagram.png" alt="Uses Case Diagram" style="max-width: 256 px; height: auto;">
 </div>
 
+## Sequence Diagrams
+
+<div style="text-align: center;">
+  <img src="documents/DELETE_api_dataset_delete_datasetId.drawio.png" alt="Sequelize model" width="500" height="auto">
+</div>
+
+<div style="text-align: center;">
+  <img src="documents/GET_api_dataset_datasetId.drawio.png" alt="Sequelize model" width="500" height="auto">
+</div>
+
+<div style="text-align: center;">
+  <img src="documents/GET_api_dataset_list.drawio.png" alt="Sequelize model" width="500" height="auto">
+</div>
+
+<div style="text-align: center;">
+  <img src="documents/GET_api_display_credit.drawio.png" alt="Sequelize model" width="500" height="auto">
+</div>
+
+<div style="text-align: center;">
+  <img src="documents/GET_api_generate_token.drawio.png" alt="Sequelize model" width="500" height="auto">
+</div>
+
+<div style="text-align: center;">
+  <img src="documents/GET_api_model_list.drawio.png" alt="Sequelize model" width="500" height="auto">
+</div>
+
+<div style="text-align: center;">
+  <img src="documents/GET_api_model_modelId.drawio.png" alt="Sequelize model" width="500" height="auto">
+</div>
+
+<div style="text-align: center;">
+  <img src="documents/POST_api_datastet_create.drawio.png" alt="Sequelize model" width="500" height="auto">
+</div>
+
+<div style="text-align: center;">
+  <img src="documents/POST_api_upload_file.drawio.png" alt="Sequelize model" width="500" height="auto">
+</div>
+
+<div style="text-align: center;">
+  <img src="documents/PUT_admin_credit_recharge.drawio.png" alt="Sequelize model" width="500" height="auto">
+</div>
+
+<div style="text-align: center;">
+  <img src="documents/PUT_admin_model_aiId_change_weights.drawio.png" alt="Sequelize model" width="500" height="auto">
+</div>
+
+
 # Database
 Let's now look at the structure of our database and the patterns we used to manage it.
 
