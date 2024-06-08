@@ -21,7 +21,7 @@ export default class AdminRoutes{
             "/model/:aiId/change/weights",
             AuthAdmin,
             validateParamIntGreaterThanZero('aiId'),
-            upload.single("image"), 
+            upload.single("weightsfile"), 
             this.adminController.updateWeights.bind(this.adminController)
         );
 
