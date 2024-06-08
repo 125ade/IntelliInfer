@@ -5,6 +5,9 @@ import { ErrorCode } from "../factory/ErrorCode";
 import User from "../models/user";
 import fs from 'fs';
 import path from 'path';
+import {SuccessResponse} from "../utils/utils";
+
+
 
 export default class AdminController {
 
@@ -19,7 +22,7 @@ export default class AdminController {
             if (!req.file) {
                 throw new ConcreteErrorCreator().createBadRequestError().setAbsentFile();
             }
-            
+            // todo fix hard coded
             const destination = '/app/media/weights';
             if (!fs.existsSync(destination)) {
                 fs.mkdirSync(destination, { recursive: true });
@@ -30,7 +33,7 @@ export default class AdminController {
                 const filePath = path.join(destination, `${req.file.originalname}`);
                 fs.writeFileSync(filePath, req.file.buffer);
 
-                this.repository.updateModelWeights(Number(req.params.aiId), filePath);
+                await this.repository.updateModelWeights(Number(req.params.aiId), filePath);
 
             } else {
                 throw new ConcreteErrorCreator().createBadRequestError().setNotSupportedFile();
@@ -52,14 +55,22 @@ export default class AdminController {
         try {
             const { email, tokensToAdd } = req.body;
 
-            const user = await this.repository.getUserByEmail(email);
+            const user: User|ConcreteErrorCreator = await this.repository.getUserByEmail(email);
 
-            if( user instanceof User){
+            if( user instanceof ConcreteErrorCreator){
+                throw user;
+            }else{
                 // Update user's credit by adding tokensToAdd
-                user.token += tokensToAdd;
+                user.token = Number(user.token) + Number(tokensToAdd);
                 await user.save();
+                const dataResult: SuccessResponse = {
+                    success: true,
+                    message: 'Credit recharged successfully',
+                    obj: user
+                }
+                return res.status(200).json(dataResult);
             }
-            return res.status(200).json({ message: 'Credit recharged successfully', user });
+
         } catch (error) {
             if( error instanceof ErrorCode){
                 error.send(res);
