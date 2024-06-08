@@ -47,7 +47,7 @@ export default class DatasetDao implements IDao<Dataset> {
     }
     
    
-    // find a dataset by datasetId
+    // find a dataset given its id
     async findById(datasetId: number): Promise<Dataset | ConcreteErrorCreator> {
             const dataset = await Dataset.findOne({
                 where: {
@@ -63,7 +63,6 @@ export default class DatasetDao implements IDao<Dataset> {
     
 
     // logically deletes a dataset (sets isDeleted to true)
-    // da fare gestione migliore degli errori, vorrei gestire anche la possibilità che il dataset con l'id specificato non sia presente nel db
     async logicallyDelete(datasetId: number): Promise<ConcreteErrorCreator | SuccessResponse>{
         try{
             const [numberOfAffectedRows, affectedRows] = await Dataset.update(
@@ -107,7 +106,8 @@ export default class DatasetDao implements IDao<Dataset> {
             throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
         }
     }
-
+    
+    // updates dataset's name
     async updateName(datasetId: number, newName: string): Promise<Dataset | ConcreteErrorCreator> {
         try {
             const dataset = await Dataset.findByPk(datasetId);
