@@ -1,5 +1,6 @@
 import { ConcreteErrorCreator } from "../factory/ErrorCreator";
 
+// interface implemented by all dao classes using generic types
 export interface IDao<T> {
     create?(item: any): Promise<T | ConcreteErrorCreator>;
     findById?(id: number): Promise<T | ConcreteErrorCreator>;
