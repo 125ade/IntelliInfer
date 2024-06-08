@@ -14,7 +14,7 @@ export function generatePath(name: string): string {
         const formattedName: string = sanitizedName.toLowerCase().replace(/\s+/g, '-');
 
         // Costruisce il percorso con il nome formattato
-        const path: string = `/path/${formattedName}`;
+        const path: string = `/${formattedName}`;
 
         return path;
     }

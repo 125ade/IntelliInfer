@@ -140,9 +140,10 @@ export default class UserController {
 
         } catch (error) {
             if (error instanceof ErrorCode) {
+                console.log(error);
                 error.send(res);
             } else {
-                // console.log(error);
+                console.log(error);
                 throw new ConcreteErrorCreator().createServerError().setFailedCreationItem().send(res);
             }
         }

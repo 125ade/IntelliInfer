@@ -1,7 +1,7 @@
 import { ConcreteErrorCreator } from "../factory/ErrorCreator";
 
 export interface IDao<T> {
-    create?(item: any): Promise<T>;
+    create?(item: any): Promise<T | ConcreteErrorCreator>;
     findById?(id: number): Promise<T | ConcreteErrorCreator>;
     findAll?(): Promise<T[] | ConcreteErrorCreator>;
     logicallyDelete?(id: number): Promise<object>;
