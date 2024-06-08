@@ -70,4 +70,18 @@ export const validateRechargeRequest = [
     body('tokensToAdd').isInt({ min: 1 }).toInt()
 ];
 
+// Middleware for validating the body content (string not null)
+export const validateName = [
+    check('name')
+        .isString().withMessage('Name must be a string')
+        .notEmpty().withMessage('Name cannot be empty'),
+    (req: Request, res: Response, next: NextFunction) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        next();
+    }
+];
+
 

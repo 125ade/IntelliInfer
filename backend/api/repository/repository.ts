@@ -44,6 +44,7 @@ export interface IRepository {
     getTags(datasetId: number): Promise<string[]>;
     updateCountDataset(datasetId: number, num: number): Promise<Dataset|ConcreteErrorCreator>;
     createListResult(imageList: Image[], aiID: number, UUID: string): Promise<Result[] | ConcreteErrorCreator>;
+    checkNames(userId: number, newName: string): Promise<boolean | ConcreteErrorCreator>;
 }
 
 
@@ -294,6 +295,27 @@ export class Repository implements IRepository {
 
         return results;
     }
+
+    async checkNames(userId: number, newName: string): Promise<boolean | ConcreteErrorCreator> {
+        const datasets = await this.getDatasetListByUserId(userId);
+        let names: string[] = [];
+        if (Array.isArray(datasets)){
+            names = datasets.map( (dataset: Dataset) => dataset.name);
+            if (!names.includes(newName)) {
+                return true;
+            } else {
+            throw new ConcreteErrorCreator().createForbiddenError().setInvalidName();
+            }
+        } else{
+            return datasets;
+        }
+    }
+
+    async updateDatasetName( datasetId: number, newName: string ): Promise< Dataset | ConcreteErrorCreator> {
+        const datasetDao: DatasetDao = new DatasetDao();
+        return datasetDao.updateName(datasetId, newName);
+    }
+
 }
 
 

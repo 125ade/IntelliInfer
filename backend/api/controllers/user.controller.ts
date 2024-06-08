@@ -9,6 +9,7 @@ import User from "../models/user";
 import {decodeToken} from "../token";
 import mime from 'mime-types';
 import {SuccessResponse} from "../utils/utils";
+import Dataset from "../models/dataset";
 
 
 
@@ -140,10 +141,8 @@ export default class UserController {
 
         } catch (error) {
             if (error instanceof ErrorCode) {
-                console.log(error);
                 error.send(res);
             } else {
-                console.log(error);
                 throw new ConcreteErrorCreator().createServerError().setFailedCreationItem().send(res);
             }
         }
@@ -319,6 +318,30 @@ export default class UserController {
                 res.status(200).json({ token: user.token });
             }
         } catch (error) {
+            if( error instanceof ErrorCode){
+                error.send(res);
+            } else {
+                new ConcreteErrorCreator().createServerError().setFailedUploadFile().send(res);
+            }
+        }
+    }
+    
+    // changes the name of a user's dataset, if he hasn't others datasets with the same name
+    async updateDatasetName(req: Request, res: Response) {
+        try{
+            const userEmail: string | undefined = req.userEmail; 
+            if( !userEmail ){
+                throw new ConcreteErrorCreator().createAuthenticationError().setFailAuthUser();
+            }
+            const user: ConcreteErrorCreator | User = await this.repository.getUserByEmail(userEmail);
+            
+            if(user instanceof User) {
+                if( await this.repository.checkNames(user.id, req.body.name)) {
+                    const dataset = await this.repository.updateDatasetName(Number(req.params.datasetId), req.body.name);
+                    if( dataset instanceof Dataset) res.status(200).json(dataset);
+                }
+            }
+        } catch( error ) {
             if( error instanceof ErrorCode){
                 error.send(res);
             } else {

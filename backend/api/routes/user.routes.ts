@@ -1,7 +1,7 @@
 import {Router} from "express";
 import UserController from "../controllers/user.controller";
 import multer from 'multer';
-import { validateCreateDataset, validateParamIntGreaterThanZero, validateFileUpload } from "../middleware/validation.middleware";
+import { validateCreateDataset, validateParamIntGreaterThanZero, validateFileUpload, validateName } from "../middleware/validation.middleware";
 import {AuthUser} from "../middleware/auth.middleware";
 
 
@@ -104,7 +104,6 @@ export default class UserRoutes{
             this.userController.datasetListByUserId.bind(this.userController));
 
 
-
         // autenticazione
         // autorizzazione "user"
         this.router.get(
@@ -114,11 +113,18 @@ export default class UserRoutes{
             this.userController.datasetDetail.bind(this.userController));
 
 
-
         // display of a user's remaining credit
         this.router.get('/display/credit',
             AuthUser,
             this.userController.displayResidualCredit.bind(this.userController)
+        );
+        
+        // update a dataset's name
+        this.router.post('/dataset/update/:datasetId',
+            AuthUser,
+            validateParamIntGreaterThanZero('datasetId'),
+            validateName,
+            this.userController.updateDatasetName.bind(this.userController)
         );
 
     }
