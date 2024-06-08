@@ -10,6 +10,7 @@
 - [Design](#design)
   - [Rotte](#rotte)
   - [Uses Case Diagram](#usescasediagram)
+  - [Sequence Diagrams](#sequencediagrams)
 - [Database](#database)
   - [ER Schema](#erschema)
   - [Database Schema](#databaseschema)
