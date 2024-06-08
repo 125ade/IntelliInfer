@@ -24,7 +24,7 @@ export default class SystemRoutes{
         // todo post /inference/:datasetId/:aiId/
         // autenticazione
         // autorizzazione "user"
-        this.router.post(
+        this.router.get(
         "/inference/:datasetId/:aiId/",
             AuthUser,
             validateParamIntGreaterThanZero("datasetId"),
