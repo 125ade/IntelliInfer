@@ -75,27 +75,6 @@ ADD CONSTRAINT fk_dataset_id
 FOREIGN KEY (dataset_id)
 REFERENCES datasets(id);
 
--- Creazione della tabella labels
-CREATE TABLE labels (
-    id SERIAL PRIMARY KEY,
-    dataset_id INTEGER NOT NULL,
-    image_id INTEGER NOT NULL,
-    path VARCHAR(300) NOT NULL,
-    description VARCHAR(300),
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
--- Aggiunta dei vincoli di chiave esterna per dataset_id e image_id
-ALTER TABLE labels
-ADD CONSTRAINT fk_dataset_id
-FOREIGN KEY (dataset_id)
-REFERENCES datasets(id);
-
-ALTER TABLE labels
-ADD CONSTRAINT fk_image_id
-FOREIGN KEY (image_id)
-REFERENCES images(id);
 
 -- Creazione della tabella results
 CREATE TABLE results (
