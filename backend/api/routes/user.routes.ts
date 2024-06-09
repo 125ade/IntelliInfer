@@ -101,7 +101,7 @@ export default class UserRoutes{
         );
         
         // update a dataset's name
-        this.router.post('/dataset/update/:datasetId',
+        this.router.put('/dataset/update/:datasetId',
             AuthUser,
             validateParamIntGreaterThanZero('datasetId'),
             validateName,
