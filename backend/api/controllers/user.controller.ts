@@ -10,6 +10,7 @@ import {decodeToken} from "../token";
 import mime from 'mime-types';
 import {SuccessResponse} from "../utils/utils";
 import Dataset from "../models/dataset";
+import Ai from "../models/ai";
 
 
 
@@ -23,8 +24,13 @@ export default class UserController {
 
     async modelList(req: Request, res: Response) {
         try {
-            const aiModels = await this.repository.listAiModels();
-            res.status(200).json(aiModels);
+            const aiModels: Ai[] | ConcreteErrorCreator = await this.repository.listAiModels();
+            const resultJson: SuccessResponse = {
+                success: true,
+                message: "Model list",
+                obj: aiModels
+            }
+            res.status(200).json(resultJson);
         } catch (error) {
             if (error instanceof ErrorCode) {
                 error.send(res);

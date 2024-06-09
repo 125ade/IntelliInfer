@@ -18,7 +18,7 @@ export default class AiDao implements IDao<Ai> {
     
     // returns the list of all ai models on db
     async findAll(): Promise<Ai[] | ConcreteErrorCreator> {
-          const models = await Ai.findAll();
+          const models: Ai[] = await Ai.findAll();
           if( models.length !== 0){
             return models;
           } else {

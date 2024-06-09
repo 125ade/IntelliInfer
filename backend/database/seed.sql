@@ -108,8 +108,9 @@ VALUES
   ('Mauro', 'mauro.sys@intelliinfer.com', 100, 'syst');
 
 -- Inserimento di un elemento nella tabella ai
-INSERT INTO ai (name, description, pathweights, architecture) 
-VALUES ('Yolov5', 'Yolov5 neural network for detection tasks', '/primo/path/esempio', 'yolo');
+INSERT INTO ai (name, description, pathweights, architecture) VALUES
+('Yolov5', 'Yolov5 neural network for detection tasks', '/primo/path/esempio', 'yolo');
+('TestNN', 'Test script to emulate a neural network..', '/primo/path/esempio', 'test');
 
 -- Insert seed data into datasets
 INSERT INTO datasets (name, path, count_elements, count_classes, description, is_deleted) VALUES
