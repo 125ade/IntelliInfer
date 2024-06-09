@@ -21,12 +21,3 @@ export interface JobData {
     images: Image[],
     results: Result[],
 }
-
-
-export interface JobReturnData {
-    userEmail: string;
-    callCost: number,
-    resultUUID: string,
-    images: Image[],
-    results: Result[],
-}

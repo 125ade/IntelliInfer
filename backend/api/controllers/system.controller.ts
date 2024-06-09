@@ -139,10 +139,9 @@ export default class SystemController {
         };
 
         try {
-            await TaskQueue.getInstance().getQueue().addJob(dataJob);
+            await TaskQueue.getInstance().getQueue().addJob(dataJob.resultUUID, dataJob);
             res.status(200).json(successResult);
         } catch (err) {
-            console.log(err)
             throw new ConcreteErrorCreator().createServerError().setFailedStartInference();
         }
 

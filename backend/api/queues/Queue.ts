@@ -16,8 +16,8 @@ export class Queue {
         this.queue = new BullQueue(queueName, { ...options, connection });
     }
 
-    public addJob(data: any, opts?: any) {
-        return this.queue.add(data, opts);
+    public addJob(id: string, data: any, opts?: any) {
+        return this.queue.add(id, data, opts);
     }
 
     public process(concurrency: number, processor: (job: Job) => Promise<void>, workerOptions?: WorkerOptions) {
