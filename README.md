@@ -92,7 +92,7 @@ The main goal of IntelliInfer is to provide an API for loading datasets, managin
 
 ## Uses Case Diagram
 <div style="text-align: center;">
-  <img src="documents/UsesCaseDiagram.png" alt="Uses Case Diagram" style="max-width: 256 px; height: auto;">
+  <img src="documents/UsesCaseDiagram.drawio.png" alt="Uses Case Diagram" style="max-width: 256 px; height: auto;">
 </div>
 
 ## Sequence Diagrams
