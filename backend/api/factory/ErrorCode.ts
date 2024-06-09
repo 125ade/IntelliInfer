@@ -136,7 +136,7 @@ export class BadRequestError extends ErrorCode {
     
     // error given by absence of a file to upload 
     setAbsentFile(): ErrorCode {
-      return this.set("There was an error. An image or zip file must be provided.");
+      return this.set("There was an error. File must be provided.");
     }
     
     // error given by absence of dataset's id
