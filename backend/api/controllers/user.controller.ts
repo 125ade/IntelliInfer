@@ -165,64 +165,6 @@ export default class UserController {
         }
     }
 
-    // route to upload a single image on volume, and on database
-    async uploadImage(req: Request, res: Response) {
-        try{
-            if (!req.file) {
-                throw new ConcreteErrorCreator().createBadRequestError().setAbsentFile();
-            }
-
-            const destination = await this.repository.createDestinationRepo(Number(req.params.datasetId));
-            if( typeof destination === 'string'){
-
-                const mimeType = req.file.mimetype;
-                if (mimeType.startsWith('image/')) {
-
-                        const filePath = path.join(destination, `${req.file.originalname}`);
-                        fs.writeFileSync(filePath, req.file.buffer);
-
-                        this.repository.createImage({
-                            "datasetId": Number(req.params.datasetId),
-                            "path": filePath,
-                            "description": req.body.description
-                          });
-
-                        res.status(200).json({ Result: 'File uploaded successfully.'});
-                };
-            }
-        } catch(error) {
-            if( error instanceof ErrorCode){
-                error.send(res);
-            } else {
-                new ConcreteErrorCreator().createServerError().setFailedUploadFile().send(res);
-            }
-        }
-    }
-
-
-    // route to upload a file zip on volume and on database
-    async uploadZip(req: Request, res: Response) {
-        try{
-            if (!req.file) {
-                throw new ConcreteErrorCreator().createBadRequestError().setAbsentFile();
-            }
-
-            const zip = new AdmZip(req.file.buffer);
-            const zipEntries: IZipEntry[] = zip.getEntries();
-
-            const destination = await this.repository.createDestinationRepo(Number(req.params.datasetId));
-            if(typeof destination === 'string'){
-                await this.repository.processZipEntries(Number(req.params.datasetId),zipEntries, destination);
-                res.status(200).json( { Result: 'File uploaded successfully'})
-            }
-        } catch(error) {
-            if( error instanceof ErrorCode){
-                error.send(res);
-            } else {
-                new ConcreteErrorCreator().createServerError().setFailedUploadFile().send(res);
-            }
-        }
-    }
 
     // route to upload an image or a file zip on volume and on database
     async uploadFile(req: Request, res: Response){
