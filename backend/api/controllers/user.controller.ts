@@ -10,6 +10,7 @@ import {decodeToken} from "../token";
 import mime from 'mime-types';
 import {SuccessResponse} from "../utils/utils";
 import Dataset from "../models/dataset";
+import Ai from "../models/ai";
 
 
 
@@ -23,8 +24,13 @@ export default class UserController {
 
     async modelList(req: Request, res: Response) {
         try {
-            const aiModels = await this.repository.listAiModels();
-            res.status(200).json(aiModels);
+            const aiModels: Ai[] | ConcreteErrorCreator = await this.repository.listAiModels();
+            const resultJson: SuccessResponse = {
+                success: true,
+                message: "Model list",
+                obj: aiModels
+            }
+            res.status(200).json(resultJson);
         } catch (error) {
             if (error instanceof ErrorCode) {
                 error.send(res);
@@ -113,7 +119,6 @@ export default class UserController {
             if (error instanceof ErrorCode) {
                 error.send(res);
             } else {
-                // console.log(error);
                 throw new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
             }
         }
@@ -125,10 +130,18 @@ export default class UserController {
             if (token !== undefined){
                 const decode = decodeToken(token.split(' ')[1]);
                 if (decode.email) {
-                    const user = await this.repository.getUserByEmail(decode.email);
+                    const user: User | ConcreteErrorCreator = await this.repository.getUserByEmail(decode.email);
                     if (user && user instanceof User) {
-                        const result = await this.repository.createDatasetWithTags(req.body, user);
-                        return res.status(201).json(result);
+                        const dataset: Dataset | ConcreteErrorCreator = await this.repository.createDatasetWithTags(req.body, user);
+                        if(dataset instanceof ConcreteErrorCreator){
+                            throw dataset;
+                        }
+                        const resultJson: SuccessResponse = {
+                            success: true,
+                            message: "Dataset created successfully",
+                            obj: dataset
+                        }
+                        return res.status(201).json(resultJson);
                     }else{
                         throw new ConcreteErrorCreator().createNotFoundError().setNoUser();
                     }
@@ -154,7 +167,12 @@ export default class UserController {
             if(result instanceof ConcreteErrorCreator){
                 throw result;
             }else{
-                return res.status(201).json(result);
+                const resultJson : SuccessResponse = {
+                    success: true,
+                    message: 'Dataset deleted successfully.',
+                    obj: result
+                }
+                return res.status(201).json(resultJson);
             }
         } catch (error) {
             if (error instanceof ErrorCode) {
@@ -232,9 +250,12 @@ export default class UserController {
                     throw new ConcreteErrorCreator().createBadRequestError().setNotSupportedFile();
                 }
 
-                this.repository.updateCountDataset(Number(req.params.datasetId), totalNumber);
-
-                res.status(200).json( { Result: 'File uploaded successfully'}); // todo: success interface
+                await this.repository.updateCountDataset(Number(req.params.datasetId), totalNumber);
+                const result: SuccessResponse = {
+                    success: true,
+                    message: 'File uploaded successfully'
+                }
+                res.status(200).json( result);
             }
         } catch(error){
             if( error instanceof ErrorCode){
@@ -289,8 +310,16 @@ export default class UserController {
             
             if(user instanceof User) {
                 if( await this.repository.checkNames(user.id, req.body.name)) {
-                    const dataset = await this.repository.updateDatasetName(Number(req.params.datasetId), req.body.name);
-                    if( dataset instanceof Dataset) res.status(200).json(dataset);
+                    const dataset: Dataset | ConcreteErrorCreator = await this.repository.updateDatasetName(Number(req.params.datasetId), req.body.name);
+                    if( dataset instanceof ConcreteErrorCreator){
+                        throw dataset;
+                    }
+                    const result: SuccessResponse = {
+                        success: true,
+                        message: 'Dataset updated successfully',
+                        obj: dataset
+                    }
+                    res.status(200).json(result);
                 }
             }
         } catch( error ) {
