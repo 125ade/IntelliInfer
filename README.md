@@ -304,14 +304,95 @@ We implemented the Data Access Object (DAO) pattern to manage database operation
 
 In detail, we defined a Dao Interface IDao to define all optional crud operations available for our models, and we defined for each Sequelize model a Dao class implementing the operations according to our needs.
 
+```typescript
+export interface IDao<T> {
+    create?(item: any): Promise<T | ConcreteErrorCreator>;
+    findById?(id: number): Promise<T | ConcreteErrorCreator>;
+    findAll?(): Promise<T[] | ConcreteErrorCreator>;
+    logicallyDelete?(id: number): Promise<object>;
+    updateItem?(id: number, property: any): Promise<T | ConcreteErrorCreator>;
+    updateCount?(Id: number, num: number): Promise<T | ConcreteErrorCreator> ;
+    findAllByDatasetId?(dataset: number): Promise<string[]>;
+}
+
+export default class AiDao implements IDao<Ai> {
+
+    constructor() {}
+    
+    // creates an ai model given a series of metadata
+    async create(aiJson: any): Promise<Ai> {
+        try{
+            const ai = await Ai.create(aiJson);
+            return ai;
+        } catch{
+            throw new ConcreteErrorCreator().createServerError().setFailedCreationItem();
+        }
+    }
+    
+    // returns the list of all ai models on db
+    async findAll(): Promise<Ai[] | ConcreteErrorCreator> {
+          const models = await Ai.findAll();
+          if( models.length !== 0){
+            return models;
+          } else {
+            throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
+          }
+    }
+    
+   // finds a specific ai model given its id
+    async findById(id: number): Promise<Ai | ConcreteErrorCreator> {
+            const model = await Ai.findByPk(id);
+            if(!model){
+                throw new ConcreteErrorCreator().createNotFoundError().setAbstentModel();
+            }
+            return model;
+    }
+    
+    // updates weights path of an ai specified by its id
+    async updateItem(id: number, weights: any): Promise<Ai | ConcreteErrorCreator> {
+        const model = await Ai.findByPk(id);
+            if(!model){
+                throw new ConcreteErrorCreator().createNotFoundError().setAbstentModel();
+            }
+            model.pathweights = weights;
+            model.save();
+            return model;
+    }
+    
+}
+```
 
 
 ## Repository Pattern
 To improve the modularity and testability of the code, the Repository pattern is used in combination with DAO pattern. The Repository pattern is placed at an higher level than the Data Access Object and on the contrary allows several different DAOs to interact. We defined a IRepository interface and we implemented the Repository class to define more complex operations that required the use of multiple DAO models. 
 
-<div style="text-align: center;">
-  <img src="documents/Repository.png" alt="Repository" width="400" height="auto">
-</div>
+```typescript
+export interface IRepository {
+    getUserById(userId: number): Promise<User | ConcreteErrorCreator>;
+    getUserByEmail(userEmail: string): Promise<User | ConcreteErrorCreator>;
+    getDatasetListByUserId(userId: number): Promise<Dataset[] | ConcreteErrorCreator>;
+    createTags(tags: string[], datasetId: number): Promise<Tag[]>;
+    listAiModels(): Promise<Ai[] | ConcreteErrorCreator>;
+    findModel(modelId: number): Promise<Ai | ConcreteErrorCreator>;
+    findResult(resultId: number): Promise<Result | ConcreteErrorCreator>;
+    listImageFromDataset(datasetId: number): Promise<Image[] | ConcreteErrorCreator>;
+    createDatasetWithTags(data: any, user: User): Promise<Dataset> ;
+    getDatasetDetail(datasetId: number): Promise<Dataset | ConcreteErrorCreator> ;
+    logicallyDelete(datasetId: number): Promise<SuccessResponse | ConcreteErrorCreator>;
+    updateModelWeights(modelId: number, weights: string ): Promise<Ai | ConcreteErrorCreator>;
+    findDatasetById(datasetId: number): Promise<Dataset | ConcreteErrorCreator>;
+    createImage(data: any): Promise<Image | null>;
+    createDestinationRepo(datasetId: number): Promise<string | ConcreteErrorCreator> ;
+    processZipEntries(datasetId: number, zipEntries: IZipEntry[], destination: string): Promise<void | ConcreteErrorCreator>;
+    updateUserTokenByCost(user: User, cost: number): Promise<void>;
+    checkUserToken(userId: number, amount: number): Promise<boolean>;
+    generateUUID(): Promise<string>;
+    getTags(datasetId: number): Promise<string[]>;
+    updateCountDataset(datasetId: number, num: number): Promise<Dataset|ConcreteErrorCreator>;
+    createListResult(imageList: Image[], aiID: number, UUID: string): Promise<Result[] | ConcreteErrorCreator>;
+    checkNames(userId: number, newName: string): Promise<boolean | ConcreteErrorCreator>;
+}
+```
 
 ## Factory Pattern
 The Factory pattern is used to define and manage exceptions. It is a creational pattern that provides an interface for creating objects, allowing subclasses to alter the type of objects that will be created. By using this pattern for exceptions, we centralize the creation logic, making it easier to manage and extend our error handling mechanism. It allows us to create different types of specific exception object in a consistent and centralized manner. 
