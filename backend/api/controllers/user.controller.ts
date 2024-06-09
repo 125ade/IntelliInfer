@@ -11,6 +11,7 @@ import mime from 'mime-types';
 import {SuccessResponse} from "../utils/utils";
 import Dataset from "../models/dataset";
 import Ai from "../models/ai";
+import Result from "../models/result";
 
 
 
@@ -42,13 +43,13 @@ export default class UserController {
 
     async datasetListByUserId(req: Request, res: Response): Promise<void> {
         try {
-            const token = req.headers.authorization
+            const token: string | undefined = req.headers.authorization
             if (token !== undefined){
-                const decode = decodeToken(token.split(' ')[1]);
+                const decode: any = decodeToken(token.split(' ')[1]);
                 if (decode.email) {
-                    const user = await this.repository.getUserByEmail(decode.email);
+                    const user: ConcreteErrorCreator | User = await this.repository.getUserByEmail(decode.email);
                     if (user && user instanceof User) {
-                        const datasetList = await this.repository.getDatasetListByUserId(user.id);
+                        const datasetList:  ConcreteErrorCreator | Dataset[] = await this.repository.getDatasetListByUserId(user.id);
                         res.status(200).json({list: datasetList});
                     } else {
                         throw new ConcreteErrorCreator().createNotFoundError().setNoUser()
@@ -73,8 +74,8 @@ export default class UserController {
     async datasetDetail(req: Request, res: Response): Promise<void> {
         try{
             if (req.params.datasetId !== undefined){
-                const datasetId = Number(req.params.datasetId);
-                const dataset = await this.repository.getDatasetDetail(datasetId);
+                const datasetId:  number = Number(req.params.datasetId);
+                const dataset: ConcreteErrorCreator | Dataset = await this.repository.getDatasetDetail(datasetId);
                 if (dataset !== null && dataset !== undefined && !(dataset instanceof ErrorCode)){
                     res.status(200).json(dataset);
                 }else{
@@ -98,7 +99,7 @@ export default class UserController {
     async findModelById(req: Request, res: Response) {
         try {
             const modelId: number = Number(req.params.modelId);// todo ai model potrebbe ritornare null è da verificare
-            const aiModel = await this.repository.findModel(modelId);
+            const aiModel: ConcreteErrorCreator | Ai = await this.repository.findModel(modelId);
             res.status(200).json(aiModel);
         } catch (error) {
             if (error instanceof ErrorCode) {
@@ -113,7 +114,7 @@ export default class UserController {
     async findResultById(req: Request, res: Response) {
         try {
             const resultId: number = Number(req.params.resultId);
-            const inferenceResult = await this.repository.findResult(resultId);
+            const inferenceResult: ConcreteErrorCreator | Result = await this.repository.findResult(resultId);
             res.status(200).json(inferenceResult);
         } catch (error) {
             if (error instanceof ErrorCode) {
@@ -126,9 +127,9 @@ export default class UserController {
 
     async createDataset(req: Request, res: Response) {
         try{
-            const token = req.headers.authorization
+            const token: string | undefined = req.headers.authorization
             if (token !== undefined){
-                const decode = decodeToken(token.split(' ')[1]);
+                const decode: any = decodeToken(token.split(' ')[1]);
                 if (decode.email) {
                     const user: User | ConcreteErrorCreator = await this.repository.getUserByEmail(decode.email);
                     if (user && user instanceof User) {
@@ -192,16 +193,16 @@ export default class UserController {
             }
 
             // Calcola il costo totale dei file da caricare
-            let totalNumber = 0;
-            let totalCost = 0;
+            let totalNumber: number = 0;
+            let totalCost: number = 0;
             if (req.file.mimetype.startsWith('image/')) {
                 totalNumber = 1;
                 totalCost = 0.75;
             } else if (req.file.mimetype.startsWith('application/zip')) {
-                const zip = new AdmZip(req.file.buffer);
+                const zip: AdmZip = new AdmZip(req.file.buffer);
                 const zipEntries: IZipEntry[] = zip.getEntries();
                 for (const entry of zipEntries) {
-                    const mimeType = mime.lookup(entry.entryName);
+                    const mimeType: string | false = mime.lookup(entry.entryName);
                     if (mimeType && mimeType.startsWith('image/')) {
                         totalNumber += 1;
                     }
@@ -211,12 +212,12 @@ export default class UserController {
                 throw new ConcreteErrorCreator().createBadRequestError().setNotSupportedFile();
             }
             
-            const userEmail = req.userEmail;
+            const userEmail: string | undefined = req.userEmail;
             if (!userEmail) {
                 throw new ConcreteErrorCreator().createBadRequestError().setMissingEmail();
             }
             
-            const user = await this.repository.getUserByEmail(userEmail);
+            const user: ConcreteErrorCreator | User = await this.repository.getUserByEmail(userEmail);
             
             if( user instanceof User){
                 // Verifica se l'utente ha abbastanza token disponibili
@@ -227,14 +228,14 @@ export default class UserController {
                 }  
             }
 
-            const destination = await this.repository.createDestinationRepo(Number(req.params.datasetId));
+            const destination: string | ConcreteErrorCreator = await this.repository.createDestinationRepo(Number(req.params.datasetId));
 
             if( typeof destination === 'string'){
 
-                const mimeType = req.file.mimetype;
+                const mimeType: string = req.file.mimetype;
 
                 if (mimeType.startsWith('image/')) {
-                    const filePath = path.join(destination, `${req.file.originalname}`);
+                    const filePath: string = path.join(destination, `${req.file.originalname}`);
                     fs.writeFileSync(filePath, req.file.buffer);
 
                     this.repository.createImage({
@@ -243,7 +244,7 @@ export default class UserController {
                         "description": req.body.description
                     });
                 } else if (mimeType.startsWith('application/zip')) {
-                    const zip = new AdmZip(req.file.buffer);
+                    const zip: AdmZip = new AdmZip(req.file.buffer);
                     const zipEntries: IZipEntry[] = zip.getEntries();
                     await this.repository.processZipEntries(Number(req.params.datasetId),zipEntries, destination);
                 } else {

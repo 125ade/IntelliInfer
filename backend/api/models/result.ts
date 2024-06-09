@@ -3,6 +3,10 @@ import { SequelizeConnection } from '../db/SequelizeConnection';
 import Image from './image';
 import Ai from './ai'; 
 
+
+// sequelize model of a table containing all inference's results
+
+
 export default class Result extends Model {
   declare id: number;
   
@@ -18,10 +22,7 @@ export default class Result extends Model {
 
 const sequelize = SequelizeConnection.getInstance().sequelize;
 
-/**
- * Initialize model, define sequelize connection, the name of the table, 
- * its attributes and relations
- */
+
 Result.init(
   {
     id: {

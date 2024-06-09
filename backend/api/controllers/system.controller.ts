@@ -33,7 +33,7 @@ export default class SystemController {
             if (user instanceof ConcreteErrorCreator ) {
                 new ConcreteErrorCreator().createNotFoundError().setNoUser().send(res);
             }else{
-                const token = generateToken(user);
+                const token: string = generateToken(user);
                 res.status(200).json({ token });
             }
         } catch (error) {
@@ -78,7 +78,7 @@ export default class SystemController {
             throw new ConcreteErrorCreator().createAuthenticationError().setNoToken();
         }
 
-        const decode = decodeToken(token.split(' ')[1]);
+        const decode: any = decodeToken(token.split(' ')[1]);
 
         if (!decode.email) {
             throw new ConcreteErrorCreator().createServerError().setFailedStartInference();

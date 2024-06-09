@@ -2,6 +2,8 @@ import { DataTypes, Model } from 'sequelize';
 import { SequelizeConnection } from '../db/SequelizeConnection';
 import {AiArchitecture} from "../static";
 
+// sequelize model of a table ai of all ai models available 
+
 export default class Ai extends Model {
 
     declare id: number;
@@ -48,7 +50,7 @@ Ai.init(
     modelName: "Ai",
     tableName: "ai",
     timestamps: true,
-    createdAt: 'created_at', // Utilizza la convenzione 'created_at' per il timestamp di creazione
+    createdAt: 'created_at', 
     updatedAt: 'updated_at' 
   },
 );

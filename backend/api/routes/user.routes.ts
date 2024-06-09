@@ -57,7 +57,6 @@ export default class UserRoutes{
 
 
         // finds an inference result given its id
-        // TODO: we have to change this route because we have to find the result given the id of the inference
         this.router.get(
             "/inference/result/:resultId",
             AuthUser,
@@ -77,16 +76,14 @@ export default class UserRoutes{
         );
 
 
-        // autenticazione
-        // autorizzazione "user"
+        // visualize the list of datasets available for a user
         this.router.get(
             '/dataset/list',
             AuthUser,
             this.userController.datasetListByUserId.bind(this.userController));
 
 
-        // autenticazione
-        // autorizzazione "user"
+        // finds a dataset given its id
         this.router.get(
             "/dataset/:datasetId",
             AuthUser,

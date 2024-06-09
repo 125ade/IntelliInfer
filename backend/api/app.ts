@@ -19,9 +19,9 @@ require('dotenv').config();
 
 // api variable
 const port: number = parseInt(process.env.API_PORT || "3000");
+
 // job queue name definition taken from env
 const QUEUE_TASK_DOCKER: string = process.env.DOKER_QUEUE_NAME || 'dockerTaskQueue';
-
 
 // init express
 const app: Express = express();
@@ -34,8 +34,6 @@ setupLogging(app)
 
 // sync db
 syncDb().then(():void=>{console.log("\t--> SYNC BD DONE")})
-
-
 
 // manage job
 try {
@@ -54,8 +52,6 @@ try {
     console.error(err);
 }
 
-
-
 // manage open API
 try {
   const openApiSpec = JSON.parse(fs.readFileSync(path.join(__dirname, 'openapi.json'), 'utf8'));
@@ -65,13 +61,11 @@ try {
   console.error(err);
 }
 
-
-// Inizializza le rotte
+// Routes Inizialization
 const userRoutes: UserRoutes = new UserRoutes();
 const systRoutes: SystemRoutes = new SystemRoutes()
 const adminRoutes: AdminRoutes = new AdminRoutes();
 
-// Usa le rotte definite nella classe UserRoutes
 app.use('/api', userRoutes.router);
 app.use('/admin', adminRoutes.router);
 app.use('/api', systRoutes.router);
@@ -79,6 +73,7 @@ app.use('/api', systRoutes.router);
 
 // manage health check
 app.get('/check/health', (req: Request, res: Response) => {res.json({ system: 'online' });});
+
 // manage 404 route not found
 app.use(handleRouteNotFound);
 

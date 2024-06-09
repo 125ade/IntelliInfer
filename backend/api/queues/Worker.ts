@@ -22,16 +22,16 @@ export class TaskQueue {
             const jobDataString: string = JSON.stringify(jobData);
             const containerName: string = "working-test";
 
-            docker.listContainers((err, containers) => {
+            docker.listContainers((err: any, containers: any) => {
                 if (err) {
                     job.log(`[log] ${err}`);
                 } else {
                     if (containers) {
-                        containers.forEach((data) => {
+                        containers.forEach((data: any) => {
                             job.log(`[log] immagine: ${data.Image}`);
                         });
 
-                        const testContainer = containers.find((container) => {
+                        const testContainer = containers.find((container: any) => {
                             return container.Names.includes(`/${containerName}`);
                         });
 
@@ -78,14 +78,14 @@ export class TaskQueue {
                 });
 
                 await job.updateProgress(60);
-                logStream.on('data', (chunk) => {
+                logStream.on('data', (chunk: any) => {
                     chunk.toString().split('\n').forEach((line:any) => {
                         job.log(`[log] ${line}`);
                     });
                 });
 
                 // Attendere che il container finisca di eseguire
-                const data = await container.wait();
+                const data: any = await container.wait();
                 await job.log(`[log] Container terminato con stato: ${data.StatusCode}`);
                 await job.updateProgress(80);
 

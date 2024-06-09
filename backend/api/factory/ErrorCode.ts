@@ -19,64 +19,54 @@ export class ServerError extends ErrorCode {
       return this;
     }
     
-    // errore: creazione di un dataset già esistente nel database
-    setAlreadyCreatedDataset(): ErrorCode {
-      return this.set("There was an error. The created dataset already exists.");
-    }
-    
-    // errore: caricamento di un file giù esistente nel database
-    setAlreadyUploadedFile(): ErrorCode {
-        return this.set("There was an error. Already uploaded file.");
-    }
-    
-    // errore nell'aggiornamento dei token 
-    setUpdatingToken(): ErrorCode {
-      return this.set("Error on updating token");
-    }
-
+    // error on the creation of an item
     setFailedCreationItem(): ErrorCode {
-      return this.set("Error on creating item");
+      return this.set("Error on creating item.");
     }
-
+    
+    // error on the update of an item
     setFailedUpdatingItem(): ErrorCode {
-      return this.set("Error on updating item");
+      return this.set("Error on updating item.");
     }
-
+    
+    // error on the elimination of an item
     setFailedDeleteItem(): ErrorCode {
-      return this.set("Error on deleting item");
+      return this.set("Error on deleting item.");
     }
 
-    // errore nella connessione al database
+    // connection error
     setFailedConnection(): ErrorCode {
         return this.set("There was an error connecting to the database.")
     }
 
-    // errore durante l'upload di un file
+    // error on the upload of a file
     setFailedUploadFile(): ErrorCode {
       return this.set("There was an error uploading the file.")
     }
 
-    // errore nella connessione al database
+    // error on the generation of a token
     setFailedGenToken(): ErrorCode {
-      return this.set("failed creation token.")
+      return this.set("Failed creation token.")
     }
 
-
-    // errore nella connessione al database
+    // error on the creation of a repository
     setFailedCreationRepo(): ErrorCode {
       return this.set("Error. Dataset path must be provided")
     }
-
+    
+    // error on the return of an item
     setFailedRetriveItem() {
         return this.set("Error. Item can not be provided")
     }
-
+    
+    // error on the start of an inference operation
     setFailedStartInference() {
-        return this.set("Error. Inference can not start")
+        return this.set("Error. Inference can't start")
     }
-
+    
+    // error on the creation of the result of an inference
     setFailedCreationResult() {
-        return this.set("Error. Inference result can not be created");
+        return this.set("Error. Inference result can't be created");
     }
 }
 
@@ -96,47 +86,35 @@ export class AuthenticationError extends ErrorCode {
       return this;
     }
     
-    // token invalido
+    // error for giving an invalid token
     setInvalidToken(): ErrorCode {
         return this.set("Authentication failed. Token is invalid.");
     }
-    // token invalido
+
+    // error for the lack of a token
     setNoToken(): ErrorCode {
-        return this.set("Authentication failed. Token is not provided.");
-    }
-
-    setNotAdmin(): ErrorCode {
-      return this.set("Authentication failed. User is not the admin");
-    }
-
-    setNotRightRole(): ErrorCode {
-      return this.set("Authentication failed. User not have the right role to use the resource");
-    }
-
-    // token scaduto
-    setTokenExpired(): ErrorCode {
-      return this.set("Authentication failed. Token has expired");
+        return this.set("Authentication failed. Token must be provided.");
     }
     
-    // firma non valida
+    // error given by wrong role of the user
+    setNotRightRole(): ErrorCode {
+      return this.set("Authentication failed. User have not the right role to use the resource");
+    }
+
+    // error given by expiration of the token
+    setTokenExpired(): ErrorCode {
+      return this.set("Authentication failed. Token has already expired");
+    }
+    
+    // error given by an invalid signature
     setInvalidSignature(): ErrorCode {
         return this.set("Authentication failed. Token signature is invalid.");
     }
-    
-    // chiave invalida
-    setInvalidKey(): ErrorCode {
-        return this.set("Authentication failed. Key is invalid.");
-    }
 
-    //Failed to authenticate user
+    // error on the authentication of a user
     setFailAuthUser(): ErrorCode {
-        return this.set("Authentication failed. Failed to authenticate user.");
+        return this.set("Authentication failed.");
     }
-
-    // chiave invalida
-    setNotSystem(): ErrorCode {
-      return this.set("Authentication failed. No System.");
-  }
 }
 
 
@@ -156,58 +134,37 @@ export class BadRequestError extends ErrorCode {
       return this;
     }
     
-    // Immagine non valida (controllo mimetype?)
-    setInvalidImages(): ErrorCode {
-        return this.set("There was an error. Images not valid.");
-      }
-    
-    // file da caricare assente 
+    // error given by absence of a file to upload 
     setAbsentFile(): ErrorCode {
       return this.set("There was an error. An image or zip file must be provided.");
     }
-
-    // file da caricare assente 
-    setAbsentBody(): ErrorCode {
-      return this.set("There was an error. Body request must be provided.");
-    }
     
-    // l'immagine è già stata sottoposta a inferenza
-    setInferredImage() {
-      return this.set("The image has already an inference.");
-    }
-    
-    // bisogna specificare l'id del dataset nella richiesta
+    // error given by absence of dataset's id
     setNoDatasetId(): ErrorCode {
         return this.set("There was an error. DatasetId must be provided.");
     }
-    
-    // bisogna specificare l'id dei risultati nella richiesta
-    setNoResultId(): ErrorCode {
-        return this.set("There was an error. ResultId must be provided.");
-    }
 
-    // bisogna specificare l'id dell'utente nella richiesta
+    // error given by absence of user's id
     setNoUserId(): ErrorCode {
-        return this.set("There was an error. User Id must be provided.");
+        return this.set("There was an error. UserId must be provided.");
     }
-
+    
+    // error given by absence of token
     setMissingToken(): ErrorCode {
       return this.set("There was an error. Token must be provided.");
     }
-
-    setMissingKey(): ErrorCode {
-      return this.set("There was an error. Key must be provided.");
-    }
-
+    
+    // error given when the file the user wants to upload is not supported (no image or zip)
     setNotSupportedFile(): ErrorCode {
       return this.set("There was an error. File format not supported.");
     }
-
+    
+    // error given by absence of email
     setMissingEmail(): ErrorCode {
       return this.set("There was an error. User email not found.");
     }
-
-
+    
+    // error given by absence of model's id
     setNoModelId() {
         return this.set("There was an error. Model id not found.");
     }
@@ -228,15 +185,13 @@ export class ForbiddenError extends ErrorCode {
       response.status(403).send(this.message);
       return this;
     }
-  
+    
+    // error given by insufficient tokens to make an operation
     setInsufficientToken(): ErrorCode{
       return this.set(`you need more tokens for this operation`);
     }
-
-    setWrongEmail(): ErrorCode{
-      return this.set('Invalid Email');
-    }
-
+    
+    // error given when the user wants to update the name of a dataset but the name is already used by one other
     setInvalidName(): ErrorCode{
       return this.set('There was an error. You have already a dataset with this name.');
     }
@@ -257,40 +212,38 @@ export class NotFoundError extends ErrorCode {
       response.status(404).send(this.message);
       return this;
     }
-  
+    
+    // error given by absence of a model
     setAbstentModel(): ErrorCode{
       return this.set("Absent model");
     }
-
+    
+    // error given by absence of a dataset
     setAbstentDataset(): ErrorCode{
         return this.set("Absent dataset");
     }
-
+    
+    // error given by absence of a route on routes defined
     setNoRoute(): ErrorCode{
         return this.set("No route found.");
     }
-
+    
+    // error given when impossible to find a result
     setAbsentResults(): ErrorCode{
         return this.set("The requested results could not be found.");
     }
-
-    setAbsentTag(): ErrorCode{
-      return this.set("The requested tags could not be found.");
-  }
-
-    setNoEmail(): ErrorCode {
-        return this.set("Email not existent.");
-    }
-
+    
+    // error given by absence of a user
     setNoUser(): ErrorCode {
       return this.set("user not found");
   }
-
+    
+    // error given by absence of a user
     setAbsentItems(): ErrorCode {
       return this.set("Impossible to find the required items.");
   }
 
-    // errore: richiesta dello stato di un'operazione di inferenza non in corso
+    // error given when the user wants to visualize the state of an inference but it's impossible to find it
     setNonExistentInference(): ErrorCode {
         return this.set("There was an error. The inference process required is not existent. Unable to find its state.")
     }

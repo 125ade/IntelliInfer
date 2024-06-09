@@ -18,7 +18,9 @@ export default class AdminController {
     constructor() {
         this.repository = new Repository();
     }
+    
 
+    // update the weights' path of an ai model
     async updateWeights(req: Request, res: Response) {
         try{
             if (!req.file) {
