@@ -66,26 +66,7 @@ export default class UserRoutes{
         );
 
 
-        // upload of an image
-        this.router.post(
-            "/dataset/:datasetId/upload/image",
-            AuthUser,
-            validateParamIntGreaterThanZero('datasetId'),
-            upload.single("image"),
-            this.userController.uploadImage.bind(this.userController));
-
-
-        // upload of a zip file
-        this.router.post(
-            '/dataset/:datasetId/upload/zip',
-            AuthUser,
-            validateParamIntGreaterThanZero('datasetId'),
-            upload.single('zip'),
-            this.userController.uploadZip.bind(this.userController));
-
-
         // upload of a file (zip or image)
-        // TODO: handle user tokens
         this.router.post(
             '/dataset/:datasetId/upload/file',
             AuthUser,
