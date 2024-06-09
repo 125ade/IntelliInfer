@@ -19,6 +19,7 @@ import { v4 as uuidv4 } from 'uuid';
 import {generatePath, SuccessResponse} from "../utils/utils";
 import DatasetTagDao from '../dao/datasetTagDao';
 import DatasetTags from '../models/datasettag';
+import {FinishResult} from "../queues/jobData";
 
 
 export interface IRepository {
@@ -44,6 +45,7 @@ export interface IRepository {
     getTags(datasetId: number): Promise<string[]>;
     updateCountDataset(datasetId: number, num: number): Promise<Dataset|ConcreteErrorCreator>;
     createListResult(imageList: Image[], aiID: number, UUID: string): Promise<Result[] | ConcreteErrorCreator>;
+    updateListResult(result:FinishResult[]): Promise<boolean | ConcreteErrorCreator>;
     checkNames(userId: number, newName: string): Promise<boolean | ConcreteErrorCreator>;
 }
 
@@ -215,7 +217,7 @@ export class Repository implements IRepository {
 
     // updates the user token amount subtracting a cost
     public async updateUserTokenByCost(user: User, cost: number): Promise<void>{
-        user.token -= cost;
+        user.token = Number(user.token) - cost;
         await user.save();
     }
 
@@ -275,9 +277,9 @@ export class Repository implements IRepository {
     
     async createListResult(imageList: Image[], aiID: number, UUID: string): Promise<Result[] | ConcreteErrorCreator> {
         const results: Result[] = [];
+        const res: ResultDao = new ResultDao()
         for (const image of imageList) {
             try {
-                const res: ResultDao = new ResultDao()
                 const result: Result | ConcreteErrorCreator = await res.initCreation(image.id, aiID, UUID);
                 if (result instanceof ConcreteErrorCreator) {
                     throw result;
@@ -293,6 +295,25 @@ export class Repository implements IRepository {
         }
 
         return results;
+    }
+
+    async updateListResult(result: FinishResult[]): Promise<boolean | ConcreteErrorCreator>{
+        const resultDao: ResultDao = new ResultDao()
+        for (const ris of result) {
+            try {
+                const result: number | ConcreteErrorCreator = await resultDao.finalizeCreation(ris);
+                if (result instanceof ConcreteErrorCreator) {
+                    throw result;
+                }
+            } catch (error) {
+                if (error instanceof ConcreteErrorCreator) {
+                    return error;
+                } else {
+                    throw new ConcreteErrorCreator().createServerError().setFailedCreationResult();
+                }
+            }
+        }
+        return true;
     }
 
     async checkNames(userId: number, newName: string): Promise<boolean | ConcreteErrorCreator> {

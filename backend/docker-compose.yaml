@@ -3,21 +3,6 @@ version: '3.7'
 name: intelliinfer
 
 services:
-#  nginx:
-#    build:
-#      context: ./nginx
-#      dockerfile: Dockerfile.nginx
-#    container_name: "nginx"
-#    ports:
-#      - '80:80'
-#      - '443:443'
-#    volumes:
-#      - ./nginx.conf:/etc/nginx/nginx.conf
-#      - ./ssl_certificate.crt:/etc/nginx/ssl/ssl_certificate.crt
-#      - ./ssl_certificate_key.key:/etc/nginx/ssl/ssl_certificate_key.key
-#    depends_on:
-#      api:
-#        condition: service_healthy
 
 
   api:
@@ -38,6 +23,7 @@ services:
     environment:
       - DOCKER_HOST=${DOCKER_HOST}
       - CONTAINER_IMAGE_NAME=${CONTAINER_IMAGE_NAME}
+      - CONTAINER_TEST_NAME=${CONTAINER_TEST_NAME}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_HOST=${REDIS_HOST}
       - DOKER_QUEUE_NAME=${DOKER_QUEUE_NAME}
@@ -128,7 +114,9 @@ services:
 #    build:
 #      context: ./neural_network/yolo
 #      dockerfile: Dockerfile
-#
+#    container_name: "yolo"
+#    command: /bin/true
+
 
 
   test:
@@ -136,6 +124,10 @@ services:
       context: ./neural_network/test
       dockerfile: Dockerfile
     container_name: "test"
+    volumes:
+      - media_data:/app/media
+    networks:
+      - private-ntwk
     command: /bin/true
 
 
@@ -150,4 +142,5 @@ volumes:
   postgres_data:
   secrets_data:
   media_data:
+    driver: local
   logs_data:
