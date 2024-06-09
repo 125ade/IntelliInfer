@@ -109,7 +109,7 @@ VALUES
 
 -- Inserimento di un elemento nella tabella ai
 INSERT INTO ai (name, description, pathweights, architecture) VALUES
-('Yolov5', 'Yolov5 neural network for detection tasks', '/primo/path/esempio', 'yolo');
+('Yolov5', 'Yolov5 neural network for detection tasks', '/primo/path/esempio', 'yolo'),
 ('TestNN', 'Test script to emulate a neural network..', '/primo/path/esempio', 'test');
 
 -- Insert seed data into datasets
