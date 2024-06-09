@@ -8,7 +8,7 @@ export default class DatasetDao implements IDao<Dataset> {
     constructor() {}
     
     // creates a dataset with informations given by datasetJson
-    async create(datasetJson: any): Promise<Dataset> {
+    async create(datasetJson: any): Promise<Dataset | ConcreteErrorCreator> {
         try{
             const dataset = await Dataset.create(datasetJson);
             return dataset;

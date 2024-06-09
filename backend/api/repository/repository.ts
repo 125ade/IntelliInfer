@@ -30,7 +30,7 @@ export interface IRepository {
     findModel(modelId: number): Promise<Ai | ConcreteErrorCreator>;
     findResult(resultId: number): Promise<Result | ConcreteErrorCreator>;
     listImageFromDataset(datasetId: number): Promise<Image[] | ConcreteErrorCreator>;
-    createDatasetWithTags(data: any, user: User): Promise<Dataset> ;
+    createDatasetWithTags(data: any, user: User): Promise<Dataset | ConcreteErrorCreator> ;
     getDatasetDetail(datasetId: number): Promise<Dataset | ConcreteErrorCreator> ;
     logicallyDelete(datasetId: number): Promise<SuccessResponse | ConcreteErrorCreator>;
     updateModelWeights(modelId: number, weights: string ): Promise<Ai | ConcreteErrorCreator>;
@@ -81,7 +81,7 @@ export class Repository implements IRepository {
 
     // given a series of metadata about the dataset to create and a list of tags/strings, dataset and associated
     // tags are created on db
-    async createDatasetWithTags(data: any, user: User): Promise<Dataset>  {
+    async createDatasetWithTags(data: any, user: User): Promise<Dataset | ConcreteErrorCreator>  {
         const datasetDao: DatasetDao = new DatasetDao();
         const tagDao: TagDao = new TagDao();
         const datasettagDao: DatasetTagDao = new DatasetTagDao();
@@ -93,7 +93,7 @@ export class Repository implements IRepository {
         const path: string = generatePath(name);
 
         // Creates the dataset
-        const newDataset: Dataset = await datasetDao.create({
+        const newDataset: Dataset | ConcreteErrorCreator = await datasetDao.create({
           name,
           description,
           path,
@@ -101,6 +101,9 @@ export class Repository implements IRepository {
           countClasses: tags.length,
           userId: user.id,
         });
+        if ( newDataset instanceof ConcreteErrorCreator){
+            return newDataset;
+        }
 
         // Associates tags with the dataset
         for (const tagName of tags) {
