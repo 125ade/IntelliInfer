@@ -2,6 +2,10 @@ import { DataTypes, Model } from 'sequelize';
 import { SequelizeConnection } from '../db/SequelizeConnection';
 import {UserRole} from "../static";
 
+
+// sequelize model of a table containing all users' data
+
+
 export default class User extends Model {
 
   declare id: number;
@@ -18,10 +22,6 @@ export default class User extends Model {
 
 const sequelize = SequelizeConnection.getInstance().sequelize;
 
-/**
- * Initialize model, define sequelize connection, the name of the table, 
- * its attributes and relations
- */
 User.init(
   {
     id: {

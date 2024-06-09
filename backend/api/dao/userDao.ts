@@ -9,7 +9,7 @@ export default class UserDao implements IDao<User> {
     // it creates a new User or throw an error if the creation operation failed
     async create(userJson: any): Promise<User> {
         try{
-            const data = await User.create(userJson);
+            const data: User = await User.create(userJson);
             return data;
         } catch{
             throw new ConcreteErrorCreator().createServerError().setFailedCreationItem();

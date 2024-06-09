@@ -1,6 +1,7 @@
 import { DataTypes, Model } from 'sequelize';
 import { SequelizeConnection } from '../db/SequelizeConnection';
 
+// intermediate model to express many-to-many association between Dataset and Tag
 
 class DatasetTags extends Model {}
 

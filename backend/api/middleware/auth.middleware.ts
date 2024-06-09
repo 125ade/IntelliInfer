@@ -22,7 +22,7 @@ export const verifyTokenSignature = async (req: Request, res: Response, next: Ne
 
         if (jwt && jwt.toLowerCase().startsWith('bearer')) {
           jwt = jwt.slice('bearer'.length).trim();
-          const decodedToken = await validateToken(jwt);
+          const decodedToken: any = await validateToken(jwt);
 
           req.userEmail = decodedToken.email;
           req.userRole = decodedToken.role;

@@ -2,6 +2,8 @@ import {body, param, check, validationResult} from "express-validator";
 import { ConcreteErrorCreator } from "../factory/ErrorCreator";
 import { Request, Response, NextFunction } from 'express';
 
+
+// middleware used when giving a parameter to a request that must be integer and not null
 export function validateParamIntGreaterThanZero(param_id: string) {
     return [
         param(param_id)
@@ -20,6 +22,8 @@ export function validateParamIntGreaterThanZero(param_id: string) {
     ];
 }
 
+
+// middleware to validate the body of the route to create a dataset
 export const validateCreateDataset = [
     check('name')
         .notEmpty().withMessage('Name is required')
@@ -36,7 +40,7 @@ export const validateCreateDataset = [
             return true;
         }),
 
-    // Middleware to check for validation errors
+    
     (req: Request, res: Response, next: NextFunction) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -51,6 +55,7 @@ export const validateCreateDataset = [
 ];
 
 
+// middleware to validate the mimetype of a file uploaded
 export function validateFileUpload(req: Request, res: Response, next: NextFunction) {
     if (!req.file) {
         return res.status(400).json({ error: 'File must be provided' });
@@ -64,13 +69,15 @@ export function validateFileUpload(req: Request, res: Response, next: NextFuncti
     next();
 }
 
-// Definisci i middleware di validazione per l'email e i token
+
+// middleware to validate the body of the route to recharge user's credit
 export const validateRechargeRequest = [
     body('email').isEmail().normalizeEmail(),
     body('tokensToAdd').isInt({ min: 1 }).toInt()
 ];
 
-// Middleware for validating the body content (string not null)
+
+// Middleware for validating the body of the route to update the name of a dataset
 export const validateName = [
     check('name')
         .isString().withMessage('Name must be a string')
