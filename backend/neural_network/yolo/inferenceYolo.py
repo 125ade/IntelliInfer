@@ -7,9 +7,10 @@ import requests
 
 
 # Define test and weights paths for INFERENCE
-test_path = '/app/images'  
-weight_path = '/app/weights/best.pt'  
+test_path = '/app/images'  # path of the images to infer
+weight_path = '/app/weights/best.pt' # path of the weights 
 output_path = '/app/output'  # volume
+
 server_port = os.environ.get('SERVER_PORT')  # porta del server Node dall'ambiente
 server_url = "http://backend:6777/save_images"  # URL del server Node
 
@@ -17,6 +18,7 @@ server_url = "http://backend:6777/save_images"  # URL del server Node
 Funzione che esegue l'inferenza su una singola immagine random all'interno del dataset disponibile.
 """
 def run_inference(test_path, weight_path):
+
     # Lista dei file nell'elenco di test
     test_files = os.listdir(test_path)
 
@@ -29,7 +31,7 @@ def run_inference(test_path, weight_path):
 
     # Esegui il comando e cattura l'output
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
+    stderr = process.communicate()
 
     # Controllo degli errori
     if process.returncode != 0:
