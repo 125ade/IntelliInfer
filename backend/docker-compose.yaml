@@ -37,6 +37,7 @@ services:
     restart: unless-stopped
     environment:
       - DOCKER_HOST=${DOCKER_HOST}
+      - CONTAINER_IMAGE_NAME=${CONTAINER_IMAGE_NAME}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_HOST=${REDIS_HOST}
       - DOKER_QUEUE_NAME=${DOKER_QUEUE_NAME}
@@ -128,15 +129,14 @@ services:
 #      context: ./neural_network/yolo
 #      dockerfile: Dockerfile
 #
-#  rcnn:
-#    build:
-#      context: ./neural_network/rcnn
-#      dockerfile: Dockerfile
-#  test_inference:
-#    build:
-#      context: ./neural_network/test_inference
-#      dockerfile: Dockerfile
-#    container_name: "test_inference"
+
+
+  test:
+    build:
+      context: ./neural_network/test
+      dockerfile: Dockerfile
+    container_name: "test"
+    command: /bin/true
 
 
 networks:

@@ -248,16 +248,26 @@ export default class UserController {
 
     async displayResidualCredit(req: Request, res: Response){
         try {
-            const userEmail = req.userEmail;
+            const userEmail: string | undefined = req.userEmail;
 
             if (!userEmail) {
                 throw new ConcreteErrorCreator().createBadRequestError().setMissingEmail();
             }
             
-            const user = await this.repository.getUserByEmail(userEmail);
+            const user: User | ConcreteErrorCreator = await this.repository.getUserByEmail(userEmail);
 
             if( user instanceof User){
-                res.status(200).json({ token: user.token });
+                const result : SuccessResponse = {
+                    success: true,
+                    message: 'Credit recharged successfully',
+                    obj: {
+                        userEmail: user.email,
+                        token: Number(user.token)
+                    }
+                }
+                res.status(200).json(result);
+            }else{
+                throw user;
             }
         } catch (error) {
             if( error instanceof ErrorCode){

@@ -218,9 +218,9 @@ export class Repository implements IRepository {
 
     // checks if the user token amount is >= requested amount
     async checkUserToken(userId: number, amount: number): Promise<boolean> {
-        const userDao = new UserDao();
-        const user = await userDao.findById(userId);
-        return !(user instanceof User && user.token < amount);
+        const userDao: UserDao = new UserDao();
+        const user: User | ConcreteErrorCreator = await userDao.findById(userId);
+        return !(user instanceof User && Number(user.token) <= amount);
     }
 
     // finds a dataset given its id
@@ -245,16 +245,12 @@ export class Repository implements IRepository {
     }
 
     async generateUUID(): Promise<string> {
+        const resuldDao = new ResultDao();
         let unique: boolean = false;
         let uuid: string = "";
         while (!unique) {
             uuid = uuidv4();
-            const existingRecord: Result | null = await Result.findOne({
-                where: {
-                    requestId: uuid
-                }
-            });
-            if (!existingRecord) {
+            if(!(await resuldDao.findOneByResultId(uuid))){
                 unique = true;
             }
         }

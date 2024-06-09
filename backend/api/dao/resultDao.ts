@@ -54,11 +54,24 @@ export default class ResultDAO implements IDao<Result> {
     }
 
     async findById(id: number): Promise<Result | ConcreteErrorCreator> {
-            const result = await Result.findByPk(id);
-            if(!result){
+            const result: Result | null = await Result.findByPk(id);
+            if(!(result instanceof Result)){
                 throw new ConcreteErrorCreator().createNotFoundError().setAbsentResults();
             }
             return result;
+    }
+
+    async findOneByResultId(uuid: string): Promise<boolean> {
+        const existingRecord: Result | null = await Result.findOne({
+            where: {
+                requestId: uuid
+            }
+        });
+        if (existingRecord instanceof Result) {
+            return true;
+        }else{
+            return false
+        }
     }
 
     async findAllByUUID(resoultUUID: string): Promise<Result[] | ConcreteErrorCreator> {
