@@ -166,7 +166,7 @@ Through it we manage and save data relating to users, datasets and related image
 
 ## Database Schema
 <div style="text-align: center;">
-  <img src="documents/DatabaseSchema.jpg" alt="Database Schema" style="max-width: 256 px; height: auto;">
+  <img src="documents/schemadatabase.drawio.png" alt="Database Schema" width="850" height="auto">
 </div>
 
 ## Sequelize
