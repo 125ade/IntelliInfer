@@ -21,7 +21,7 @@ export class Queue {
     }
 
     public process(concurrency: number, processor: (job: Job) => Promise<void>, workerOptions?: WorkerOptions) {
-        const connection = RedisConnection.getInstance().redis;
+        const connection: Redis = RedisConnection.getInstance().redis;
         this.worker = new BullWorker(this.queue.name, processor, { ...workerOptions, connection, concurrency });
     }
 

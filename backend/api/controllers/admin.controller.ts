@@ -8,7 +8,7 @@ import path from 'path';
 import {SuccessResponse} from "../utils/utils";
 import process from "node:process";
 
-const destination: string = process.env.DESTINATION_PATH_WEIGHTS || "/weights";
+const destination: string = process.env.DESTINATION_PATH_WEIGHTS || "/app/media/weights";
 const file_extension: string = process.env.FILE_WEIGHTS_EXTENSION || ".pt";
 
 export default class AdminController {
@@ -18,7 +18,9 @@ export default class AdminController {
     constructor() {
         this.repository = new Repository();
     }
+    
 
+    // update the weights' path of an ai model
     async updateWeights(req: Request, res: Response) {
         try{
             if (!req.file) {

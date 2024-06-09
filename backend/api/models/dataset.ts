@@ -4,10 +4,13 @@ import User from './user';
 import DatasetTags from './datasettag';
 
 
+// sequelize model of a table containing all datasets available
+
+
 export default class Dataset extends Model {
 
   declare id: number;
-  declare userId: number | null; // NB lo metto ora opzionale per testare la rotta create dataset
+  declare userId: number | null; // optional because there are already datasets available to use
   declare name: string;
   declare path: string;
   declare countElements: number;
@@ -15,7 +18,6 @@ export default class Dataset extends Model {
   declare description: string | null;
   declare isDeleted: boolean; 
 
-  // Associazioni del modello
   static associate(models: any) {
     Dataset.belongsToMany(models.Tag, { through: DatasetTags });
   }
@@ -35,12 +37,12 @@ Dataset.init(
     },
     userId: {
       type: DataTypes.INTEGER,
-      allowNull: true, // NB solo per ora
+      allowNull: true, 
       references: {
         model: User,
         key: 'id'
       },
-      field: 'user_id' // Aggiungi questo campo per indicare il nome corretto della colonna nel database
+      field: 'user_id' 
     },
     name: {
       type: DataTypes.STRING,
@@ -77,7 +79,7 @@ Dataset.init(
     tableName: "datasets",
     paranoid: true,
     timestamps: true,
-    createdAt: 'created_at', // Utilizza la convenzione 'created_at' per il timestamp di creazione
+    createdAt: 'created_at', 
     updatedAt: 'updated_at',
     deletedAt: 'deleted_at'
   },

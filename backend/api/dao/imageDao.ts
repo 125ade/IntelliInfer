@@ -9,7 +9,7 @@ export default class ImageDao implements IDao<Image> {
     // creates a new Image instance given a series of metadata
     async create(imageJson: any): Promise<Image> {
         try{
-            const data = await Image.create(imageJson);
+            const data: Image = await Image.create(imageJson);
             return data;
         } catch{
             throw new ConcreteErrorCreator().createServerError().setFailedCreationItem();
@@ -18,7 +18,7 @@ export default class ImageDao implements IDao<Image> {
     
     // finds a specific Image given its id
     async findById(id: number): Promise<Image | ConcreteErrorCreator> {
-        const image = await Image.findByPk(id);
+        const image: Image | null = await Image.findByPk(id);
         if(!image){
             throw new ConcreteErrorCreator().createNotFoundError().setAbstentModel();
         }

@@ -99,7 +99,7 @@ export class Repository implements IRepository {
           name,
           description,
           path,
-          countElements: 0, // Set to 0 or a default value, adjust as needed
+          countElements: 0,
           countClasses: tags.length,
           userId: user.id,
         });
@@ -157,27 +157,24 @@ export class Repository implements IRepository {
     
     // finds a dataset given its id
     async findDatasetById(datasetId: number): Promise<Dataset | ConcreteErrorCreator> {
-        const datasetDao = new DatasetDao();
+        const datasetDao: DatasetDao = new DatasetDao();
         return datasetDao.findById(datasetId);
     }
     
     // creates an instance of Image Sequelize model to save it on db
     async createImage(data: any): Promise<Image | null> {
-        const imageDao = new ImageDao();
+        const imageDao: ImageDao = new ImageDao();
         return imageDao.create(data);
     }
     
     // creates the destination repository used for files uploaded on our volume
     async createDestinationRepo(datasetId: number): Promise<string | ConcreteErrorCreator> {
-        const datasetDao = new DatasetDao();
-        //const dataset = await Dataset.findByPk(datasetId);
-        const dataset = await datasetDao.findById(datasetId);
+        const datasetDao: DatasetDao = new DatasetDao();
+        const dataset: ConcreteErrorCreator | Dataset = await datasetDao.findById(datasetId);
         if( dataset instanceof Dataset){
-            const datasetPath = dataset?.path;
+            const datasetPath: string = dataset?.path;
             if(typeof datasetPath === 'string'){
-                const destination = path.join('/app/media', datasetPath, 'img');
-
-                // Assicurati che la cartella di destinazione esista
+                const destination: string = path.join('/app/media', datasetPath, 'img');
                 if (!fs.existsSync(destination)) {
                     fs.mkdirSync(destination, { recursive: true });
                 }
@@ -192,16 +189,15 @@ export class Repository implements IRepository {
     async processZipEntries(datasetId: number, zipEntries: IZipEntry[], destination: string): Promise<void | ConcreteErrorCreator> {
         try {
             zipEntries.forEach((entry: IZipEntry) => {
-                const entryName = entry.entryName;
-                const entryData = entry.getData();
-                const mimeType = mime.lookup(entryName);
+                const entryName: string = entry.entryName;
+                const entryData: Buffer = entry.getData();
+                const mimeType: string | false = mime.lookup(entryName);
     
                 if (mimeType && mimeType.startsWith('image/')) {
-                    const filePath = path.join(destination, entryName);
+                    const filePath: string = path.join(destination, entryName);
                     fs.writeFileSync(filePath, entryData);
 
-                    // Salva l'immagine nel database utilizzando ImageDao
-                    const imageDao = new ImageDao()
+                    const imageDao: ImageDao = new ImageDao()
                     imageDao.create({
                     datasetId: datasetId, 
                     path: entryName,
@@ -210,7 +206,6 @@ export class Repository implements IRepository {
                 }
             });
         } catch {
-            //return false; // Restituisce false se si verifica un errore durante l'elaborazione
             throw new ConcreteErrorCreator().createServerError().setFailedUploadFile();
         }
     }
@@ -245,12 +240,12 @@ export class Repository implements IRepository {
 
     // updates the number of elements of a dataset
     public async updateCountDataset(datasetId: number, num: number): Promise<Dataset|ConcreteErrorCreator> {
-        const datasetDao = new DatasetDao();
+        const datasetDao: DatasetDao = new DatasetDao();
         return datasetDao.updateCount(datasetId, num);
     }
 
     async generateUUID(): Promise<string> {
-        const resuldDao = new ResultDao();
+        const resuldDao: ResultDao = new ResultDao();
         let unique: boolean = false;
         let uuid: string = "";
         while (!unique) {
@@ -264,7 +259,7 @@ export class Repository implements IRepository {
 
     // returns all tags associated to a dataset specified by its id
     async getTags(datasetId: number): Promise<string[]> {
-        const datasetTagDao = new DatasetTagDao();
+        const datasetTagDao: DatasetTagDao = new DatasetTagDao();
         return await datasetTagDao.findAllByDatasetId(datasetId);
     }
 
@@ -275,6 +270,7 @@ export class Repository implements IRepository {
     }
 
     
+    // given the list of images, the ai model and job uuid, generates an array of parcial results
     async createListResult(imageList: Image[], aiID: number, UUID: string): Promise<Result[] | ConcreteErrorCreator> {
         const results: Result[] = [];
         const res: ResultDao = new ResultDao()
@@ -316,6 +312,7 @@ export class Repository implements IRepository {
         return true;
     }
 
+    // verifies if all datasets associated to a user have a given name
     async checkNames(userId: number, newName: string): Promise<boolean | ConcreteErrorCreator> {
         const datasets = await this.getDatasetListByUserId(userId);
         let names: string[] = [];
@@ -331,6 +328,7 @@ export class Repository implements IRepository {
         }
     }
 
+    // updates a dataset's name
     async updateDatasetName( datasetId: number, newName: string ): Promise< Dataset | ConcreteErrorCreator> {
         const datasetDao: DatasetDao = new DatasetDao();
         return datasetDao.updateName(datasetId, newName);

@@ -23,7 +23,7 @@ export class RedisConnection {
   // Initialize connection
   private static InitializeConnection(): RedisConnection {
 
-    const newInstance = new RedisConnection();
+    const newInstance: RedisConnection = new RedisConnection();
 
     newInstance.port = parseInt(process.env.REDIS_PORT || "6379");
     newInstance.host = process.env.REDIS_HOST || 'localhost';

@@ -2,6 +2,9 @@ import { DataTypes, Model } from 'sequelize';
 import {SequelizeConnection} from '../db/SequelizeConnection';
 import Dataset from './dataset';
 
+
+// sequelize model of a table containing all images
+
 export default class Image extends Model {
   declare id: number;
   
@@ -15,10 +18,7 @@ export default class Image extends Model {
 
 const sequelize = SequelizeConnection.getInstance().sequelize;
 
-/**
- * Initialize model, define sequelize connection, the name of the table, 
- * its attributes and relations
- */
+
 Image.init(
   {
     id: {

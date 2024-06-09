@@ -10,7 +10,7 @@ export default class DatasetDao implements IDao<Dataset> {
     // creates a dataset with informations given by datasetJson
     async create(datasetJson: any): Promise<Dataset | ConcreteErrorCreator> {
         try{
-            const dataset = await Dataset.create(datasetJson);
+            const dataset: Dataset = await Dataset.create(datasetJson);
             return dataset;
         } catch{
             throw new ConcreteErrorCreator().createServerError().setFailedCreationItem();
@@ -33,7 +33,7 @@ export default class DatasetDao implements IDao<Dataset> {
     
     // returns all datasets associated to a specific userId on database
     async findAllByUserId(user_id: number): Promise<Dataset[] | ConcreteErrorCreator> {
-        const datasets = await Dataset.findAll({
+        const datasets: Dataset[] = await Dataset.findAll({
                 where: {
                     userId: user_id,
                     isDeleted: false
@@ -49,7 +49,7 @@ export default class DatasetDao implements IDao<Dataset> {
    
     // find a dataset given its id
     async findById(datasetId: number): Promise<Dataset | ConcreteErrorCreator> {
-            const dataset = await Dataset.findOne({
+            const dataset: Dataset | null = await Dataset.findOne({
                 where: {
                     id: datasetId,
                     isDeleted: false
@@ -95,7 +95,7 @@ export default class DatasetDao implements IDao<Dataset> {
     // update the number of images of a dataset, given the number of elements to sum
     async updateCount(datasetId: number, num: number): Promise<Dataset | ConcreteErrorCreator> {
         try {
-            const dataset = await Dataset.findByPk(datasetId);
+            const dataset: Dataset | null = await Dataset.findByPk(datasetId);
             if( dataset instanceof Dataset) {
                 dataset.countElements += num;
                 dataset.save();
@@ -110,7 +110,7 @@ export default class DatasetDao implements IDao<Dataset> {
     // updates dataset's name
     async updateName(datasetId: number, newName: string): Promise<Dataset | ConcreteErrorCreator> {
         try {
-            const dataset = await Dataset.findByPk(datasetId);
+            const dataset: Dataset | null = await Dataset.findByPk(datasetId);
             if( dataset instanceof Dataset) {
                 dataset.name = newName;
                 dataset.save();

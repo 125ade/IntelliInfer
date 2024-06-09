@@ -57,7 +57,7 @@ export default class ResultDAO implements IDao<Result> {
     }
 
     async findAll(): Promise<Result[] | ConcreteErrorCreator> {
-          const results = await Result.findAll();
+          const results: Result[] = await Result.findAll();
           if( results.length !== 0){
             return results;
           } else {

@@ -14,8 +14,6 @@ import Result from "../models/result";
 import {SuccessResponse} from "../utils/utils";
 
 
-
-
 export default class SystemController {
 
     private repository: Repository;
@@ -34,9 +32,9 @@ export default class SystemController {
             const user: User | ConcreteErrorCreator = await this.repository.getUserById(userId);
             if (user instanceof ConcreteErrorCreator) {
                 new ConcreteErrorCreator().createNotFoundError().setNoUser().send(res);
-            } else {
-                const token = generateToken(user);
-                res.status(200).json({token});
+            }else{
+                const token: string = generateToken(user);
+                res.status(200).json({ token });
             }
         } catch (error) {
             if (error instanceof ErrorCode) {
@@ -80,7 +78,7 @@ export default class SystemController {
                 throw new ConcreteErrorCreator().createAuthenticationError().setNoToken();
             }
 
-            const decode = decodeToken(token.split(' ')[1]);
+            const decode: any = decodeToken(token.split(' ')[1]);
 
             if (!decode.email) {
                 throw new ConcreteErrorCreator().createServerError().setFailedStartInference();
@@ -97,7 +95,7 @@ export default class SystemController {
             if (!await this.repository.checkUserToken(user.id, amountInference)) {
                 throw new ConcreteErrorCreator().createForbiddenError().setInsufficientToken();
             }
-            // todo remove used cost amount
+
             const imageList: Image[] | ConcreteErrorCreator = await this.repository.listImageFromDataset(dataset.id);
 
             if (imageList instanceof ConcreteErrorCreator) {
@@ -129,9 +127,6 @@ export default class SystemController {
                 images: imageList,
                 results: resultList,
             };
-
-            // // todo elimina il console.log()
-            // console.log(`\n\n\n\n${JSON.stringify(dataJob)}\n\n\n\n`);
 
             const successResult: SuccessResponse = {
                 success: true,

@@ -174,39 +174,225 @@ Sequelize is an ORM (Object-Relational Mapping) for Node.js used to facilitate t
 
 In Sequelize, database tables are represented by models. Each model is a class that maps to a specific table in the database, and contains table attributes, data types, validations, and relationships with other tables.
 
-<div style="text-align: center;">
-  <img src="documents/SequelizeModel.png" alt="Sequelize model" width="400" height="auto">
-</div>
+```typescript
+Ai.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      allowNull: false
+    },
+    name: {
+      type: DataTypes.CHAR(200),
+      allowNull: false
+    },
+    description: {
+      type: DataTypes.CHAR(300),
+    },
+    pathweights: {
+      type: DataTypes.CHAR(300),
+      allowNull: false
+    },
+    architecture: {
+      type: DataTypes.ENUM,
+      values: Object.values(AiArchitecture),
+      allowNull: false,
+      defaultValue: AiArchitecture.YOLO
+    }
+  },
+  {
+    sequelize,
+    modelName: "Ai",
+    tableName: "ai",
+    timestamps: true,
+    createdAt: 'created_at', // Utilizza la convenzione 'created_at' per il timestamp di creazione
+    updatedAt: 'updated_at' 
+  },
+);
+```
 
-Sequelize also allows to define relationships between models, such as one-to-many, many-to-many, and one-to-one associations, defined using methods such as hasMany, belongsTo, hasOne, and belongsToMany.
+Sequelize also allows to define relationships between models, such as one-to-many, many-to-many, and one-to-one associations, defined using methods such as hasMany, belongsTo, hasOne, and belongsToMany. In particular, in many-to-many relationships an intermediate table was defined:
 
-<div style="text-align: center;">
-  <img src="documents/relations.png" alt="Relationships between models" width="400" height="auto">
-</div>
+```typescript
+DatasetTags.init(
+  {
+    // Chiavi esterne
+    datasetId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      field: 'dataset_id'
+    },
+    tagId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      primaryKey: true,
+      field: 'tag_id'
+    }
+  },
+  {
+    sequelize,
+    modelName: 'DatasetTags',
+    tableName: 'datasetstags',
+    timestamps: false,
+  }
+);
+```
 
-# Patterns 
+
+# Patterns
+
 ## Singleton Pattern
-The Singleton pattern is used to ensure that only one instance of the database connection is created. This helps to efficiently manage connection resources and prevent problems related to managing multiple simultaneous connections. It ensures that all application components use the same database instance, improving consistency and performance.
+The Singleton pattern is used to ensure that only one instance of the database connection is created. This helps to efficiently manage connection resources and prevent problems related to managing multiple simultaneous connections. In IntelliInfer the Singleton pattern is used to guarantee a single connection to Redis and to the database and to guarantee having a single access to the job queue. It ensures that all application components use the same instance, improving consistency and performance.
 
-To do this it uses a private constructor, accessible only via the getInstance() method. When accessed for the first time, the method creates an instance and returns the entity of the object to the client, while in subsequent calls the entity of the already existing object is returned.
+To do this, it uses a private constructor, accessible only via the getInstance() method. When accessed for the first time, the method creates an instance and returns the entity of the object to the client, while in subsequent calls the entity of the already existing object is returned.
 
-<div style="text-align: center;">
-  <img src="documents/SingletonClass.png" alt="Singleton class" width="400" height="auto">
-</div>
+```typescript
+export class SequelizeConnection {
+  
+  // Connection instance
+  private static instance: SequelizeConnection;
+  public sequelize!: Sequelize;
+
+  /**
+   * The Singleton's constructor should always be private to prevent direct
+   * construction calls with the `new` operator.
+   */
+  private constructor() {}
+  
+  // Initialize connection
+  private static InitializeConnection(): SequelizeConnection {
+    
+    const newInstance = new SequelizeConnection();
+
+    const user: string = process.env.POSTGRES_USER || "myuser";
+    const password: string = process.env.POSTGRES_PASSWORD || "mypassword";
+    const database: string = process.env.POSTGRES_DB || "db_inference";
+    const dialect: Dialect = process.env.SEQUELIZE_DIALECT as Dialect || 'postgres';
+    const host: string = process.env.POSTGRES_HOST || 'database';
+    const port: number = Number(process.env.POSTGRES_PORT || '5432')
+    const flag_log: boolean = Boolean(process.env.SEQUELIZE_LOGGING ) || true;
+
+    newInstance.sequelize = new Sequelize(
+        database,
+        user,
+        password,
+        {
+          dialect: dialect,
+          host: host,
+          port: port,
+          logging: flag_log ? logSequelize : false,
+        });
+
+    return newInstance;
+
+  }
+
+  /**
+   * static method that controls the access to the singleton instance.
+   */
+  public static getInstance(): SequelizeConnection {
+    if (this.instance === undefined) this.instance = this.InitializeConnection();
+
+    return this.instance;
+  }
+}
+```
 
 ## DAO Pattern
 We implemented the Data Access Object (DAO) pattern to manage database operations using Sequelize models. The DAO pattern is a structural pattern that abstracts and encapsulates all access to the data source and provide a consistent API for CRUD (Create, Read, Update, Delete) operations. It is an intermediary between the application's business logic and the database, it isolates the application layer from the persistence layer, making the codebase more modular and easier to maintain, and it promotes code reuse by centralizing data access logic. This results in a more robust, flexible, and scalable application architecture.
 
 In detail, we defined a Dao Interface IDao to define all optional crud operations available for our models, and we defined for each Sequelize model a Dao class implementing the operations according to our needs.
 
-NB: inserire qui il codice tipo di un DAO e l'interfaccia IDao
+```typescript
+export interface IDao<T> {
+    create?(item: any): Promise<T | ConcreteErrorCreator>;
+    findById?(id: number): Promise<T | ConcreteErrorCreator>;
+    findAll?(): Promise<T[] | ConcreteErrorCreator>;
+    logicallyDelete?(id: number): Promise<object>;
+    updateItem?(id: number, property: any): Promise<T | ConcreteErrorCreator>;
+    updateCount?(Id: number, num: number): Promise<T | ConcreteErrorCreator> ;
+    findAllByDatasetId?(dataset: number): Promise<string[]>;
+}
+
+export default class AiDao implements IDao<Ai> {
+
+    constructor() {}
+    
+    // creates an ai model given a series of metadata
+    async create(aiJson: any): Promise<Ai> {
+        try{
+            const ai = await Ai.create(aiJson);
+            return ai;
+        } catch{
+            throw new ConcreteErrorCreator().createServerError().setFailedCreationItem();
+        }
+    }
+    
+    // returns the list of all ai models on db
+    async findAll(): Promise<Ai[] | ConcreteErrorCreator> {
+          const models = await Ai.findAll();
+          if( models.length !== 0){
+            return models;
+          } else {
+            throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
+          }
+    }
+    
+   // finds a specific ai model given its id
+    async findById(id: number): Promise<Ai | ConcreteErrorCreator> {
+            const model = await Ai.findByPk(id);
+            if(!model){
+                throw new ConcreteErrorCreator().createNotFoundError().setAbstentModel();
+            }
+            return model;
+    }
+    
+    // updates weights path of an ai specified by its id
+    async updateItem(id: number, weights: any): Promise<Ai | ConcreteErrorCreator> {
+        const model = await Ai.findByPk(id);
+            if(!model){
+                throw new ConcreteErrorCreator().createNotFoundError().setAbstentModel();
+            }
+            model.pathweights = weights;
+            model.save();
+            return model;
+    }
+    
+}
+```
+
 
 ## Repository Pattern
 To improve the modularity and testability of the code, the Repository pattern is used in combination with DAO pattern. The Repository pattern is placed at an higher level than the Data Access Object and on the contrary allows several different DAOs to interact. We defined a IRepository interface and we implemented the Repository class to define more complex operations that required the use of multiple DAO models. 
 
-<div style="text-align: center;">
-  <img src="documents/Repository.png" alt="Repository" width="400" height="auto">
-</div>
+```typescript
+export interface IRepository {
+    getUserById(userId: number): Promise<User | ConcreteErrorCreator>;
+    getUserByEmail(userEmail: string): Promise<User | ConcreteErrorCreator>;
+    getDatasetListByUserId(userId: number): Promise<Dataset[] | ConcreteErrorCreator>;
+    createTags(tags: string[], datasetId: number): Promise<Tag[]>;
+    listAiModels(): Promise<Ai[] | ConcreteErrorCreator>;
+    findModel(modelId: number): Promise<Ai | ConcreteErrorCreator>;
+    findResult(resultId: number): Promise<Result | ConcreteErrorCreator>;
+    listImageFromDataset(datasetId: number): Promise<Image[] | ConcreteErrorCreator>;
+    createDatasetWithTags(data: any, user: User): Promise<Dataset> ;
+    getDatasetDetail(datasetId: number): Promise<Dataset | ConcreteErrorCreator> ;
+    logicallyDelete(datasetId: number): Promise<SuccessResponse | ConcreteErrorCreator>;
+    updateModelWeights(modelId: number, weights: string ): Promise<Ai | ConcreteErrorCreator>;
+    findDatasetById(datasetId: number): Promise<Dataset | ConcreteErrorCreator>;
+    createImage(data: any): Promise<Image | null>;
+    createDestinationRepo(datasetId: number): Promise<string | ConcreteErrorCreator> ;
+    processZipEntries(datasetId: number, zipEntries: IZipEntry[], destination: string): Promise<void | ConcreteErrorCreator>;
+    updateUserTokenByCost(user: User, cost: number): Promise<void>;
+    checkUserToken(userId: number, amount: number): Promise<boolean>;
+    generateUUID(): Promise<string>;
+    getTags(datasetId: number): Promise<string[]>;
+    updateCountDataset(datasetId: number, num: number): Promise<Dataset|ConcreteErrorCreator>;
+    createListResult(imageList: Image[], aiID: number, UUID: string): Promise<Result[] | ConcreteErrorCreator>;
+    checkNames(userId: number, newName: string): Promise<boolean | ConcreteErrorCreator>;
+}
+```
 
 ## Factory Pattern
 The Factory pattern is used to define and manage exceptions. It is a creational pattern that provides an interface for creating objects, allowing subclasses to alter the type of objects that will be created. By using this pattern for exceptions, we centralize the creation logic, making it easier to manage and extend our error handling mechanism. It allows us to create different types of specific exception object in a consistent and centralized manner. 
