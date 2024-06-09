@@ -47,6 +47,18 @@ The main goal of IntelliInfer is to provide an API for loading datasets, managin
 
 # Design
 
+## Class Diagram
+
+<div style="text-align: center;">
+  <img src="documents/ClassesDiagram.drawio.png" alt="Sequelize model" width="750" height="auto">
+</div>
+
+## Uses Case Diagram
+<div style="text-align: center;">
+  <img src="documents/UsesCaseDiagram.drawio.png" alt="Uses Case Diagram" style="max-width: 256 px; height: auto;">
+</div>
+
+
 ## Rotte
 
 | Auth | Function                                          | Role  |
@@ -89,11 +101,6 @@ The main goal of IntelliInfer is to provide an API for loading datasets, managin
 | GET   | /generate/token/:userId                          |
 | GET   | /check/health                                    |
 
-
-## Uses Case Diagram
-<div style="text-align: center;">
-  <img src="documents/UsesCaseDiagram.drawio.png" alt="Uses Case Diagram" style="max-width: 256 px; height: auto;">
-</div>
 
 ## Sequence Diagrams
 
