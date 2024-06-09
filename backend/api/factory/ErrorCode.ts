@@ -236,6 +236,10 @@ export class ForbiddenError extends ErrorCode {
     setWrongEmail(): ErrorCode{
       return this.set('Invalid Email');
     }
+
+    setInvalidName(): ErrorCode{
+      return this.set('There was an error. You have already a dataset with this name.');
+    }
 }
 
 /**

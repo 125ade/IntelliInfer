@@ -9,6 +9,7 @@ import User from "../models/user";
 import {decodeToken} from "../token";
 import mime from 'mime-types';
 import {SuccessResponse} from "../utils/utils";
+import Dataset from "../models/dataset";
 
 
 
@@ -142,7 +143,6 @@ export default class UserController {
             if (error instanceof ErrorCode) {
                 error.send(res);
             } else {
-                // console.log(error);
                 throw new ConcreteErrorCreator().createServerError().setFailedCreationItem().send(res);
             }
         }
@@ -165,64 +165,6 @@ export default class UserController {
         }
     }
 
-    // route to upload a single image on volume, and on database
-    async uploadImage(req: Request, res: Response) {
-        try{
-            if (!req.file) {
-                throw new ConcreteErrorCreator().createBadRequestError().setAbsentFile();
-            }
-
-            const destination = await this.repository.createDestinationRepo(Number(req.params.datasetId));
-            if( typeof destination === 'string'){
-
-                const mimeType = req.file.mimetype;
-                if (mimeType.startsWith('image/')) {
-
-                        const filePath = path.join(destination, `${req.file.originalname}`);
-                        fs.writeFileSync(filePath, req.file.buffer);
-
-                        this.repository.createImage({
-                            "datasetId": Number(req.params.datasetId),
-                            "path": filePath,
-                            "description": req.body.description
-                          });
-
-                        res.status(200).json({ Result: 'File uploaded successfully.'});
-                };
-            }
-        } catch(error) {
-            if( error instanceof ErrorCode){
-                error.send(res);
-            } else {
-                new ConcreteErrorCreator().createServerError().setFailedUploadFile().send(res);
-            }
-        }
-    }
-
-
-    // route to upload a file zip on volume and on database
-    async uploadZip(req: Request, res: Response) {
-        try{
-            if (!req.file) {
-                throw new ConcreteErrorCreator().createBadRequestError().setAbsentFile();
-            }
-
-            const zip = new AdmZip(req.file.buffer);
-            const zipEntries: IZipEntry[] = zip.getEntries();
-
-            const destination = await this.repository.createDestinationRepo(Number(req.params.datasetId));
-            if(typeof destination === 'string'){
-                await this.repository.processZipEntries(Number(req.params.datasetId),zipEntries, destination);
-                res.status(200).json( { Result: 'File uploaded successfully'})
-            }
-        } catch(error) {
-            if( error instanceof ErrorCode){
-                error.send(res);
-            } else {
-                new ConcreteErrorCreator().createServerError().setFailedUploadFile().send(res);
-            }
-        }
-    }
 
     // route to upload an image or a file zip on volume and on database
     async uploadFile(req: Request, res: Response){
@@ -328,6 +270,30 @@ export default class UserController {
                 throw user;
             }
         } catch (error) {
+            if( error instanceof ErrorCode){
+                error.send(res);
+            } else {
+                new ConcreteErrorCreator().createServerError().setFailedUploadFile().send(res);
+            }
+        }
+    }
+    
+    // changes the name of a user's dataset, if he hasn't others datasets with the same name
+    async updateDatasetName(req: Request, res: Response) {
+        try{
+            const userEmail: string | undefined = req.userEmail; 
+            if( !userEmail ){
+                throw new ConcreteErrorCreator().createAuthenticationError().setFailAuthUser();
+            }
+            const user: ConcreteErrorCreator | User = await this.repository.getUserByEmail(userEmail);
+            
+            if(user instanceof User) {
+                if( await this.repository.checkNames(user.id, req.body.name)) {
+                    const dataset = await this.repository.updateDatasetName(Number(req.params.datasetId), req.body.name);
+                    if( dataset instanceof Dataset) res.status(200).json(dataset);
+                }
+            }
+        } catch( error ) {
             if( error instanceof ErrorCode){
                 error.send(res);
             } else {

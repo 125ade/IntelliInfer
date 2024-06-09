@@ -47,6 +47,18 @@ The main goal of IntelliInfer is to provide an API for loading datasets, managin
 
 # Design
 
+## Class Diagram
+
+<div style="text-align: center;">
+  <img src="documents/ClassesDiagram.drawio.png" alt="Sequelize model" width="950" height="auto">
+</div>
+
+## Uses Case Diagram
+<div style="text-align: center;">
+  <img src="documents/UsesCaseDiagram.drawio.png" alt="Uses Case Diagram" style="max-width: 256 px; height: auto;">
+</div>
+
+
 ## Rotte
 
 | Auth | Function                                          | Role  |
@@ -90,55 +102,54 @@ The main goal of IntelliInfer is to provide an API for loading datasets, managin
 | GET   | /check/health                                    |
 
 
-## Uses Case Diagram
-<div style="text-align: center;">
-  <img src="documents/UsesCaseDiagram.png" alt="Uses Case Diagram" style="max-width: 256 px; height: auto;">
-</div>
-
 ## Sequence Diagrams
 
 <div style="text-align: center;">
-  <img src="documents/DELETE_api_dataset_delete_datasetId.drawio.png" alt="Sequelize model" width="650" height="auto">
+  <img src="documents/DELETE_api_dataset_delete_datasetId.drawio.png" alt="Sequelize model" width="850" height="auto">
 </div>
 
 <div style="text-align: center;">
-  <img src="documents/GET_api_dataset_datasetId.drawio.png" alt="Sequelize model" width="650" height="auto">
+  <img src="documents/GET_api_dataset_datasetId.drawio.png" alt="Sequelize model" width="850" height="auto">
 </div>
 
 <div style="text-align: center;">
-  <img src="documents/GET_api_dataset_list.drawio.png" alt="Sequelize model" width="650" height="auto">
+  <img src="documents/GET_api_dataset_list.drawio.png" alt="Sequelize model" width="850" height="auto">
 </div>
 
 <div style="text-align: center;">
-  <img src="documents/GET_api_display_credit.drawio.png" alt="Sequelize model" width="650" height="auto">
+  <img src="documents/GET_api_display_credit.drawio.png" alt="Sequelize model" width="850" height="auto">
 </div>
 
 <div style="text-align: center;">
-  <img src="documents/GET_api_generate_token.drawio.png" alt="Sequelize model" width="650" height="auto">
+  <img src="documents/GET_api_generate_token.drawio.png" alt="Sequelize model" width="850" height="auto">
 </div>
 
 <div style="text-align: center;">
-  <img src="documents/GET_api_model_list.drawio.png" alt="Sequelize model" width="650" height="auto">
+  <img src="documents/GET_api_model_list.drawio.png" alt="Sequelize model" width="850" height="auto">
 </div>
 
 <div style="text-align: center;">
-  <img src="documents/GET_api_model_modelId.drawio.png" alt="Sequelize model" width="650" height="auto">
+  <img src="documents/GET_api_model_modelId.drawio.png" alt="Sequelize model" width="850" height="auto">
 </div>
 
 <div style="text-align: center;">
-  <img src="documents/POST_api_datastet_create.drawio.png" alt="Sequelize model" width="650" height="auto">
+  <img src="documents/POST_api_datastet_create.drawio.png" alt="Sequelize model" width="850" height="auto">
 </div>
 
 <div style="text-align: center;">
-  <img src="documents/POST_api_upload_file.drawio.png" alt="Sequelize model" width="650" height="auto">
+  <img src="documents/POST_api_upload_file.drawio.png" alt="Sequelize model" width="850" height="auto">
 </div>
 
 <div style="text-align: center;">
-  <img src="documents/PUT_admin_credit_recharge.drawio.png" alt="Sequelize model" width="650" height="auto">
+  <img src="documents/PUT_admin_credit_recharge.drawio.png" alt="Sequelize model" width="850" height="auto">
 </div>
 
 <div style="text-align: center;">
-  <img src="documents/PUT_admin_model_aiId_change_weights.drawio.png" alt="Sequelize model" width="650" height="auto">
+  <img src="documents/PUT_admin_model_aiId_change_weights.drawio.png" alt="Sequelize model" width="850" height="auto">
+</div>
+
+<div style="text-align: center;">
+  <img src="documents/POST_api_dataset_update_datasetId.drawio.png" alt="Sequelize model" width="850" height="auto">
 </div>
 
 
@@ -150,12 +161,12 @@ Through it we manage and save data relating to users, datasets and related image
 
 ## ER Schema
 <div style="text-align: center;">
-  <img src="documents/ERschema.jpg" alt="ER schema" width="900" height="auto">
+  <img src="documents/ER.drawio.png" alt="ER schema" width="750" height="auto">
 </div>
 
 ## Database Schema
 <div style="text-align: center;">
-  <img src="documents/DatabaseSchema.jpg" alt="Database Schema" style="max-width: 256 px; height: auto;">
+  <img src="documents/schemadatabase.drawio.png" alt="Database Schema" width="850" height="auto">
 </div>
 
 ## Sequelize

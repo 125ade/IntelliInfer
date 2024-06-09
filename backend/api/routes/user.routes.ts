@@ -1,7 +1,7 @@
 import {Router} from "express";
 import UserController from "../controllers/user.controller";
 import multer from 'multer';
-import { validateCreateDataset, validateParamIntGreaterThanZero, validateFileUpload } from "../middleware/validation.middleware";
+import { validateCreateDataset, validateParamIntGreaterThanZero, validateFileUpload, validateName } from "../middleware/validation.middleware";
 import {AuthUser} from "../middleware/auth.middleware";
 
 
@@ -66,26 +66,7 @@ export default class UserRoutes{
         );
 
 
-        // upload of an image
-        this.router.post(
-            "/dataset/:datasetId/upload/image",
-            AuthUser,
-            validateParamIntGreaterThanZero('datasetId'),
-            upload.single("image"),
-            this.userController.uploadImage.bind(this.userController));
-
-
-        // upload of a zip file
-        this.router.post(
-            '/dataset/:datasetId/upload/zip',
-            AuthUser,
-            validateParamIntGreaterThanZero('datasetId'),
-            upload.single('zip'),
-            this.userController.uploadZip.bind(this.userController));
-
-
         // upload of a file (zip or image)
-        // TODO: handle user tokens
         this.router.post(
             '/dataset/:datasetId/upload/file',
             AuthUser,
@@ -104,7 +85,6 @@ export default class UserRoutes{
             this.userController.datasetListByUserId.bind(this.userController));
 
 
-
         // autenticazione
         // autorizzazione "user"
         this.router.get(
@@ -114,11 +94,18 @@ export default class UserRoutes{
             this.userController.datasetDetail.bind(this.userController));
 
 
-
         // display of a user's remaining credit
         this.router.get('/display/credit',
             AuthUser,
             this.userController.displayResidualCredit.bind(this.userController)
+        );
+        
+        // update a dataset's name
+        this.router.put('/dataset/update/:datasetId',
+            AuthUser,
+            validateParamIntGreaterThanZero('datasetId'),
+            validateName,
+            this.userController.updateDatasetName.bind(this.userController)
         );
 
     }

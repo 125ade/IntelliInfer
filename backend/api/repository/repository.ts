@@ -11,14 +11,14 @@ import Result from '../models/result';
 import { ConcreteErrorCreator } from '../factory/ErrorCreator';
 import Dataset from '../models/dataset';
 import User from "../models/user";
-import DatasetTags from '../models/datasettag';
 import path from 'path';
 import fs from 'fs';
 import { IZipEntry }  from 'adm-zip';
 import mime from 'mime-types';
 import { v4 as uuidv4 } from 'uuid';
 import {generatePath, SuccessResponse} from "../utils/utils";
-import DatasetTagDAO from "../dao/datasetTagDao";
+import DatasetTagDao from '../dao/datasetTagDao';
+import DatasetTags from '../models/datasettag';
 
 
 export interface IRepository {
@@ -44,24 +44,27 @@ export interface IRepository {
     getTags(datasetId: number): Promise<string[]>;
     updateCountDataset(datasetId: number, num: number): Promise<Dataset|ConcreteErrorCreator>;
     createListResult(imageList: Image[], aiID: number, UUID: string): Promise<Result[] | ConcreteErrorCreator>;
+    checkNames(userId: number, newName: string): Promise<boolean | ConcreteErrorCreator>;
 }
 
 
 export class Repository implements IRepository {
 
     constructor() {};
-
+    
+    // finds a user given his id
     public async getUserById(userId: number) {
         const user: UserDao = new UserDao();
         return user.findById(userId);
     }
-
+    
+    // finds a user given his email
     public async getUserByEmail(userEmail: string): Promise<User | ConcreteErrorCreator> {
         const user: UserDao = new UserDao();
         return user.findByEmail(userEmail);
     }
 
-
+    // display all datasets associated with a specified user, given his id
     public async getDatasetListByUserId(userId: number): Promise<Dataset[] | ConcreteErrorCreator> {
         const dataset: DatasetDao = new DatasetDao();
         return dataset.findAllByUserId(userId);
@@ -76,17 +79,20 @@ export class Repository implements IRepository {
         return createdTags;
     }
 
-    // used into the route to create a dataset
+    // given a series of metadata about the dataset to create and a list of tags/strings, dataset and associated
+    // tags are created on db
     async createDatasetWithTags(data: any, user: User): Promise<Dataset>  {
         const datasetDao: DatasetDao = new DatasetDao();
         const tagDao: TagDao = new TagDao();
+        const datasettagDao: DatasetTagDao = new DatasetTagDao();
 
-        const { name, description, tags } = data; // quando avremo userid ci sarà anche quello
+        const { name, description, tags } = data;
 
-        // Generate the path
+        // relative path of the repository that will be generated inside our volume when
+        // uploading files inside the dataset
         const path: string = generatePath(name);
 
-        // Create the dataset
+        // Creates the dataset
         const newDataset: Dataset = await datasetDao.create({
           name,
           description,
@@ -96,21 +102,19 @@ export class Repository implements IRepository {
           userId: user.id,
         });
 
-        // Associate tags with the dataset
+        // Associates tags with the dataset
         for (const tagName of tags) {
             const tagInstance: Tag = await tagDao.create({ name: tagName });
-            // Crea un'istanza della tabella di associazione DatasetTags
-            await DatasetTags.create({
-                datasetId: newDataset.id,
-                tagId: tagInstance.name
-            });
-          }
+            await datasettagDao.create(
+                {
+                   datasetId: newDataset.id,
+                   tagId: tagInstance.name
+                }
+            );
+        }
 
         return newDataset;
     }
-
-
-
 
     // lists all available Ai models
     async listAiModels(): Promise<Ai[] | ConcreteErrorCreator>{
@@ -145,17 +149,20 @@ export class Repository implements IRepository {
         const aiDao: AiDao = new AiDao();
         return aiDao.updateItem(modelId, path);
     }
-
+    
+    // finds a dataset given its id
     async findDatasetById(datasetId: number): Promise<Dataset | ConcreteErrorCreator> {
         const datasetDao = new DatasetDao();
         return datasetDao.findById(datasetId);
     }
-
+    
+    // creates an instance of Image Sequelize model to save it on db
     async createImage(data: any): Promise<Image | null> {
         const imageDao = new ImageDao();
         return imageDao.create(data);
     }
-
+    
+    // creates the destination repository used for files uploaded on our volume
     async createDestinationRepo(datasetId: number): Promise<string | ConcreteErrorCreator> {
         const datasetDao = new DatasetDao();
         //const dataset = await Dataset.findByPk(datasetId);
@@ -175,7 +182,8 @@ export class Repository implements IRepository {
             }
         } else  throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
     }
-
+    
+    // processes all the images extracted from the zip file uploaded to save them on db and on volume
     async processZipEntries(datasetId: number, zipEntries: IZipEntry[], destination: string): Promise<void | ConcreteErrorCreator> {
         try {
             zipEntries.forEach((entry: IZipEntry) => {
@@ -202,9 +210,7 @@ export class Repository implements IRepository {
         }
     }
 
-    
     // updates the user token amount subtracting a cost
-    // checks if the user has the available amount
     public async updateUserTokenByCost(user: User, cost: number): Promise<void>{
         user.token -= cost;
         await user.save();
@@ -217,7 +223,7 @@ export class Repository implements IRepository {
         return !(user instanceof User && Number(user.token) <= amount);
     }
 
-
+    // finds a dataset given its id
     async getDatasetDetail(datasetId: number): Promise<Dataset | ConcreteErrorCreator> {
         try{
             const datasetDao: DatasetDao = new DatasetDao();
@@ -232,7 +238,6 @@ export class Repository implements IRepository {
         }
     }
 
-    
     // updates the number of elements of a dataset
     public async updateCountDataset(datasetId: number, num: number): Promise<Dataset|ConcreteErrorCreator> {
         const datasetDao = new DatasetDao();
@@ -252,20 +257,19 @@ export class Repository implements IRepository {
         return uuid;
     }
 
-
+    // returns all tags associated to a dataset specified by its id
     async getTags(datasetId: number): Promise<string[]> {
-        const datasetTagDao = new DatasetTagDAO();
+        const datasetTagDao = new DatasetTagDao();
         return await datasetTagDao.findAllByDatasetId(datasetId);
     }
 
-
+    // returns all images of a dataset specified by its id
     async listImageFromDataset(datasetId: number): Promise<Image[] | ConcreteErrorCreator> {
         const imageDao: ImageDao = new ImageDao();
         return imageDao.findAllImmagineByDatasetId(datasetId);
     }
 
-
-
+    
     async createListResult(imageList: Image[], aiID: number, UUID: string): Promise<Result[] | ConcreteErrorCreator> {
         const results: Result[] = [];
         for (const image of imageList) {
@@ -287,6 +291,27 @@ export class Repository implements IRepository {
 
         return results;
     }
+
+    async checkNames(userId: number, newName: string): Promise<boolean | ConcreteErrorCreator> {
+        const datasets = await this.getDatasetListByUserId(userId);
+        let names: string[] = [];
+        if (Array.isArray(datasets)){
+            names = datasets.map( (dataset: Dataset) => dataset.name);
+            if (!names.includes(newName)) {
+                return true;
+            } else {
+            throw new ConcreteErrorCreator().createForbiddenError().setInvalidName();
+            }
+        } else{
+            return datasets;
+        }
+    }
+
+    async updateDatasetName( datasetId: number, newName: string ): Promise< Dataset | ConcreteErrorCreator> {
+        const datasetDao: DatasetDao = new DatasetDao();
+        return datasetDao.updateName(datasetId, newName);
+    }
+
 }
 
 

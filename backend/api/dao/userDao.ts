@@ -24,7 +24,8 @@ export default class UserDao implements IDao<User> {
         }
         return user;
     }
-
+    
+    // finds a user given his email
     async findByEmail(email: string): Promise<User | ConcreteErrorCreator> {
             const user: User | null = await User.findOne({ where: { email } });
             if (!user) {

@@ -6,6 +6,7 @@ export default class AiDao implements IDao<Ai> {
 
     constructor() {}
     
+    // creates an ai model given a series of metadata
     async create(aiJson: any): Promise<Ai> {
         try{
             const ai = await Ai.create(aiJson);
@@ -15,7 +16,7 @@ export default class AiDao implements IDao<Ai> {
         }
     }
     
-    
+    // returns the list of all ai models on db
     async findAll(): Promise<Ai[] | ConcreteErrorCreator> {
           const models = await Ai.findAll();
           if( models.length !== 0){
@@ -25,7 +26,7 @@ export default class AiDao implements IDao<Ai> {
           }
     }
     
-   
+   // finds a specific ai model given its id
     async findById(id: number): Promise<Ai | ConcreteErrorCreator> {
             const model = await Ai.findByPk(id);
             if(!model){
@@ -33,7 +34,8 @@ export default class AiDao implements IDao<Ai> {
             }
             return model;
     }
-
+    
+    // updates weights path of an ai specified by its id
     async updateItem(id: number, weights: any): Promise<Ai | ConcreteErrorCreator> {
         const model = await Ai.findByPk(id);
             if(!model){
