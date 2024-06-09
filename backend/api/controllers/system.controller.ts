@@ -95,7 +95,7 @@ export default class SystemController {
         if (!await this.repository.checkUserToken(user.id, amountInference)) {
             throw new ConcreteErrorCreator().createForbiddenError().setInsufficientToken();
         }
-
+        // todo remove used cost amount
         const imageList: Image[] | ConcreteErrorCreator = await this.repository.listImageFromDataset(dataset.id);
 
         if (imageList instanceof ConcreteErrorCreator) {

@@ -212,9 +212,9 @@ export class Repository implements IRepository {
 
     // checks if the user token amount is >= requested amount
     async checkUserToken(userId: number, amount: number): Promise<boolean> {
-        const userDao = new UserDao();
-        const user = await userDao.findById(userId);
-        return !(user instanceof User && user.token < amount);
+        const userDao: UserDao = new UserDao();
+        const user: User | ConcreteErrorCreator = await userDao.findById(userId);
+        return !(user instanceof User && Number(user.token) <= amount);
     }
 
 

@@ -20,8 +20,7 @@ export class TaskQueue {
         this.queue.process(1, async (job) => {
             const jobData = job.data;
             const jobDataString: string = JSON.stringify(jobData);
-            // todo mettere nelle var di ambiente
-            const containerName = "test";
+            const containerName: string = "working-test";
 
             docker.listContainers((err, containers) => {
                 if (err) {
@@ -55,7 +54,7 @@ export class TaskQueue {
             // todo selezionare in base all'architettura
             const containerOptions = {
                 Image: test_image_container_name,
-                Cmd: ['python', 'inferenceSimulator.py', jobDataString],  // Passa i dati del job come argomento
+                Cmd: ['python', 'inferenceSimulator.py', jobDataString],
                 Tty: false,
                 name: containerName,
             };
