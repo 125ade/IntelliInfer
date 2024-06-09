@@ -1,6 +1,7 @@
 import { IDao } from './daoInterface';
 import Result from '../models/result';
 import { ConcreteErrorCreator } from '../factory/ErrorCreator';
+import {FinishResult} from "../queues/jobData";
 
 const initCreationData = {
     start: true,
@@ -29,20 +30,31 @@ export default class ResultDAO implements IDao<Result> {
         }
     }
 
-    // async finalizeCreation(Object = initCreationData, UUID: string ): Promise<Result | ConcreteErrorCreator> {
-    //     try {
-    //         return await Result.update({
-    //
-    //             requestId: UUID,
-    //         });
-    //     }catch (error){
-    //         if (error instanceof ConcreteErrorCreator) {
-    //             throw error;
-    //         }else{
-    //             throw new ConcreteErrorCreator().createServerError().setFailedCreationResult();
-    //         }
-    //     }
-    // }
+    async finalizeCreation(finishResult: FinishResult): Promise<number | ConcreteErrorCreator> {
+        try {
+            if(!("data" in finishResult)) {
+                throw new ConcreteErrorCreator().createServerError().setFailedCreationResult();
+            }
+            const x =  await Result.update(
+              {
+                  data: finishResult.data,
+              },
+              {
+                where: {
+                    id: finishResult.id,
+                    requestId: finishResult.requestId,
+                }
+              }
+            );
+            return Number(x.pop())
+        }catch (error){
+            if (error instanceof ConcreteErrorCreator) {
+                throw error;
+            }else{
+                throw new ConcreteErrorCreator().createServerError().setFailedCreationResult();
+            }
+        }
+    }
 
     async findAll(): Promise<Result[] | ConcreteErrorCreator> {
           const results: Result[] = await Result.findAll();
