@@ -49,7 +49,7 @@ The main goal of IntelliInfer is to provide an API for loading datasets, managin
 IntelliInfer leverages several powerful technologies to ensure efficient and scalable deployment and job management, such as Docker, Docker Compose, BullMQ, and Redis.
 
 <div style="text-align: center;">
-  <img src="documents/InfrastructureScheme.jpeg" alt="Sequelize model" width="750" height="auto">
+  <img src="documents/InfrastructureScheme.jpeg" alt="Sequelize model" width="650" height="auto">
 </div>
 InfrastructureScheme.jpeg
 
