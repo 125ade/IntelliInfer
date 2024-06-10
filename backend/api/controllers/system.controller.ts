@@ -287,7 +287,6 @@ export default class SystemController {
             if (box === undefined) {
                 throw new ConcreteErrorCreator().createServerError().setFailedCreationItem();
             }
-            console.log(`larghezza: ${imgElement.width} altezza: ${imgElement.height}  toto larghezza: ${Number(imgElement.width*2)}`)
             for (const bb of box) {
                 let { x_center, y_center, width, height, class_id, confidence } = bb;
 
@@ -303,8 +302,6 @@ export default class SystemController {
                 let w: number = width;
                 let h: number = height;
 
-                // Log the bounding box details for debugging
-                console.log(`Bounding Box - x: ${x}, y: ${y}, w: ${w}, h: ${h}, class: ${class_id}, confidence: ${confidence}`);
 
                 // Draw the bounding box on the right side image
                 ctx.strokeStyle = 'red';

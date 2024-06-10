@@ -20,8 +20,6 @@ class InsufficientTokenError extends Error {
   }
 }
 
-
-const doc_host = process.env.DOCKER_HOST || "unix:///var/run/docker.sock";
 const docker = new Docker({ socketPath: '/var/run/docker.sock' });
 const QUEUE_TASK_DOCKER: string = process.env.DOKER_QUEUE_NAME || 'dockerTaskQueue';
 const test_image_container_name: string = process.env.CONTAINER_IMAGE_NAME || 'intelliinfer-test';
