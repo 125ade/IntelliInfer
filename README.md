@@ -64,7 +64,9 @@ Download the .env file and place it in the root directory of the project. The .e
 DOCKER_HOST=unix:///var/run/docker.sock
 
 CONTAINER_IMAGE_NAME=intelliinfer-test
+CONTAINER_IMAGE_YOLO_NAME=intelliinfer-yolo
 CONTAINER_TEST_NAME=working-test
+CONTAINER_YOLO_NAME=working-yolo
 
 POSTGRES_PORT=5432
 POSTGRES_USER=myuser
