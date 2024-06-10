@@ -25,13 +25,7 @@ export function validateParamIntGreaterThanZero(param_id: string) {
 export function validateParamIntFromZero(paramId: string) {
     return [
         param(paramId)
-            .custom(value => {
-                const numericValue: number = Number(value);
-                if (!isNaN(numericValue) && numericValue >= 0) {
-                    return true;
-                }
-                throw new ConcreteErrorCreator().createBadRequestError().setNoImageId();
-            }),
+            .isInt({ min: 0 }),
         (req: Request, res: Response, next: NextFunction) => {
             const errors = validationResult(req);
             if (!errors.isEmpty()) {

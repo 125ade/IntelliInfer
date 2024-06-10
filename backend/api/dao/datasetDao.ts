@@ -63,7 +63,7 @@ export default class DatasetDao implements IDao<Dataset> {
     
 
     // logically deletes a dataset (sets isDeleted to true)
-    async logicallyDelete(datasetId: number): Promise<ConcreteErrorCreator | SuccessResponse>{
+    async logicallyDelete(datasetId: number){
         try{
             const [numberOfAffectedRows, affectedRows] = await Dataset.update(
                 { isDeleted: true },
@@ -76,11 +76,7 @@ export default class DatasetDao implements IDao<Dataset> {
             if (numberOfAffectedRows === 0) {
                 throw new ConcreteErrorCreator().createNotFoundError().setAbstentDataset();
             }
-            return {
-                success: true,
-                message: "deleted successfully",
-                obj: affectedRows[0]
-            };
+            return  affectedRows[0] ;
         } catch (error) {
             if(error instanceof ConcreteErrorCreator){
                 throw error;

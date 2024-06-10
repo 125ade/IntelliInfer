@@ -12,5 +12,3 @@ RUN pip install -r requirements.txt
 
 WORKDIR /app
 
-# Comando di default da eseguire quando il container viene avviato
-CMD ["python", "inferenceYolo.py"]

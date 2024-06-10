@@ -100,16 +100,16 @@ export default class ResultDAO implements IDao<Result> {
 
     }
 
-    async findAllByUuidAndImage(uuid: string, imageId: number) {
-        const results: Result[] = await Result.findAll({
+    async findAllByUuidAndImage(uuid: string, imageId: number): Promise<Result | ConcreteErrorCreator> {
+        const result: Result | null = await Result.findOne({
                 where: {
                     requestId: uuid,
                     imageId: imageId
                 }
             });
-          if (results.length == 0) {
-              throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems()
+          if (result == null) {
+              throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
           }
-          return results;
+          return result;
     }
 }

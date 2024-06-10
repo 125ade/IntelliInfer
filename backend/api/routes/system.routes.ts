@@ -43,7 +43,7 @@ export default class SystemRoutes{
 
         // finds an inference result given its id
         this.router.get(
-            "/inference/result/:uuid/:imageId",
+            "/inference/result/:jobId/:imageId",
             AuthUser,
             validateParamIntGreaterThanZero("jobId"),
             validateParamIntFromZero("imageId"),
