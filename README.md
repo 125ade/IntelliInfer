@@ -48,9 +48,9 @@ The main goal of IntelliInfer is to provide an API for loading datasets, managin
 
 IntelliInfer leverages several powerful technologies to ensure efficient and scalable deployment and job management, such as Docker, Docker Compose, BullMQ, and Redis.
 
-<div style="text-align: center;">
+<p align="center">
   <img src="documents/InfrastructureScheme.jpeg" alt="Sequelize model" width="550" height="auto">
-</div>
+</p>
 
 
 ## Docker
@@ -115,16 +115,16 @@ By combining these technologies, our infrastructure can dynamically scale, effic
 ## Class Diagram
 The class diagram shows a general overview of the structure of the project. The implementation relationships of the interfaces and the relationships between different classes are indicated. It is also possible to note which classes are involved in the use of the different patterns.
 
-<div style="text-align: center;">
+<p align="center">
   <img src="documents/ClassesDiagram.drawio.png" alt="Sequelize model" width="950" height="auto">
-</div>
+</p>
 
 ## Uses Case Diagram
 The use case diagram represents which routes are intended for use by the user and by the admin. It is possible to have an in-depth explanation of the latter later, together with the relevant sequence diagrams, which give a better representation of the flow of the project.
 
-<div style="text-align: center;">
+<p align="center">
   <img src="documents/UsesCaseDiagram.drawio.png" alt="Uses Case Diagram" style="max-width: 256 px; height: auto;">
-</div>
+</p>
 
 
 ## Rotte
@@ -173,87 +173,87 @@ The use case diagram represents which routes are intended for use by the user an
 ## Sequence Diagrams
 Route to logically delete a dataset:
 
-<div style="text-align: center;">
+<p align="center">
   <img src="documents/DELETE_api_dataset_delete_datasetId.drawio.png" alt="Sequelize model" width="850" height="auto">
-</div>
+</p>
 
 Route to find a specific dataset given its id:
 
-<div style="text-align: center;">
+<p align="center">
   <img src="documents/GET_api_dataset_datasetId.drawio .png" alt="Sequelize model" width="850" height="auto">
-</div>
+</p>
 
 Route to display all available datasets for a user:
 
-<div style="text-align: center;">
+<p align="center">
   <img src="documents/GET_api_dataset_list.drawio.png" alt="Sequelize model" width="850" height="auto">
-</div>
+</p>
 
 Route to display the user's residual credit:
 
-<div style="text-align: center;">
+<p align="center">
   <img src="documents/GET_api_display_credit.drawio.png" alt="Sequelize model" width="850" height="auto">
-</div>
+</p>
 
 Route to generate token for user or admin:
 
-<div style="text-align: center;">
+<p align="center">
   <img src="documents/GET_api_generate_token.drawio.png" alt="Sequelize model" width="850" height="auto">
-</div>
+</p>
 
 Route to display list of all available AI models:
 
-<div style="text-align: center;">
+<p align="center">
   <img src="documents/GET_api_model_list.drawio.png" alt="Sequelize model" width="850" height="auto">
-</div>
+</p>
 
 Route to find a specific AI model given its id:
 
-<div style="text-align: center;">
+<p align="center">
   <img src="documents/GET_api_model_modelId.drawio.png" alt="Sequelize model" width="850" height="auto">
-</div>
+</p>
 
 Route to create a dataset:
 
-<div style="text-align: center;">
+<p align="center">
   <img src="documents/POST_api_datastet_create.drawio.png" alt="Sequelize model" width="850" height="auto">
-</div>
+</p>
 
 Route to upload a file (image or zip):
 
-<div style="text-align: center;">
+<p align="center">
   <img src="documents/POST_api_upload_file.drawio.png" alt="Sequelize model" width="850" height="auto">
-</div>
+</p>
 
 Route to recharge user's credit:
 
-<div style="text-align: center;">
+<p align="center">
   <img src="documents/PUT_admin_credit_recharge.drawio.png" alt="Sequelize model" width="850" height="auto">
-</div>
+</p>
 
 Route to update weights' path for an AI model:
 
-<div style="text-align: center;">
+<p align="center">
   <img src="documents/PUT_admin_model_aiId_change_weights.drawio .png" alt="Sequelize model" width="850" height="auto">
-</div>
+</p>
 
 Route to update dataset's name:
 
-<div style="text-align: center;">
+<p align="center">
   <img src="documents/POST_api_dataset_update_datasetId.drawio.png" alt="Sequelize model" width="850" height="auto">
-</div>
+</p>
 
 Route to init a new inference operation:
 
-<div style="text-align: center;">
+<p align="center">
   <img src="documents/GET_inference_datasetId_aiId.drawio.png" alt="Sequelize model" width="850" height="auto">
-</div>
+</p>
 
 Route to check the state of an inference:
 
-<div style="text-align: center;">
+<p align="center">
   <img src="documents/Get_inference_status.drawio.png" alt="Sequelize model" width="850" height="auto">
-</div>
+</p>
 
 
 # Database
@@ -263,14 +263,14 @@ This project uses PostgreSQL as relational database. It was chosen for its advan
 Through it we manage and save data relating to users, datasets and related images, to the AI architectures themselves and their results. Below you can find the structure of the database, in terms of associations and table field.
 
 ## ER Schema
-<div style="text-align: center;">
+<p align="center">
   <img src="documents/ER.drawio.png" alt="ER schema" width="750" height="auto">
-</div>
+</p>
 
 ## Database Schema
-<div style="text-align: center;">
+<p align="center">
   <img src="documents/schemadatabase.drawio.png" alt="Database Schema" width="850" height="auto">
-</div>
+</p>
 
 ## Sequelize
 Sequelize is an ORM (Object-Relational Mapping) for Node.js used to facilitate the management of CRUD operations and the tables definition. We define models for each table in the database and use Sequelize as an high level interface to interact with PostgreSQL.
@@ -500,9 +500,9 @@ export interface IRepository {
 ## Factory Pattern
 The Factory pattern is used to define and manage exceptions. It is a creational pattern that provides an interface for creating objects, allowing subclasses to alter the type of objects that will be created. By using this pattern for exceptions, we centralize the creation logic, making it easier to manage and extend our error handling mechanism. It allows us to create different types of specific exception object in a consistent and centralized manner. 
 
-<div style="text-align: center;">
+<p align="center">
   <img src="documents/FactoryPattern.drawio.png" alt="Sequelize model" width="400" height="auto">
-</div>
+</p>
 
 # Proposed Neural Network Models
 
@@ -512,22 +512,22 @@ In our application, users are able to perform inference on a variety of image da
 ## YOLOv5
 YOLOv5 is an object detection model that builds upon the success of its predecessors. Developed by Ultralytics, YOLOv5 offers significant advancements in speed and accuracy compared to previous versions. It employs a single neural network to detect objects within images or video frames in real-time, providing bounding box coordinates and class probabilities for each detected object. YOLOv5 is highly versatile, capable of detecting a wide range of objects across various environments with remarkable efficiency.
 
-<div style="text-align: center;">
+<p align="center">
   <img src="documents/Yolo-v5.jpg" alt="Yolov5" style="max-width: 256 px; height: auto;">
-</div>
+</p>
 
 What we did to implement inference on YOLOv5 in our project was to train a pre-existing architecture on a high-resolution SAR satellite image dataset. Subsequently, we saved the weights with which the user has the option to test this functionality, retrieving them from the database, and we implemented the script to perform inference on an architecture we imported. You can find it at the following link: https://github.com/jasonmanesis/Ship-Detection-on-Remote-Sensing-Synthetic-Aperture-Radar-Data.
 
-<div style="text-align: center;">
+<p align="center">
   <img src="documents/boundingbox3.jpg" alt="Example result" style="max-width: 256 px; height: auto;">
-</div>
+</p>
 
 ## Faster RCNN
 Also the Faster RCNN (Region-based Convolutional Neural Network) is a deep learning model widely used for object detection tasks. It represents a significant advancement over previous R-CNN architectures by integrating region proposal networks (RPNs) directly into the network architecture, enabling end-to-end training. Faster R-CNN achieves impressive accuracy and efficiency by leveraging convolutional neural networks (CNNs) to extract features from an input image and using the RPN to propose candidate object bounding boxes. These proposals are then refined and classified by subsequent layers in the network, resulting in precise object detection with reduced computational overhead. Faster R-CNN has become a popular choice for various applications, including autonomous driving, surveillance, and image understanding tasks.
 
-<div style="text-align: center;">
+<p align="center">
   <img src="documents/FasterRCNN.png" alt="Faster RCNN" style="max-width: 256 px; height: auto;">
-</div>
+</p>
 
 To implement inference on this architecture in our project, we relied on the resources found in the following GitHub repository: https://github.com/litcoderr/faster-rcnn-inference/blob/main/docker/Dockerfile
 
@@ -909,21 +909,17 @@ If you want to run the tests automatically, you can use Postman's runner feature
     "success": true,
     "message": "Dataset deleted successfully.",
     "obj": {
-        "success": true,
-        "message": "deleted successfully",
-        "obj": {
-            "id": 1,
-            "name": "Ships",
-            "path": "/ships",
-            "description": "Dataset of Sar images for ships detection",
-            "created_at": "2024-06-10T09:18:17.518Z",
-            "updated_at": "2024-06-10T10:38:14.962Z",
-            "deleted_at": null,
-            "userId": null,
-            "countElements": 100,
-            "countClasses": 5,
-            "isDeleted": true
-        }
+        "id": 7,
+        "name": "FoodDataset",
+        "path": "/fooddataset",
+        "description": "Collection of images of various types of food",
+        "created_at": "2024-06-10T11:42:24.258Z",
+        "updated_at": "2024-06-10T11:42:33.448Z",
+        "deleted_at": null,
+        "userId": 1,
+        "countElements": 0,
+        "countClasses": 3,
+        "isDeleted": true
     }
 }
 ```
