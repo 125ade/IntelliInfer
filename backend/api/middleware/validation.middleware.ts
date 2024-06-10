@@ -22,14 +22,12 @@ export function validateParamIntGreaterThanZero(param_id: string) {
     ];
 }
 
-export function validateParamIntOrAll(param_id: string) {
+export function validateParamIntFromZero(paramId: string) {
     return [
-        param(param_id)
+        param(paramId)
             .custom(value => {
-                if (typeof value === 'string' && value.toLowerCase() === 'all') {
-                    return true;
-                }
-                if (!isNaN(value) && Number(value) >= 0) {
+                const numericValue: number = Number(value);
+                if (!isNaN(numericValue) && numericValue >= 0) {
                     return true;
                 }
                 throw new ConcreteErrorCreator().createBadRequestError().setNoImageId();
@@ -37,9 +35,9 @@ export function validateParamIntOrAll(param_id: string) {
         (req: Request, res: Response, next: NextFunction) => {
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
-               next( new ConcreteErrorCreator()
+                next(new ConcreteErrorCreator()
                     .createBadRequestError()
-                    .setNoUserId()
+                    .setNoImageId()
                     .send(res));
             } else {
                 next();

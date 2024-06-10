@@ -10,6 +10,16 @@ import {ConcreteErrorCreator} from "../factory/ErrorCreator";
 import User from "../models/user";
 import {Error} from "sequelize";
 
+class InsufficientTokenError extends Error {
+  constructor(message = "insufficient token") {
+    super(message);
+    this.name = "InsufficientTokenError";
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, InsufficientTokenError);
+    }
+  }
+}
+
 
 const doc_host = process.env.DOCKER_HOST || "unix:///var/run/docker.sock";
 const docker = new Docker({ socketPath: '/var/run/docker.sock' });
@@ -43,7 +53,7 @@ export class TaskQueue {
                        throw user;
                    }
                    if (!(await this.repository.checkUserToken(user.id, jobData.callCost))){
-                       await job.moveToFailed(new Error("insufficent token"),  "ABORTED", true);
+                       await job.moveToFailed(new InsufficientTokenError,  "ABORTED", true);
                        return;
                    }
 

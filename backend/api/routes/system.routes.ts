@@ -1,9 +1,8 @@
 import {Router} from "express";
 import SystemController from "../controllers/system.controller";
 import {
+    validateParamIntFromZero,
     validateParamIntGreaterThanZero,
-    validateParamIntOrAll,
-    validateParamUUID
 } from "../middleware/validation.middleware";
 import {AuthUser} from "../middleware/auth.middleware";
 
@@ -46,8 +45,8 @@ export default class SystemRoutes{
         this.router.get(
             "/inference/result/:uuid/:imageId",
             AuthUser,
-            validateParamUUID("uuid"),
-            validateParamIntOrAll("imageId"),
+            validateParamIntGreaterThanZero("jobId"),
+            validateParamIntFromZero("imageId"),
             this.systemController.getInferenceResult.bind(this.systemController)
         );
 

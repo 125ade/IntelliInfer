@@ -164,17 +164,14 @@ export default class SystemController {
     }
 
     async getStatusJob(req: Request, res: Response){
-
-        const jobName = req.params.jobId;
+        const jobId = req.params.jobId;
         try {
             const taskQueue = TaskQueue.getInstance();
-            const job = await taskQueue.getQueue().getJob(jobName);
+            const job = await taskQueue.getQueue().getJob(jobId);
             if (!job) {
-                return res.status(404).json({ error: `Job with name ${jobName} not found` });
+                throw new ConcreteErrorCreator().createServerError().setFailedCheckStatus().send(res);
             }
-            const name = job.name;
             const status = await job.getState();
-            //'waiting', 'active', 'completed', 'failed', 'delayed'
             let resultJson : SuccessResponse;
             switch (status){
                 case "active": // RUNNING
@@ -207,6 +204,17 @@ export default class SystemController {
                     }
                     break;
                 case "failed": // FAILED
+                    const { failedReason } = job;
+                    if (failedReason === 'insufficient token' && job.stacktrace.includes('ABORTED')) {
+                        resultJson = {
+                            success: true,
+                            message: "ABORTED",
+                            obj: {
+                                jobId: job.id,
+                            }
+                        }
+                        break;
+                    }
                 case "unknown":
                 default:
                     resultJson = {
@@ -219,20 +227,22 @@ export default class SystemController {
             }
             res.status(200).json(resultJson);
         } catch (err) {
-
+            if (!(err instanceof ConcreteErrorCreator)) {
                 new ConcreteErrorCreator().createServerError().setFailedCheckStatus().send(res);
-
+            }
         }
     }
 
 
     async getInferenceResult(req: Request, res: Response, next: NextFunction) {
         try {
-            const uuid: string = req.params.uuid;
+            const jobId: string = req.params.jobId;
             const imageId = Number(req.params.imageId);
-
-            
-            const inferenceResult: ConcreteErrorCreator | Result[] = await this.repository.findResultByUuidAndImageId(uuid, Number(imageId));
+            const job = await TaskQueue.getInstance().getQueue().getJob(jobId);
+            if (!job) {
+                throw new ConcreteErrorCreator().createServerError().setFailedRetriveItem().send(res);
+            }
+            const inferenceResult: ConcreteErrorCreator | Result[] = await this.repository.findResultByUuidAndImageId(job.name, Number(imageId));
             
             // Verifica che `inferenceResult` sia un array valido prima di procedere
             if (!Array.isArray(inferenceResult) || inferenceResult.length === 0) {
