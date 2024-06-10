@@ -99,5 +99,17 @@ export default class ResultDAO implements IDao<Result> {
           return results;
 
     }
-    
+
+    async findAllByUuidAndImage(uuid: string, imageId: number) {
+        const results: Result[] = await Result.findAll({
+                where: {
+                    resoultId: uuid,
+                    imageId: imageId
+                }
+            });
+          if (results.length == 0) {
+              throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems()
+          }
+          return results;
+    }
 }

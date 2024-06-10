@@ -31,6 +31,14 @@ export interface BoundingBox {
     height: number
 }
 
+export interface DataResultInterface {
+    error: undefined,
+    start: boolean,
+    finish: boolean,
+    box?: BoundingBox[]
+}
+
+
 export interface FinishResult {
     id: number,
     imageId: number,
@@ -117,3 +125,6 @@ export const isJobReturnData = (data: any): data is JobReturnData => {
         data.results.every(isFinishResult)
     );
 };
+
+
+export type JobStatus = 'completed' | 'failed' | 'delayed' | 'active' | 'waiting' | 'stuck' | 'aborted';

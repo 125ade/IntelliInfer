@@ -12,6 +12,7 @@ import {JobData} from "../queues/jobData";
 import Image from "../models/image";
 import Result from "../models/result";
 import {SuccessResponse} from "../utils/utils";
+import {isNumeric} from "validator";
 
 
 export default class SystemController {
@@ -156,10 +157,87 @@ export default class SystemController {
 
 
     async checkStatusInference(req: Request, res: Response, next: NextFunction) {
+        try {
+            const jobId: string = req.params.jobId;
 
+            if (!jobId) {
+                throw new ConcreteErrorCreator().createBadRequestError().setNoJobId();
+            }
+
+            const job = await TaskQueue.getInstance().getQueue().getJob(jobId);
+
+            if (job === undefined) {
+                throw new ConcreteErrorCreator().createNotFoundError().setJobNotFound();
+            }
+            const jobStatus = await job.getState();
+            console.log(jobStatus);
+            // todo riportare anche i risultati se completo
+            let response: SuccessResponse = {
+                success: true,
+            };
+
+            switch (jobStatus) {
+                case 'completed':
+                    //console.log("terminato");
+                    response.message = "Job completed";
+                    //response.result = jobResult; // Include the result of the inference
+                    break;
+                case 'failed':
+                    response.message = "Job failed";
+                    //response.error = job.failedReason;
+                    break;
+                case 'active':
+                    response.message = "Job running";
+                    break;
+                case 'waiting':
+                    response.message = "Job pending";
+                    break;
+                case 'delayed':
+                    response.message = "Job delayed";
+                    break;
+                // case 'stuck':
+                //     response.message = "Job stuck";
+                //     break;
+                // case 'aborted':
+                //     response.message = "Job aborted due to insufficient credit";
+                //     break;
+                default:
+                    response.message = "Unknown job status";
+            }
+
+            res.status(200).json(response);
+
+        } catch (error) {
+            if (error instanceof ErrorCode) {
+                error.send(res);
+            } else {
+                new ConcreteErrorCreator().createServerError().setFailedCheckStatus().send(res);
+            }
+        }
     }
 
-    async getInferenceResult(req: Request, res: Response, next: NextFunction) {}
+    async getInferenceResult(req: Request, res: Response, next: NextFunction) {
+        try {
+            const uuid: string = req.params.uuid;
+            const imageId: number | string = req.params.imageId;
+            let inferenceResult: ConcreteErrorCreator | Result[] = [];
+            if (isNumeric(imageId)) {
+                inferenceResult = await this.repository.findResultByUuidAndImageId(uuid, Number(imageId));
+            }
+            if (imageId === "all"){
+                inferenceResult = await this.repository.findResult(uuid);
+            }
+
+            // todo check del istanza e creazione del risultato
+            res.status(200).json({todo:"todo"});
+        } catch (error) {
+            if (error instanceof ErrorCode) {
+                error.send(res);
+            } else {
+                new ConcreteErrorCreator().createServerError().setFailedRetriveItem().send(res);
+            }
+        }
+    }
     //     try {
     //         const resultUUID: string = req.params.resultUUID;
     //

@@ -111,19 +111,6 @@ export default class UserController {
         }
     }
 
-    async findResultById(req: Request, res: Response) {
-        try {
-            const resultId: number = Number(req.params.resultId);
-            const inferenceResult: ConcreteErrorCreator | Result = await this.repository.findResult(resultId);
-            res.status(200).json(inferenceResult);
-        } catch (error) {
-            if (error instanceof ErrorCode) {
-                error.send(res);
-            } else {
-                throw new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
-            }
-        }
-    }
 
     async createDataset(req: Request, res: Response) {
         try{

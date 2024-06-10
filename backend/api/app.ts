@@ -13,6 +13,7 @@ import { syncDb } from "./db/dbSync";
 import * as process from "node:process";
 import {handleRouteNotFound} from "./middleware/route.middleware";
 import {TaskQueue} from "./queues/Worker";
+import { createCanvas } from 'canvas';
 
 
 require('dotenv').config();
@@ -35,31 +36,19 @@ setupLogging(app)
 // sync db
 syncDb().then(():void=>{console.log("\t--> SYNC BD DONE")})
 
-// manage job
-try {
-    const taskQueue = TaskQueue.getInstance().getQueue();
-    const serverAdapter: ExpressAdapter = new ExpressAdapter();
-    serverAdapter.setBasePath('/admin/queues');
-    const bullBoard = createBullBoard({
-        queues: [new BullMQAdapter(taskQueue['queue'])],
-        serverAdapter: serverAdapter
-    });
+const taskQueue = TaskQueue.getInstance().getQueue();
+const serverAdapter: ExpressAdapter = new ExpressAdapter();
+serverAdapter.setBasePath('/admin/queues');
+createBullBoard({
+    queues: [new BullMQAdapter(taskQueue['queue'])],
+    serverAdapter: serverAdapter
+});
 
-    app.use('/admin/queues', serverAdapter.getRouter());
+app.use('/admin/queues', serverAdapter.getRouter());
 
-} catch (err) {
-    // todo handle log
-    console.error(err);
-}
+const openApiSpec = JSON.parse(fs.readFileSync(path.join(__dirname, 'openapi.json'), 'utf8'));
+app.use('/admin/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
 
-// manage open API
-try {
-  const openApiSpec = JSON.parse(fs.readFileSync(path.join(__dirname, 'openapi.json'), 'utf8'));
-  app.use('/admin/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
-}catch (err){
-  // todo handle log
-  console.error(err);
-}
 
 // Routes Inizialization
 const userRoutes: UserRoutes = new UserRoutes();
@@ -69,6 +58,25 @@ const adminRoutes: AdminRoutes = new AdminRoutes();
 app.use('/api', userRoutes.router);
 app.use('/admin', adminRoutes.router);
 app.use('/api', systRoutes.router);
+
+
+app.get('/black-image', (req, res) => {
+    const width = 800;
+    const height = 600;
+    const canvas = createCanvas(width, height);
+    const context = canvas.getContext('2d');
+
+    // Impostare il colore di sfondo a nero
+    context.fillStyle = 'black';
+    context.fillRect(0, 0, width, height);
+
+    // Convertire il canvas in un buffer e inviare come risposta
+    canvas.toBuffer((err, buffer) => {
+        if (err) throw err;
+        res.set('Content-Type', 'image/png');
+        res.send(buffer);
+    });
+});
 
 
 // manage health check

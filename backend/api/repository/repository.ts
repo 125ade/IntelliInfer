@@ -18,8 +18,7 @@ import mime from 'mime-types';
 import { v4 as uuidv4 } from 'uuid';
 import {generatePath, SuccessResponse} from "../utils/utils";
 import DatasetTagDao from '../dao/datasetTagDao';
-import DatasetTags from '../models/datasettag';
-import {FinishResult} from "../queues/jobData";
+import {DataResultInterface, FinishResult, JobReturnData} from "../queues/jobData";
 
 
 export interface IRepository {
@@ -29,7 +28,7 @@ export interface IRepository {
     createTags(tags: string[], datasetId: number): Promise<Tag[]>;
     listAiModels(): Promise<Ai[] | ConcreteErrorCreator>;
     findModel(modelId: number): Promise<Ai | ConcreteErrorCreator>;
-    findResult(resultId: number): Promise<Result | ConcreteErrorCreator>;
+    findResult(uuid: string): Promise<Result[] | ConcreteErrorCreator>;
     listImageFromDataset(datasetId: number): Promise<Image[] | ConcreteErrorCreator>;
     createDatasetWithTags(data: any, user: User): Promise<Dataset | ConcreteErrorCreator> ;
     getDatasetDetail(datasetId: number): Promise<Dataset | ConcreteErrorCreator> ;
@@ -47,6 +46,7 @@ export interface IRepository {
     createListResult(imageList: Image[], aiID: number, UUID: string): Promise<Result[] | ConcreteErrorCreator>;
     updateListResult(result:FinishResult[]): Promise<boolean | ConcreteErrorCreator>;
     checkNames(userId: number, newName: string): Promise<boolean | ConcreteErrorCreator>;
+    updateDatasetName( datasetId: number, newName: string ): Promise< Dataset | ConcreteErrorCreator>;
 }
 
 
@@ -134,9 +134,9 @@ export class Repository implements IRepository {
     }
 
     // find an inference result by id
-    async findResult(resultId: number): Promise<Result | ConcreteErrorCreator>{
+    async findResult(uuid: string): Promise<Result[] | ConcreteErrorCreator>{
         const resultDao: ResultDao = new ResultDao();
-        return resultDao.findById(resultId);
+        return resultDao.findAllByUUID(uuid);
     }
 
     // Given the datasetId, deletes logically the dataset
@@ -333,6 +333,81 @@ export class Repository implements IRepository {
         const datasetDao: DatasetDao = new DatasetDao();
         return datasetDao.updateName(datasetId, newName);
     }
+
+    async findResultByUuidAndImageId(uuid: string, imageId: number) {
+        const resultDao: ResultDao = new ResultDao();
+        return resultDao.findAllByUuidAndImage(uuid, imageId);
+    }
+
+    async getImagePathFromId(id: number): Promise< string | ConcreteErrorCreator >{
+        const imageDao: ImageDao = new ImageDao();
+        const img: Image | ConcreteErrorCreator =  await imageDao.findById(id);
+        if (img instanceof Image) {
+            return img.path;
+        }else{
+            return img
+        }
+    }
+
+
+//     async drawImageWithBBoxes(result: Result) {
+//     const canvas = document.createElement('canvas');
+//     const ctx = canvas.getContext('2d');
+//     const data: DataResultInterface = result.data
+//
+//     if (data.error !== undefined || data.start !== false || data.finish !== true) {
+//         console.error('Invalid result data');
+//         return;
+//     }
+//
+//     // Get image path from ID
+//     const imagePath = await this.getImagePathFromId(result.imageId);
+//     if (typeof imagePath !== 'string') {
+//         console.error('Failed to retrieve image path');
+//         return;
+//     }
+//
+//     const img = new Image();
+//     img.src = imagePath;
+//
+//     img.onload = () => {
+//         canvas.width = img.width * 2; // original + annotated
+//         canvas.height = img.height;
+//
+//         // Draw original image on the left side
+//         ctx.drawImage(img, 0, 0, img.width, img.height);
+//
+//         // Draw image again on the right side for annotations
+//         ctx.drawImage(img, img.width, 0, img.width, img.height);
+//
+//         // Draw bounding boxes on the right side
+//         if (result.data.box && Array.isArray(result.data.box)) {
+//             result.data.box.forEach(bbox => {
+//                 const { x_center, y_center, width, height, class_id, confidence } = bbox;
+//
+//                 const x = (x_center - width / 2) * img.width;
+//                 const y = (y_center - height / 2) * img.height;
+//                 const w = width * img.width;
+//                 const h = height * img.height;
+//
+//                 ctx.strokeStyle = 'red';
+//                 ctx.lineWidth = 2;
+//                 ctx.strokeRect(x + img.width, y, w, h);
+//
+//                 ctx.fillStyle = 'red';
+//                 ctx.font = '20px Arial';
+//                 ctx.fillText(`Class: ${class_id}, Conf: ${(confidence * 100).toFixed(2)}%`, x + img.width, y - 5);
+//             });
+//         }
+//
+//         document.body.appendChild(canvas);
+//     };
+//
+//     img.onerror = () => {
+//         console.error('Failed to load image');
+//     };
+// }
+
 
 }
 

@@ -68,6 +68,10 @@ export class ServerError extends ErrorCode {
     setFailedCreationResult() {
         return this.set("Error. Inference result can't be created");
     }
+
+    setFailedCheckStatus() {
+        return this.set("Error. impossible to check the status of the job");
+    }
 }
 
 /**
@@ -168,6 +172,14 @@ export class BadRequestError extends ErrorCode {
     setNoModelId() {
         return this.set("There was an error. Model id not found.");
     }
+
+    setNoJobId() {
+        return this.set("There was an error. Job id not found.");
+    }
+
+    setNoImageId() {
+        return this.set("Value must be a number greater than or equal to 0 or the string \"all\" for see all the frame");
+    }
 }
 
 /**
@@ -246,5 +258,9 @@ export class NotFoundError extends ErrorCode {
     // error given when the user wants to visualize the state of an inference but it's impossible to find it
     setNonExistentInference(): ErrorCode {
         return this.set("There was an error. The inference process required is not existent. Unable to find its state.")
+    }
+
+    setJobNotFound() {
+        return this.set("Impossible to find the job.");
     }
 }
