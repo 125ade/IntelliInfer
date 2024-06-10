@@ -8,12 +8,16 @@ import Dataset from "../models/dataset";
 import Ai from "../models/ai";
 import process from "node:process";
 import {TaskQueue} from "../queues/Worker";
-import {JobData} from "../queues/jobData";
+import {FinishResult, JobData} from "../queues/jobData";
 import Image from "../models/image";
 import Result from "../models/result";
 import {SuccessResponse} from "../utils/utils";
 import {isNumeric} from "validator";
 import {JobState} from "bullmq";
+import { Canvas, createCanvas, loadImage } from 'canvas';
+import { DataResultInterface } from "../queues/jobData";
+import { BoundingBox } from "../queues/jobData";
+
 
 
 export default class SystemController {
@@ -224,24 +228,90 @@ export default class SystemController {
         try {
             const uuid: string = req.params.uuid;
             const imageId: number | string = req.params.imageId;
+
             let inferenceResult: ConcreteErrorCreator | Result[] = [];
-            if (isNumeric(imageId)) {
+            if (this.isNumeric(imageId)) {
                 inferenceResult = await this.repository.findResultByUuidAndImageId(uuid, Number(imageId));
-            }
-            if (imageId === "all"){
+            } else if (imageId === "all") {
                 inferenceResult = await this.repository.findResult(uuid);
+            } else {
+                return res.status(400).json({ error: "Invalid imageId parameter" });
             }
 
-            // todo check del istanza e creazione del risultato
-            res.status(200).json({todo:"todo"});
+            // Verifica che `inferenceResult` sia un array valido prima di procedere
+            if (!Array.isArray(inferenceResult) || inferenceResult.length === 0) {
+                return res.status(404).json({ error: "No results found for the given parameters" });
+            }
+
+            // Ottieni il percorso dell'immagine
+            const imagePath: string | ConcreteErrorCreator = await this.repository.getImagePathFromId(inferenceResult[0].imageId);
+            if (typeof imagePath !== 'string') {
+                return res.status(500).json({ error: "Failed to retrieve image path" });
+            }
+
+            // Carica l'immagine originale
+            const imageURL: string = `/path/to/volume/${imagePath}`;
+            const imgElement = await loadImage(imageURL);
+
+            // Crea un canvas e ottieni il contesto
+            const canvas: Canvas = createCanvas(imgElement.width * 2, imgElement.height);
+            const ctx = canvas.getContext('2d');
+
+            if (!ctx) {
+                return res.status(500).json({ error: "Failed to get 2D context" });
+            }
+
+            // Disegna l'immagine originale sul lato sinistro
+            ctx.drawImage(imgElement, 0, 0, imgElement.width, imgElement.height);
+
+            // Disegna di nuovo l'immagine sul lato destro per annotazioni
+            ctx.drawImage(imgElement, imgElement.width, 0, imgElement.width, imgElement.height);
+
+            // Disegna i bounding box sul lato destro
+            inferenceResult.forEach((result: Result) => {
+                const data = result.data;
+                if (data && data.box && Array.isArray(data.box)) {
+                    data.box.forEach((bb: BoundingBox) => {
+                        const { x_center, y_center, width, height, class_id, confidence } = bb;
+
+                        const x = (x_center - width / 2) * imgElement.width;
+                        const y = (y_center - height / 2) * imgElement.height;
+                        const w = width * imgElement.width;
+                        const h = height * imgElement.height;
+
+                        ctx.strokeStyle = 'red';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(x + imgElement.width, y, w, h);
+
+                        ctx.fillStyle = 'red';
+                        ctx.font = '20px Arial';
+                        ctx.fillText(`Class: ${class_id}, Conf: ${(confidence * 100).toFixed(2)}%`, x + imgElement.width, y - 5);
+                    });
+                }
+            });
+
+            // Converti il canvas in un buffer
+            const buffer = canvas.toBuffer('image/png');
+
+            // Imposta gli header e invia il buffer come risposta
+            res.setHeader('Content-Type', 'image/png');
+            res.send(buffer);
         } catch (error) {
             if (error instanceof ErrorCode) {
                 error.send(res);
             } else {
-                new ConcreteErrorCreator().createServerError().setFailedRetriveItem().send(res);
+                new ConcreteErrorCreator().createServerError().setFailedRetrieveItem().send(res);
             }
         }
     }
+
+    // Helper function per verificare se un valore è numerico
+    isNumeric(value: any): boolean {
+        return !isNaN(value - parseFloat(value));
+    }
+
+
+
     //     try {
     //         const resultUUID: string = req.params.resultUUID;
     //
