@@ -8,12 +8,15 @@ import Dataset from "../models/dataset";
 import Ai from "../models/ai";
 import process from "node:process";
 import {TaskQueue} from "../queues/Worker";
-import {JobData} from "../queues/jobData";
+import {FinishResult, JobData} from "../queues/jobData";
 import Image from "../models/image";
 import Result from "../models/result";
 import {SuccessResponse} from "../utils/utils";
 import {isNumeric} from "validator";
-import { createCanvas, loadImage } from 'canvas';
+import { Canvas, createCanvas, loadImage } from 'canvas';
+import { DataResultInterface } from "../queues/jobData";
+import { BoundingBox } from "../queues/jobData";
+
 
 
 export default class SystemController {
@@ -237,17 +240,17 @@ export default class SystemController {
             }
     
             // Ottieni il percorso dell'immagine
-            const imagePath = await this.repository.getImagePathFromId(inferenceResult[0].imageId);
+            const imagePath: string | ConcreteErrorCreator = await this.repository.getImagePathFromId(inferenceResult[0].imageId);
             if (typeof imagePath !== 'string') {
                 return res.status(500).json({ error: "Failed to retrieve image path" });
             }
     
             // Carica l'immagine originale
-            const imageURL = `/path/to/volume/${imagePath}`;
+            const imageURL: string = `/path/to/volume/${imagePath}`;
             const imgElement = await loadImage(imageURL);
     
             // Crea un canvas e ottieni il contesto
-            const canvas = createCanvas(imgElement.width * 2, imgElement.height);
+            const canvas: Canvas = createCanvas(imgElement.width * 2, imgElement.height);
             const ctx = canvas.getContext('2d');
     
             if (!ctx) {
@@ -261,21 +264,26 @@ export default class SystemController {
             ctx.drawImage(imgElement, imgElement.width, 0, imgElement.width, imgElement.height);
     
             // Disegna i bounding box sul lato destro
-            inferenceResult.forEach(result => {
-                const { x_center, y_center, width, height, class_id, confidence } = result.data.box;
-    
-                const x = (x_center - width / 2) * imgElement.width;
-                const y = (y_center - height / 2) * imgElement.height;
-                const w = width * imgElement.width;
-                const h = height * imgElement.height;
-    
-                ctx.strokeStyle = 'red';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(x + imgElement.width, y, w, h);
-    
-                ctx.fillStyle = 'red';
-                ctx.font = '20px Arial';
-                ctx.fillText(`Class: ${class_id}, Conf: ${(confidence * 100).toFixed(2)}%`, x + imgElement.width, y - 5);
+            inferenceResult.forEach((result: Result) => {
+                const data = result.data;
+                if (data && data.box && Array.isArray(data.box)) {
+                    data.box.forEach((bb: BoundingBox) => {
+                        const { x_center, y_center, width, height, class_id, confidence } = bb;
+            
+                        const x = (x_center - width / 2) * imgElement.width;
+                        const y = (y_center - height / 2) * imgElement.height;
+                        const w = width * imgElement.width;
+                        const h = height * imgElement.height;
+            
+                        ctx.strokeStyle = 'red';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(x + imgElement.width, y, w, h);
+            
+                        ctx.fillStyle = 'red';
+                        ctx.font = '20px Arial';
+                        ctx.fillText(`Class: ${class_id}, Conf: ${(confidence * 100).toFixed(2)}%`, x + imgElement.width, y - 5);
+                    });
+                }
             });
     
             // Converti il canvas in un buffer
