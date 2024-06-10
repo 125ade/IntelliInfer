@@ -1,9 +1,6 @@
-import fs from 'fs';
-import path from 'path';
 import express, {Express} from "express";
 import bodyParser from 'body-parser';
 import { Request, Response } from 'express';
-import swaggerUi from "swagger-ui-express";
 import { createBullBoard } from '@bull-board/api';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { ExpressAdapter } from "@bull-board/express";
@@ -13,7 +10,6 @@ import { syncDb } from "./db/dbSync";
 import * as process from "node:process";
 import {handleRouteNotFound} from "./middleware/route.middleware";
 import {TaskQueue} from "./queues/Worker";
-import { createCanvas } from 'canvas';
 
 
 require('dotenv').config();
@@ -46,9 +42,6 @@ createBullBoard({
 
 app.use('/admin/queues', serverAdapter.getRouter());
 
-const openApiSpec = JSON.parse(fs.readFileSync(path.join(__dirname, 'openapi.json'), 'utf8'));
-app.use('/admin/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
-
 
 // Routes Inizialization
 const userRoutes: UserRoutes = new UserRoutes();
@@ -58,26 +51,6 @@ const adminRoutes: AdminRoutes = new AdminRoutes();
 app.use('/api', userRoutes.router);
 app.use('/admin', adminRoutes.router);
 app.use('/api', systRoutes.router);
-
-
-app.get('/black-image', (req, res) => {
-    const width = 800;
-    const height = 600;
-    const canvas = createCanvas(width, height);
-    const context = canvas.getContext('2d');
-
-    // Impostare il colore di sfondo a nero
-    context.fillStyle = 'black';
-    context.fillRect(0, 0, width, height);
-
-    // Convertire il canvas in un buffer e inviare come risposta
-    canvas.toBuffer((err, buffer) => {
-        if (err) throw err;
-        res.set('Content-Type', 'image/png');
-        res.send(buffer);
-    });
-});
-
 
 // manage health check
 app.get('/check/health', (req: Request, res: Response) => {res.json({ system: 'online' });});

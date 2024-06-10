@@ -38,17 +38,18 @@ export interface DataResultInterface {
     box?: BoundingBox[]
 }
 
+export interface FinishData {
+    error: undefined,
+    start: boolean,
+    finish: boolean,
+    box?: BoundingBox[]
+}
 
 export interface FinishResult {
     id: number,
     imageId: number,
     aiId: number,
-    data: {
-        error: undefined,
-        start: boolean,
-        finish: boolean,
-        box?: BoundingBox[]
-    },
+    data: FinishData,
     requestId: string,
     updated_at: string,
     created_at: string
