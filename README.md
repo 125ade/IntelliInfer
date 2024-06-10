@@ -152,6 +152,9 @@ The main goal of IntelliInfer is to provide an API for loading datasets, managin
   <img src="documents/POST_api_dataset_update_datasetId.drawio.png" alt="Sequelize model" width="850" height="auto">
 </div>
 
+<div style="text-align: center;">
+  <img src="documents/GET_inference_datasetId_aiId.drawio.png" alt="Sequelize model" width="850" height="auto">
+</div>
 
 # Database
 Let's now look at the structure of our database and the patterns we used to manage it.
