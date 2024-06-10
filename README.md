@@ -188,7 +188,7 @@ Route to init a new inference operation:
 Let's now look at the structure of our database and the patterns we used to manage it.
 
 This project uses PostgreSQL as relational database. It was chosen for its advanced capabilities, its reliability and its compliance with SQL standards, making it ideal for applications requiring robust and secure data management.
-Through it we manage and save data relating to users, datasets and related images and labels, to the AI architectures themselves and their results. Below you can find the structure of the database, in terms of associations and table field.
+Through it we manage and save data relating to users, datasets and related images, to the AI architectures themselves and their results. Below you can find the structure of the database, in terms of associations and table field.
 
 ## ER Schema
 <div style="text-align: center;">
