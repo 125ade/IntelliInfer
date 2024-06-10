@@ -1,7 +1,8 @@
 import { DataTypes, Model } from 'sequelize';
 import { SequelizeConnection } from '../db/SequelizeConnection';
 import Image from './image';
-import Ai from './ai'; 
+import Ai from './ai';
+import {FinishData} from "../queues/jobData";
 
 
 // sequelize model of a table containing all inference's results
@@ -14,7 +15,7 @@ export default class Result extends Model {
   
   declare aiId: number;
   
-  declare data: object;
+  declare data: FinishData;
 
   declare requestId: string;
 

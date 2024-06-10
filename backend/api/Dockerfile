@@ -4,7 +4,6 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y curl
 
-COPY openapi.json ./dist/openapi.json
 COPY package.json .
 COPY tsconfig.json .
 
