@@ -100,7 +100,7 @@ export default class SystemController {
             const amountInference: number = dataset.countElements * costoInferenza;
 
             if (!await this.repository.checkUserToken(user.id, amountInference)) {
-                throw new ConcreteErrorCreator().createForbiddenError().setInsufficientToken();
+                throw new ConcreteErrorCreator().createAuthenticationError().setInsufficientToken();
             }
 
             const imageList: Image[] | ConcreteErrorCreator = await this.repository.listImageFromDataset(dataset.id);

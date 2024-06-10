@@ -131,6 +131,11 @@ export class AuthenticationError extends ErrorCode {
     setFailAuthUser(): ErrorCode {
         return this.set("Authentication failed.");
     }
+
+    // error given by insufficient tokens to make an operation
+    setInsufficientToken(): ErrorCode{
+      return this.set(`you need more tokens for this operation`);
+    }
 }
 
 
@@ -216,10 +221,6 @@ export class ForbiddenError extends ErrorCode {
       return this;
     }
     
-    // error given by insufficient tokens to make an operation
-    setInsufficientToken(): ErrorCode{
-      return this.set(`you need more tokens for this operation`);
-    }
     
     // error given when the user wants to update the name of a dataset but the name is already used by one other
     setInvalidName(): ErrorCode{
