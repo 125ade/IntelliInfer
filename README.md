@@ -44,8 +44,8 @@ Follow these steps to get the project up and running quickly.
 First, clone the repository to your local machine using Git:
 
 ```bash
-git clone https://github.com/your-username/your-repo.git](https://github.com/125ade/IntelliInfer.git
-cd your-repo
+git clone https://github.com/125ade/IntelliInfer.git
+cd IntelliInfer
 ```
 
 ## Step 2: Download the .env File
