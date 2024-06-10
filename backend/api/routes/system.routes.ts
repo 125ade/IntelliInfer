@@ -22,7 +22,8 @@ export default class SystemRoutes{
         this.router.get(
             "/generate/token/:userId",
             validateParamIntGreaterThanZero("userId"),
-            this.systemController.generateTokenFromUserId.bind(this.systemController));
+            this.systemController.generateTokenFromUserId.bind(this.systemController)
+        );
 
         // start the inference
         this.router.get(
@@ -34,10 +35,11 @@ export default class SystemRoutes{
 
         // return the status of the inference or result json if completed
         this.router.get(
-            "/inference/status/:uuid",
+            "/inference/get/status/:jobId",
             AuthUser,
-            //validateParamUUID("uuid"),
-            this.systemController.checkStatusInference.bind(this.systemController));
+            validateParamIntGreaterThanZero("jobId"),
+            this.systemController.getStatusJob.bind(this.systemController)
+        );
 
 
         // finds an inference result given its id

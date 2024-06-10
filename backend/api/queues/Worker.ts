@@ -7,6 +7,8 @@ import {isJobReturnData, JobData, JobReturnData, JobStatus} from "./jobData";
 import {AiArchitecture} from "../static";
 import {Repository} from "../repository/repository";
 import {ConcreteErrorCreator} from "../factory/ErrorCreator";
+import User from "../models/user";
+import {Error} from "sequelize";
 
 
 const doc_host = process.env.DOCKER_HOST || "unix:///var/run/docker.sock";
@@ -34,6 +36,16 @@ export class TaskQueue {
         this.queue.process(1, async (job) => {
             const jobData : JobData = job.data;
             const jobDataString: string = JSON.stringify(jobData);
+            await job.log(`[info] ${job.id}`)
+            await job.log(`[info] ${job.name}`)
+            const user: User | ConcreteErrorCreator = await this.repository.getUserByEmail(jobData.userEmail)
+                   if (user instanceof ConcreteErrorCreator){
+                       throw user;
+                   }
+                   if (!(await this.repository.checkUserToken(user.id, jobData.callCost))){
+                       await job.moveToFailed(new Error("insufficent token"),  "ABORTED", true);
+                       return;
+                   }
 
             await job.log("[log] inizio work");
             await job.updateProgress(1);
@@ -61,6 +73,8 @@ export class TaskQueue {
                 const container: Docker.Container = await docker.createContainer(containerOptions);
                 await job.log(`[log] Container creato: ${container.id}`);
 
+
+
                 // Avvio del container
                 await job.updateProgress(40);
                 await container.start();
@@ -76,16 +90,15 @@ export class TaskQueue {
                 await job.updateProgress(60);
                 logStream.on('data', (chunk): void => {
                     chunk.toString().split('\n').forEach((line: any): void => {
-                        //job.log(`[log] ${extractData(line)}`);
                         try {
                             const jsonLog = JSON.parse(extractData(line));
                             if (isJobReturnData(jsonLog)){
                                 this.repository.updateListResult(jsonLog.results)
-                                    .then((val: boolean | ConcreteErrorCreator): void =>{
+                                    .then(async (val: boolean | ConcreteErrorCreator) =>{
                                        if (val instanceof ConcreteErrorCreator){
                                            throw val;
                                        }else{
-                                           this.updateTokenCredit(jsonLog);
+                                           await this.updateTokenCredit(jsonLog);
                                        }
                                     })
                                     .catch((val: ConcreteErrorCreator | undefined): void =>{
@@ -153,20 +166,20 @@ export class TaskQueue {
     }
 
     public async getJobStatus(jobId: string){
-        const job = await this.queue.getJob(jobId);
+        const job = await this.queue.getJobStatus(jobId)
+
         if (!job) {
             throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
         }
-        if (await job.getState() === "unknown"){
-            throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
-        }else{
-            return job.getState();
-        }
+        console.log(job)
     }
 
     public getQueue(): Queue {
         return this.queue;
     }
+
+
+
 }
 
 

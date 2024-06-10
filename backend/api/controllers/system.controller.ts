@@ -135,18 +135,20 @@ export default class SystemController {
                 results: resultList,
             };
 
-            const successResult: SuccessResponse = {
-                success: true,
-                message: "start inference on your dataset",
-                obj: {
-                    resultId: newUuid,
-                    datasetName: dataset.name,
-                    architecture: ai.architecture,
-                }
-            };
+
 
             try {
-                await TaskQueue.getInstance().getQueue().addJob(dataJob.resultUUID, dataJob);
+                const j = await TaskQueue.getInstance().getQueue().addJob(dataJob.resultUUID, dataJob);
+                const successResult: SuccessResponse = {
+                    success: true,
+                    message: "start inference on your dataset",
+                    obj: {
+                        jobId: j.id,
+                        // resultId: newUuid,
+                        datasetName: dataset.name,
+                        architecture: ai.architecture,
+                    }
+                };
                 res.status(200).json(successResult);
             } catch (err) {
                 throw new ConcreteErrorCreator().createServerError().setFailedStartInference();
@@ -161,69 +163,68 @@ export default class SystemController {
         }
     }
 
+    async getStatusJob(req: Request, res: Response){
 
-    async checkStatusInference(req: Request, res: Response) {
-        console.log(res);
-        // try {
-        //     console.log(res);
-        //     const jobId: string = req.params.uuid;
-        //     console.log(jobId)
-        //
-        //     if (!jobId) {
-        //         throw new ConcreteErrorCreator().createBadRequestError().setNoJobId();
-        //     }
-        //
-        //     const job: JobState | "unknown" = await TaskQueue.getInstance().getQueue().getJobStatus(jobId);
-        //     console.log(job)
-        //     if (job === "unknown") {
-        //         throw new ConcreteErrorCreator().createNotFoundError().setJobNotFound();
-        //     }
-        //     // const jobStatus = await job.getState();
-        //     // console.log(jobStatus);
-        //     // // todo riportare anche i risultati se completo
-        //     // let response: SuccessResponse = {
-        //     //     success: true,
-        //     // };
-        //     //
-        //     // switch (jobStatus) {
-        //     //     case 'completed':
-        //     //         //console.log("terminato");
-        //     //         response.message = "Job completed";
-        //     //         //response.result = jobResult; // Include the result of the inference
-        //     //         break;
-        //     //     case 'failed':
-        //     //         response.message = "Job failed";
-        //     //         //response.error = job.failedReason;
-        //     //         break;
-        //     //     case 'active':
-        //     //         response.message = "Job running";
-        //     //         break;
-        //     //     case 'waiting':
-        //     //         response.message = "Job pending";
-        //     //         break;
-        //     //     case 'delayed':
-        //     //         response.message = "Job delayed";
-        //     //         break;
-        //     //     // case 'stuck':
-        //     //     //     response.message = "Job stuck";
-        //     //     //     break;
-        //     //     // case 'aborted':
-        //     //     //     response.message = "Job aborted due to insufficient credit";
-        //     //     //     break;
-        //     //     default:
-        //     //         response.message = "Unknown job status";
-        //     // }
-        //
-        //     res.status(200).json({job});
-        //
-        // } catch (error) {
-        //     if (error instanceof ErrorCode) {
-        //         error.send(res);
-        //     } else {
-        //         new ConcreteErrorCreator().createServerError().setFailedCheckStatus().send(res);
-        //     }
-        // }
+        const jobName = req.params.jobId;
+        try {
+            const taskQueue = TaskQueue.getInstance();
+            const job = await taskQueue.getQueue().getJob(jobName);
+            if (!job) {
+                return res.status(404).json({ error: `Job with name ${jobName} not found` });
+            }
+            const name = job.name;
+            const status = await job.getState();
+            //'waiting', 'active', 'completed', 'failed', 'delayed'
+            let resultJson : SuccessResponse;
+            switch (status){
+                case "active": // RUNNING
+                    resultJson = {
+                        success: true,
+                        message: "RUNNING",
+                        obj: {
+                            jobId: job.id,
+                        }
+                    }
+                    break;
+                case "waiting": // PENDING
+                case "delayed":
+                    resultJson = {
+                        success: true,
+                        message: "PENDING",
+                        obj: {
+                            jobId: job.id,
+                        }
+                    }
+                    break;
+                case "completed": // COMPLETED
+                    resultJson = {
+                        success: true,
+                        message: "COMPLETED",
+                        obj: {
+                            jobId: job.id,
+                            results: await this.repository.findResult(job.name)
+                        }
+                    }
+                    break;
+                case "failed": // FAILED
+                case "unknown":
+                default:
+                    resultJson = {
+                        success: true,
+                        message: "FAILED",
+                        obj: {
+                            jobId: job.id,
+                        }
+                    }
+            }
+            res.status(200).json(resultJson);
+        } catch (err) {
+
+                new ConcreteErrorCreator().createServerError().setFailedCheckStatus().send(res);
+
+        }
     }
+
 
     async getInferenceResult(req: Request, res: Response, next: NextFunction) {
         try {

@@ -77,6 +77,10 @@ export class ServerError extends ErrorCode {
     setFailedCheckStatus() {
         return this.set("Error. impossible to check the status of the job");
     }
+
+    setFailedRetrieveItem() {
+        return this.set("Error. impossible to retrive the item");
+    }
 }
 
 /**
