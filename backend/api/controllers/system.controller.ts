@@ -239,75 +239,84 @@ export default class SystemController {
             const jobId: string = req.params.jobId;
             const imageId = Number(req.params.imageId);
             const job = await TaskQueue.getInstance().getQueue().getJob(jobId);
+
             if (!job) {
                 throw new ConcreteErrorCreator().createServerError().setFailedRetriveItem().send(res);
             }
-            const inferenceResult: ConcreteErrorCreator | Result[] = await this.repository.findResultByUuidAndImageId(job.name, Number(imageId));
-            
-            // Verifica che `inferenceResult` sia un array valido prima di procedere
-            if (!Array.isArray(inferenceResult) || inferenceResult.length === 0) {
-                return res.status(404).json({ error: "No results found for the given parameters" });
+
+            let inferenceResult: ConcreteErrorCreator | Result;
+
+            if (imageId === 0) {
+                const results: ConcreteErrorCreator | Result[] = await this.repository.findResult(job.name);
+                if (results instanceof ConcreteErrorCreator) {
+                    throw results;
+                }
+                inferenceResult = results[0];
+            } else {
+                inferenceResult = await this.repository.findResultByUuidAndImageId(job.name, imageId);
+                if (inferenceResult instanceof ConcreteErrorCreator) {
+                    throw inferenceResult;
+                }
             }
 
-            // Ottieni il percorso dell'immagine
-            const imagePath: string | ConcreteErrorCreator = await this.repository.getImagePathFromId(inferenceResult[0].imageId);
+            const imagePath: string | ConcreteErrorCreator = await this.repository.getImagePathFromId(inferenceResult.imageId);
             if (typeof imagePath !== 'string') {
-                return res.status(500).json({ error: "Failed to retrieve image path" });
+                throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
             }
 
-            // Carica l'immagine originale
-            const imageURL: string = `${imagePath}`;
-            const imgElement: LoadedImage = await loadImage(imageURL);
+            // Load the original image
+            const imgElement: LoadedImage = await loadImage(imagePath);
 
-            // Crea un canvas e ottieni il contesto
+            // Create a canvas and get the 2D context
             const canvas: Canvas = createCanvas(imgElement.width * 2, imgElement.height);
             const ctx = canvas.getContext('2d');
 
             if (!ctx) {
-                return res.status(500).json({ error: "Failed to get 2D context" });
+                throw new ConcreteErrorCreator().createServerError().setFailedCreationItem();
             }
 
-            // Disegna l'immagine originale sul lato sinistro
+            // Draw the original image on the left side
             ctx.drawImage(imgElement, 0, 0, imgElement.width, imgElement.height);
 
-            // Disegna di nuovo l'immagine sul lato destro per annotazioni
+            // Draw the original image again on the right side for annotations
             ctx.drawImage(imgElement, imgElement.width, 0, imgElement.width, imgElement.height);
 
-            // Disegna i bounding box sul lato destro
-            inferenceResult.forEach((result: Result) => {
-                const data: FinishData = result.data;
-                const box: BoundingBox[] | undefined = data.box;
-                if (box) {
-                    box.forEach((bb: BoundingBox) => {
-                        const { x_center, y_center, width, height, class_id, confidence } = bb;
-                        console.log(x_center);
-                        console.log(y_center);
-                        console.log(width);
-                        console.log(height);
-                        console.log(confidence);
+            const data: FinishData = inferenceResult.data;
+            const box: BoundingBox[] | undefined = data.box;
 
-                        const x: number = (x_center - width / 2) * imgElement.width;
-                        const y: number = (y_center - height / 2) * imgElement.height;
-                        const w: number = width * imgElement.width;
-                        const h: number = height * imgElement.height;
+            if (box === undefined) {
+                throw new ConcreteErrorCreator().createServerError().setFailedCreationItem();
+            }
+            console.log(`larghezza: ${imgElement.width} altezza: ${imgElement.height}  toto larghezza: ${Number(imgElement.width*2)}`)
+            for (const bb of box) {
+                const { x_center, y_center, width, height, class_id, confidence } = bb;
 
-                        ctx.strokeStyle = 'red';
-                        ctx.lineWidth = 2;
-                        ctx.strokeRect(x + imgElement.width, y, w, h);
+                let x: number = (x_center - width / 2) + imgElement.width;
+                let y: number = (y_center - height / 2);
+                let w: number = width;
+                let h: number = height;
 
-                        ctx.fillStyle = 'red';
-                        ctx.font = '20px Arial';
-                        ctx.fillText(`Class: ${class_id}, Conf: ${(confidence * 100).toFixed(2)}%`, x + imgElement.width, y - 5);
-                    });
-                }
-            });
+                // Log the bounding box details for debugging
+                console.log(`Bounding Box - x: ${x}, y: ${y}, w: ${w}, h: ${h}, class: ${class_id}, confidence: ${confidence}`);
 
-            // Converti il canvas in un buffer
+                // Draw the bounding box on the right side image
+                ctx.strokeStyle = 'red';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(x + imgElement.width, y, w, h);
+
+                // Add label with class and confidence
+                ctx.fillStyle = 'red';
+                ctx.font = '20px Arial';
+                ctx.fillText(`Class: ${class_id}, Conf: ${(confidence * 100).toFixed(2)}%`, x + imgElement.width, y - 5);
+            }
+
+            // Convert the canvas to a buffer
             const buffer = canvas.toBuffer('image/png');
 
-            // Imposta gli header e invia il buffer come risposta
+            // Set headers and send the buffer as response
             res.setHeader('Content-Type', 'image/png');
             res.send(buffer);
+
         } catch (error) {
             if (error instanceof ErrorCode) {
                 error.send(res);
@@ -316,42 +325,6 @@ export default class SystemController {
             }
         }
     }
-
-    // Helper function per verificare se un valore è numerico
-    isNumeric(value: any): boolean {
-        return !isNaN(value - parseFloat(value));
-    }
-
-
-
-    //     try {
-    //         const resultUUID: string = req.params.resultUUID;
-    //
-    //         if (!resultUUID) {
-    //             throw new ConcreteErrorCreator().createBadRequestError().setNoResultUUID();
-    //         }
-    //
-    //         const resultData: ResultData | ConcreteErrorCreator = await this.repository.getResultData(resultUUID);
-    //
-    //         if (resultData instanceof ConcreteErrorCreator) {
-    //             throw resultData;
-    //         }
-    //
-    //         res.status(200).json({
-    //             success: true,
-    //             message: "Inference result retrieved successfully",
-    //             data: resultData
-    //         });
-    //
-    //     } catch (error) {
-    //         if (error instanceof ErrorCode) {
-    //             error.send(res);
-    //         } else {
-    //             new ConcreteErrorCreator().createServerError().setFailedRetrieveResult().send(res);
-    //         }
-    //     }
-    // }
-
 
 
 }

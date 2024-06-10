@@ -166,7 +166,7 @@ export default class UserController {
 
     async deleteDatasetById(req: Request, res: Response) {
         try{
-            const result: SuccessResponse | ConcreteErrorCreator = await this.repository.logicallyDelete(Number(req.params.datasetId));
+            const result: Dataset | ConcreteErrorCreator = await this.repository.logicallyDelete(Number(req.params.datasetId));
             if(result instanceof ConcreteErrorCreator){
                 throw result;
             }else{
@@ -283,7 +283,7 @@ export default class UserController {
             if( user instanceof User){
                 const result : SuccessResponse = {
                     success: true,
-                    message: 'Credit recharged successfully',
+                    message: 'Token credit',
                     obj: {
                         userEmail: user.email,
                         token: Number(user.token)

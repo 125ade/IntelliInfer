@@ -32,7 +32,7 @@ export interface IRepository {
     listImageFromDataset(datasetId: number): Promise<Image[] | ConcreteErrorCreator>;
     createDatasetWithTags(data: any, user: User): Promise<Dataset | ConcreteErrorCreator> ;
     getDatasetDetail(datasetId: number): Promise<Dataset | ConcreteErrorCreator> ;
-    logicallyDelete(datasetId: number): Promise<SuccessResponse | ConcreteErrorCreator>;
+    logicallyDelete(datasetId: number): Promise<Dataset | ConcreteErrorCreator>;
     updateModelWeights(modelId: number, weights: string ): Promise<Ai | ConcreteErrorCreator>;
     findDatasetById(datasetId: number): Promise<Dataset | ConcreteErrorCreator>;
     createImage(data: any): Promise<Image | null>;
@@ -140,7 +140,7 @@ export class Repository implements IRepository {
     }
 
     // Given the datasetId, deletes logically the dataset
-    async logicallyDelete(datasetId: number): Promise<ConcreteErrorCreator| SuccessResponse>{
+    async logicallyDelete(datasetId: number): Promise<ConcreteErrorCreator| Dataset>{
         try{
             const datasetDao: DatasetDao = new DatasetDao();
             return datasetDao.logicallyDelete(datasetId);
@@ -334,7 +334,7 @@ export class Repository implements IRepository {
         return datasetDao.updateName(datasetId, newName);
     }
 
-    async findResultByUuidAndImageId(uuid: string, imageId: number) {
+    async findResultByUuidAndImageId(uuid: string, imageId: number): Promise<Result | ConcreteErrorCreator> {
         const resultDao: ResultDao = new ResultDao();
         return resultDao.findAllByUuidAndImage(uuid, imageId);
     }

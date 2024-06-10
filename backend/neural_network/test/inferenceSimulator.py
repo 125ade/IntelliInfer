@@ -5,12 +5,12 @@ import random
 
 
 def process_image(image_path):
-    cla = random.randrange(1,3)
-    con = random.randint(0,100)/100
-    x_center = random.randint(0, 100)
-    y_center = random.randint(0, 100)
-    width = random.randint(1, 100)
-    height = random.choice([width, random.randint(1, 100)])
+    cla = 1
+    con = 0.9
+    x_center = 500
+    y_center = 500
+    width = 300
+    height = 300
     result = {
         "error": None,
         "start": False,
