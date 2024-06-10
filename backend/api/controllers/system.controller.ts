@@ -207,6 +207,17 @@ export default class SystemController {
                     }
                     break;
                 case "failed": // FAILED
+                    const { failedReason } = job;
+                    if (failedReason === 'insufficient token' && job.stacktrace.includes('ABORTED')) {
+                        resultJson = {
+                            success: true,
+                            message: "ABORTED",
+                            obj: {
+                                jobId: job.id,
+                            }
+                        }
+                        break;
+                    }
                 case "unknown":
                 default:
                     resultJson = {
