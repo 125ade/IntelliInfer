@@ -1131,7 +1131,9 @@ If you want to run the tests automatically, you can use Postman's runner feature
     }
 }
 ```
-
+# link postman
+[user test collection](https://intelliinfer.postman.co/workspace/intelliinfer-Workspace~6d22ccce-2074-441d-bce4-90ed7aec9ce6/collection/36008018-a4b11de5-f567-4c38-bfb5-ac28b7b2f1c5?action=share&creator=36008018)
+[admin test collection](https://intelliinfer.postman.co/workspace/intelliinfer-Workspace~6d22ccce-2074-441d-bce4-90ed7aec9ce6/collection/36008018-f0a1f0e4-22d6-42b3-8578-d92cef2508a6?action=share&creator=36008018)
 
 # Authors
 This project is developed and maintained by the following authors:
