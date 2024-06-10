@@ -7,8 +7,8 @@ import random
 def process_image(image_path):
     cla = 1
     con = 0.9
-    x_center = 20
-    y_center = 50
+    x_center = 130
+    y_center = -130
     width = 300
     height = 300
     result = {

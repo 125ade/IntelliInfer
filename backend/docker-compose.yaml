@@ -24,6 +24,8 @@ services:
       - DOCKER_HOST=${DOCKER_HOST}
       - CONTAINER_IMAGE_NAME=${CONTAINER_IMAGE_NAME}
       - CONTAINER_TEST_NAME=${CONTAINER_TEST_NAME}
+      - CONTAINER_IMAGE_YOLO_NAME=${CONTAINER_IMAGE_YOLO_NAME}
+      - CONTAINER_YOLO_NAME=${CONTAINER_YOLO_NAME}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_HOST=${REDIS_HOST}
       - DOKER_QUEUE_NAME=${DOKER_QUEUE_NAME}
@@ -110,12 +112,16 @@ services:
 
 
 
-#  yolo:
-#    build:
-#      context: ./neural_network/yolo
-#      dockerfile: Dockerfile
-#    container_name: "yolo"
-#    command: /bin/true
+  yolo:
+    build:
+      context: ./neural_network/yolo
+      dockerfile: Dockerfile
+    container_name: "yolo"
+    volumes:
+      - media_data:/app/media
+    networks:
+      - private-ntwk
+    command: /bin/true
 
 
 

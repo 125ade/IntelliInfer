@@ -25,7 +25,9 @@ const doc_host = process.env.DOCKER_HOST || "unix:///var/run/docker.sock";
 const docker = new Docker({ socketPath: '/var/run/docker.sock' });
 const QUEUE_TASK_DOCKER: string = process.env.DOKER_QUEUE_NAME || 'dockerTaskQueue';
 const test_image_container_name: string = process.env.CONTAINER_IMAGE_NAME || 'intelliinfer-test';
-const containerName: string = process.env.CONTAINER_TEST_NAME || "working-test";
+const yolo_image_container_name: string = process.env.CONTAINER_IMAGE_YOLO_NAME || 'intelliinfer-yolo';
+const containerNameTest: string = process.env.CONTAINER_TEST_NAME || "working-test";
+const containerNameYolo: string = process.env.CONTAINER_YOLO_NAME || "working-yolo";
 
 const extractData = (input: string): string => {
   const regex = /\{\"userEmail\".*$/;
@@ -63,14 +65,23 @@ export class TaskQueue {
             let containerOptions: {};
             switch (jobData.model.architecture ){
                 case AiArchitecture.YOLO:
-                case AiArchitecture.RCNN:
+                    containerOptions = containerOptions = {
+                        Image: yolo_image_container_name,
+                        Cmd: ['python', 'inferenceYolo.py', jobDataString],
+                        Tty: false,
+                        name: containerNameYolo,
+                        HostConfig: {
+                            Binds: ['intelliinfer_media_data:/app/media']
+                        }
+                    };
+                    break;
                 case AiArchitecture.TEST:
                 default:
                     containerOptions = containerOptions = {
                         Image: test_image_container_name,
                         Cmd: ['python', 'inferenceSimulator.py', jobDataString],
                         Tty: false,
-                        name: containerName,
+                        name: containerNameTest,
                         HostConfig: {
                             Binds: ['intelliinfer_media_data:/app/media']
                         }

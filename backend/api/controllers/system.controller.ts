@@ -289,10 +289,17 @@ export default class SystemController {
             }
             console.log(`larghezza: ${imgElement.width} altezza: ${imgElement.height}  toto larghezza: ${Number(imgElement.width*2)}`)
             for (const bb of box) {
-                const { x_center, y_center, width, height, class_id, confidence } = bb;
+                let { x_center, y_center, width, height, class_id, confidence } = bb;
 
-                let x: number = (x_center - width / 2) + imgElement.width;
-                let y: number = (y_center - height / 2);
+                // const canvasWidth = imgElement.width * 2;
+                // const canvasHeight = imgElement.height;
+                //
+                // // Centrare il bounding box nell'immagine di destra
+                //  x_center = (canvasWidth / 4) * 3; // posizione centrale dell'immagine di destra
+                //  y_center = canvasHeight / 2;
+
+                let x: number = x_center
+                let y: number = y_center
                 let w: number = width;
                 let h: number = height;
 
