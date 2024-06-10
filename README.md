@@ -7,9 +7,17 @@
 ## Table of Contents
 - [Introduction](#introduction)
 - [Project Goal](#projectgoal)
+- [Quick Start](#quickstart)
+- [Infrastructure](#infrastructure)
+  - [Docker](#docker)
+  - [Docker Compose](#dockercompose)
+  - [Redis](#redis)
+  - [BullMQ](#bullmq)
+  - [Integration and Workflow](#integrationandworkflow)
 - [Design](#design)
-  - [Rotte](#rotte)
+  - [Class Diagram](#classdiagram)
   - [Uses Case Diagram](#usescasediagram)
+  - [Routes](#routes)
   - [Sequence Diagrams](#sequencediagrams)
 - [Database](#database)
   - [ER Schema](#erschema)
@@ -23,7 +31,7 @@
 - [Proposed Neural Network models](#proposedneuralnetworkmodels)
   - [Overview](#overview)
   - [Yolov5](#yolov5)
-  - [Faster RCNN](#fasterrcnn)
+- [API Testing with Postman](#apitestingwithpostman)
 - [Authors](#authors)
 - [License](#license)
 
@@ -50,7 +58,7 @@ cd IntelliInfer
 
 ## Step 2: Download the .env File
 
-Download the .env file and place it in the root directory of the project. The .env file contains environment variables required for the project to run.
+Download the .env file and place it in the root directory of the project. The .env file contains environment variables required for the project to run.  Below is an example of the .env file for a test:
 
 ```plaintext
 DOCKER_HOST=unix:///var/run/docker.sock
@@ -211,7 +219,7 @@ The use case diagram represents which routes are intended for use by the user an
 </p>
 
 
-## Rotte
+## Routes
 
 | Auth | Function                                          | Role  |
 |-----|---------------------------------------------------|--------|
@@ -596,7 +604,7 @@ The Factory pattern is used to define and manage exceptions. It is a creational 
 # Proposed Neural Network Models
 
 ## Overview
-In our application, users are able to perform inference on a variety of image datasets using different artificial intelligence models and various weight combinations. Specifically, they can execute inference on a YOLOv5 architecture and on a Faster RCNN. Furthermore, considering the possibility of having multiple models, we have introduced also a simulator of inference.
+In our application, we supposed users are able to perform inference on a variety of image datasets using different artificial intelligence models and various weight combinations. Specifically, in IntelliInfer,  we implemented inference on a YOLOv5 architecture. Furthermore, considering the possibility of having multiple models, we have introduced also a simulator of inference.
 
 ## YOLOv5
 YOLOv5 is an object detection model that builds upon the success of its predecessors. Developed by Ultralytics, YOLOv5 offers significant advancements in speed and accuracy compared to previous versions. It employs a single neural network to detect objects within images or video frames in real-time, providing bounding box coordinates and class probabilities for each detected object. YOLOv5 is highly versatile, capable of detecting a wide range of objects across various environments with remarkable efficiency.
@@ -611,14 +619,7 @@ What we did to implement inference on YOLOv5 in our project was to train a pre-e
   <img src="documents/boundingbox3.jpg" alt="Example result" style="max-width: 256 px; height: auto;">
 </p>
 
-## Faster RCNN
-Also the Faster RCNN (Region-based Convolutional Neural Network) is a deep learning model widely used for object detection tasks. It represents a significant advancement over previous R-CNN architectures by integrating region proposal networks (RPNs) directly into the network architecture, enabling end-to-end training. Faster R-CNN achieves impressive accuracy and efficiency by leveraging convolutional neural networks (CNNs) to extract features from an input image and using the RPN to propose candidate object bounding boxes. These proposals are then refined and classified by subsequent layers in the network, resulting in precise object detection with reduced computational overhead. Faster R-CNN has become a popular choice for various applications, including autonomous driving, surveillance, and image understanding tasks.
-
-<p align="center">
-  <img src="documents/FasterRCNN.png" alt="Faster RCNN" style="max-width: 256 px; height: auto;">
-</p>
-
-To implement inference on this architecture in our project, we relied on the resources found in the following GitHub repository: https://github.com/litcoderr/faster-rcnn-inference/blob/main/docker/Dockerfile
+To test the functionality on our Yolo for the detection of vessels, we have provided the weights 'best.pt' and a dataset of Sar images within the project 'files' folder.
 
 # API Testing with Postman
 
@@ -1129,26 +1130,6 @@ If you want to run the tests automatically, you can use Postman's runner feature
 ```
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
 # Authors
 This project is developed and maintained by the following authors:
 
