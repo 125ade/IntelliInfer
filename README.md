@@ -145,7 +145,7 @@ The main goal of IntelliInfer is to provide an API for loading datasets, managin
 </div>
 
 <div style="text-align: center;">
-  <img src="documents/PUT_admin_model_aiId_change_weights.drawio.png" alt="Sequelize model" width="850" height="auto">
+  <img src="documents/PUT_admin_model_aiId_change_weights.drawio .png" alt="Sequelize model" width="850" height="auto">
 </div>
 
 <div style="text-align: center;">
