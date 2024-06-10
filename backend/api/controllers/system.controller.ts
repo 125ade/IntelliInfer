@@ -8,7 +8,7 @@ import Dataset from "../models/dataset";
 import Ai from "../models/ai";
 import process from "node:process";
 import {TaskQueue} from "../queues/Worker";
-import {FinishResult, JobData} from "../queues/jobData";
+import {FinishData, FinishResult, JobData} from "../queues/jobData";
 import Image from "../models/image";
 import Result from "../models/result";
 import {SuccessResponse} from "../utils/utils";
@@ -17,6 +17,7 @@ import {JobState} from "bullmq";
 import { Canvas, createCanvas, loadImage } from 'canvas';
 import { DataResultInterface } from "../queues/jobData";
 import { BoundingBox } from "../queues/jobData";
+import { Image as LoadedImage } from "canvas";
 
 
 
@@ -227,17 +228,11 @@ export default class SystemController {
     async getInferenceResult(req: Request, res: Response, next: NextFunction) {
         try {
             const uuid: string = req.params.uuid;
-            const imageId: number | string = req.params.imageId;
+            const imageId = Number(req.params.imageId);
 
-            let inferenceResult: ConcreteErrorCreator | Result[] = [];
-            if (this.isNumeric(imageId)) {
-                inferenceResult = await this.repository.findResultByUuidAndImageId(uuid, Number(imageId));
-            } else if (imageId === "all") {
-                inferenceResult = await this.repository.findResult(uuid);
-            } else {
-                return res.status(400).json({ error: "Invalid imageId parameter" });
-            }
-
+            
+            const inferenceResult: ConcreteErrorCreator | Result[] = await this.repository.findResultByUuidAndImageId(uuid, Number(imageId));
+            
             // Verifica che `inferenceResult` sia un array valido prima di procedere
             if (!Array.isArray(inferenceResult) || inferenceResult.length === 0) {
                 return res.status(404).json({ error: "No results found for the given parameters" });
@@ -250,8 +245,8 @@ export default class SystemController {
             }
 
             // Carica l'immagine originale
-            const imageURL: string = `/path/to/volume/${imagePath}`;
-            const imgElement = await loadImage(imageURL);
+            const imageURL: string = `${imagePath}`;
+            const imgElement: LoadedImage = await loadImage(imageURL);
 
             // Crea un canvas e ottieni il contesto
             const canvas: Canvas = createCanvas(imgElement.width * 2, imgElement.height);
@@ -269,15 +264,21 @@ export default class SystemController {
 
             // Disegna i bounding box sul lato destro
             inferenceResult.forEach((result: Result) => {
-                const data = result.data;
-                if (data && data.box && Array.isArray(data.box)) {
-                    data.box.forEach((bb: BoundingBox) => {
+                const data: FinishData = result.data;
+                const box: BoundingBox[] | undefined = data.box;
+                if (box) {
+                    box.forEach((bb: BoundingBox) => {
                         const { x_center, y_center, width, height, class_id, confidence } = bb;
+                        console.log(x_center);
+                        console.log(y_center);
+                        console.log(width);
+                        console.log(height);
+                        console.log(confidence);
 
-                        const x = (x_center - width / 2) * imgElement.width;
-                        const y = (y_center - height / 2) * imgElement.height;
-                        const w = width * imgElement.width;
-                        const h = height * imgElement.height;
+                        const x: number = (x_center - width / 2) * imgElement.width;
+                        const y: number = (y_center - height / 2) * imgElement.height;
+                        const w: number = width * imgElement.width;
+                        const h: number = height * imgElement.height;
 
                         ctx.strokeStyle = 'red';
                         ctx.lineWidth = 2;
@@ -300,7 +301,7 @@ export default class SystemController {
             if (error instanceof ErrorCode) {
                 error.send(res);
             } else {
-                new ConcreteErrorCreator().createServerError().setFailedRetrieveItem().send(res);
+                new ConcreteErrorCreator().createServerError().setFailedRetriveItem().send(res);
             }
         }
     }

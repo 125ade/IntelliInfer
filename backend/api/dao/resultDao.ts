@@ -90,7 +90,7 @@ export default class ResultDAO implements IDao<Result> {
 
           const results: Result[] = await Result.findAll({
                 where: {
-                    resoultId: resoultUUID
+                    requestId: resoultUUID
                 }
             });
           if (results.length == 0) {
@@ -103,7 +103,7 @@ export default class ResultDAO implements IDao<Result> {
     async findAllByUuidAndImage(uuid: string, imageId: number) {
         const results: Result[] = await Result.findAll({
                 where: {
-                    resoultId: uuid,
+                    requestId: uuid,
                     imageId: imageId
                 }
             });
