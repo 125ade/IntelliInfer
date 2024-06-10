@@ -48,12 +48,15 @@ The main goal of IntelliInfer is to provide an API for loading datasets, managin
 # Design
 
 ## Class Diagram
+The class diagram shows a general overview of the structure of the project. The implementation relationships of the interfaces and the relationships between different classes are indicated. It is also possible to note which classes are involved in the use of the different patterns.
 
 <div style="text-align: center;">
   <img src="documents/ClassesDiagram.drawio.png" alt="Sequelize model" width="950" height="auto">
 </div>
 
 ## Uses Case Diagram
+The use case diagram represents which routes are intended for use by the user and by the admin. It is possible to have an in-depth explanation of the latter later, together with the relevant sequence diagrams, which give a better representation of the flow of the project.
+
 <div style="text-align: center;">
   <img src="documents/UsesCaseDiagram.drawio.png" alt="Uses Case Diagram" style="max-width: 256 px; height: auto;">
 </div>
@@ -103,61 +106,89 @@ The main goal of IntelliInfer is to provide an API for loading datasets, managin
 
 
 ## Sequence Diagrams
+Route to logically delete a dataset:
 
 <div style="text-align: center;">
   <img src="documents/DELETE_api_dataset_delete_datasetId.drawio.png" alt="Sequelize model" width="850" height="auto">
 </div>
 
+Route to find a specific dataset given its id:
+
 <div style="text-align: center;">
-  <img src="documents/GET_api_dataset_datasetId.drawio.png" alt="Sequelize model" width="850" height="auto">
+  <img src="documents/GET_api_dataset_datasetId.drawio .png" alt="Sequelize model" width="850" height="auto">
 </div>
+
+Route to display all available datasets for a user:
 
 <div style="text-align: center;">
   <img src="documents/GET_api_dataset_list.drawio.png" alt="Sequelize model" width="850" height="auto">
 </div>
 
+Route to display the user's residual credit:
+
 <div style="text-align: center;">
   <img src="documents/GET_api_display_credit.drawio.png" alt="Sequelize model" width="850" height="auto">
 </div>
+
+Route to generate token for user or admin:
 
 <div style="text-align: center;">
   <img src="documents/GET_api_generate_token.drawio.png" alt="Sequelize model" width="850" height="auto">
 </div>
 
+Route to display list of all available AI models:
+
 <div style="text-align: center;">
   <img src="documents/GET_api_model_list.drawio.png" alt="Sequelize model" width="850" height="auto">
 </div>
+
+Route to find a specific AI model given its id:
 
 <div style="text-align: center;">
   <img src="documents/GET_api_model_modelId.drawio.png" alt="Sequelize model" width="850" height="auto">
 </div>
 
+Route to create a dataset:
+
 <div style="text-align: center;">
   <img src="documents/POST_api_datastet_create.drawio.png" alt="Sequelize model" width="850" height="auto">
 </div>
+
+Route to upload a file (image or zip):
 
 <div style="text-align: center;">
   <img src="documents/POST_api_upload_file.drawio.png" alt="Sequelize model" width="850" height="auto">
 </div>
 
+Route to recharge user's credit:
+
 <div style="text-align: center;">
   <img src="documents/PUT_admin_credit_recharge.drawio.png" alt="Sequelize model" width="850" height="auto">
 </div>
 
+Route to update weights' path for an AI model:
+
 <div style="text-align: center;">
-  <img src="documents/PUT_admin_model_aiId_change_weights.drawio.png" alt="Sequelize model" width="850" height="auto">
+  <img src="documents/PUT_admin_model_aiId_change_weights.drawio .png" alt="Sequelize model" width="850" height="auto">
 </div>
+
+Route to update dataset's name:
 
 <div style="text-align: center;">
   <img src="documents/POST_api_dataset_update_datasetId.drawio.png" alt="Sequelize model" width="850" height="auto">
 </div>
 
+Route to init a new inference operation:
+
+<div style="text-align: center;">
+  <img src="documents/GET_inference_datasetId_aiId.drawio.png" alt="Sequelize model" width="850" height="auto">
+</div>
 
 # Database
 Let's now look at the structure of our database and the patterns we used to manage it.
 
 This project uses PostgreSQL as relational database. It was chosen for its advanced capabilities, its reliability and its compliance with SQL standards, making it ideal for applications requiring robust and secure data management.
-Through it we manage and save data relating to users, datasets and related images and labels, to the AI architectures themselves and their results. Below you can find the structure of the database, in terms of associations and table field.
+Through it we manage and save data relating to users, datasets and related images, to the AI architectures themselves and their results. Below you can find the structure of the database, in terms of associations and table field.
 
 ## ER Schema
 <div style="text-align: center;">

@@ -350,63 +350,74 @@ export class Repository implements IRepository {
     }
 
 
-//     async drawImageWithBBoxes(result: Result) {
-//     const canvas = document.createElement('canvas');
-//     const ctx = canvas.getContext('2d');
-//     const data: DataResultInterface = result.data
-//
-//     if (data.error !== undefined || data.start !== false || data.finish !== true) {
-//         console.error('Invalid result data');
-//         return;
-//     }
-//
-//     // Get image path from ID
-//     const imagePath = await this.getImagePathFromId(result.imageId);
-//     if (typeof imagePath !== 'string') {
-//         console.error('Failed to retrieve image path');
-//         return;
-//     }
-//
-//     const img = new Image();
-//     img.src = imagePath;
-//
-//     img.onload = () => {
-//         canvas.width = img.width * 2; // original + annotated
-//         canvas.height = img.height;
-//
-//         // Draw original image on the left side
-//         ctx.drawImage(img, 0, 0, img.width, img.height);
-//
-//         // Draw image again on the right side for annotations
-//         ctx.drawImage(img, img.width, 0, img.width, img.height);
-//
-//         // Draw bounding boxes on the right side
-//         if (result.data.box && Array.isArray(result.data.box)) {
-//             result.data.box.forEach(bbox => {
-//                 const { x_center, y_center, width, height, class_id, confidence } = bbox;
-//
-//                 const x = (x_center - width / 2) * img.width;
-//                 const y = (y_center - height / 2) * img.height;
-//                 const w = width * img.width;
-//                 const h = height * img.height;
-//
-//                 ctx.strokeStyle = 'red';
-//                 ctx.lineWidth = 2;
-//                 ctx.strokeRect(x + img.width, y, w, h);
-//
-//                 ctx.fillStyle = 'red';
-//                 ctx.font = '20px Arial';
-//                 ctx.fillText(`Class: ${class_id}, Conf: ${(confidence * 100).toFixed(2)}%`, x + img.width, y - 5);
-//             });
-//         }
-//
-//         document.body.appendChild(canvas);
-//     };
-//
-//     img.onerror = () => {
-//         console.error('Failed to load image');
-//     };
-// }
+    async drawImageWithBBoxes(result: any) {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        if (!ctx) {
+            console.error('Failed to get 2D context');
+            return;
+        }
+
+        if (result.data.error !== undefined || result.data.start !== false || result.data.finish !== true) {
+            console.error('Invalid result data');
+            return;
+        }
+    
+        // Get image path from ID
+        const imagePath = await this.getImagePathFromId(result.imageId);
+        if (typeof imagePath !== 'string') {
+            console.error('Failed to retrieve image path');
+            return;
+        }
+    
+        const response = await fetch(`/path/to/volume/${imagePath}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch image from volume');
+        }
+
+        const blob = await response.blob();
+        const img: HTMLImageElement = new window.Image();
+        img.src = URL.createObjectURL(blob);
+    
+        img.onload = () => {
+            canvas.width = img.width * 2; // original + annotated
+            canvas.height = img.height;
+    
+            // Draw original image on the left side
+            ctx.drawImage(img, 0, 0, img.width, img.height);
+    
+            // Draw image again on the right side for annotations
+            ctx.drawImage(img, img.width, 0, img.width, img.height);
+    
+            // Draw bounding boxes on the right side
+            if (result.data.box && Array.isArray(result.data.box)) {
+                result.data.box.forEach((bbox: any) => {
+                    const { x_center, y_center, width, height, class_id, confidence } = bbox;
+    
+                    const x = (x_center - width / 2) * img.width;
+                    const y = (y_center - height / 2) * img.height;
+                    const w = width * img.width;
+                    const h = height * img.height;
+    
+                    ctx.strokeStyle = 'red';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(x + img.width, y, w, h);
+    
+                    ctx.fillStyle = 'red';
+                    ctx.font = '20px Arial';
+                    ctx.fillText(`Class: ${class_id}, Conf: ${(confidence * 100).toFixed(2)}%`, x + img.width, y - 5);
+                });
+            }
+    
+            document.body.appendChild(canvas);
+        };
+    
+        img.onerror = () => {
+            console.error('Failed to load image');
+        };
+    }
+    
 
 
 }
