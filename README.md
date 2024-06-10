@@ -44,6 +44,66 @@ The main goal of IntelliInfer is to provide an API for loading datasets, managin
 - ```bash
    openssl rsa -in test_purpose_private_key.pem -pubout -out test_purpose_public_key.pem
 
+# Infrastructure
+
+IntelliInfer leverages several powerful technologies to ensure efficient and scalable deployment and job management, such as Docker, Docker Compose, BullMQ, and Redis.
+
+## Docker
+
+Docker is a containerization platform that allows us to package applications and their dependencies into portable containers that can run consistently across various environments, ensuring that our microservices behave the same way in development, testing, and production.
+
+We use Docker to:
+- **Encapsulate our inference microservices**: Each microservice runs in its own container, ensuring isolation and consistency.
+- **Simplify deployment**: Containers can be easily deployed, stopped, and scaled without worrying about underlying hardware or OS specifics.
+- **Enhance reproducibility**: Docker ensures that our development and production environments are identical, reducing various issues.
+
+It is also important to note that the potential of the Docker API was exploited to dynamically generate the containers where the inference operation is carried out.
+
+### Docker Compose
+
+Docker Compose is a tool for defining and running multi-container Docker applications. With Docker Compose, we can define all the services our application needs (such as microservices, databases, and message queues) in a single YAML file and manage them collectively.
+
+We use Docker Compose to:
+- **Orchestrate our microservices**: Define and run our inference microservices, Redis, and other components together.
+- **Automate the setup**: Easily spin up the entire stack with a single command (`docker-compose up`), including network configuration and service dependencies.
+- **Manage configurations**: Centralize and manage configuration settings for all services in a single file.
+
+### Redis
+
+Redis is an in-memory data structure store that we use primarily as a database and message broker. It is known for its high performance and versatility.
+
+In our infrastructure, Redis is used to:
+- **Store job information**: Act as a database to store the state and metadata of jobs queued for processing.
+- **Facilitate messaging**: Serve as a message broker to manage the communication between different microservices via job queues.
+- **Provide persistence**: Although primarily in-memory, Redis supports persistence, ensuring that job states are not lost between restarts.
+
+### BullMQ
+
+BullMQ is a Node.js library for creating robust and scalable job queues using Redis. It allows us to manage background jobs and processing with ease.
+
+We use BullMQ to:
+- **Manage job queues**: Queue and process inference jobs dynamically, ensuring efficient task distribution among available microservices.
+- **Handle retries and failures**: Automatically retry failed jobs and log errors for later inspection.
+- **Monitor job progress**: Provide real-time insights into job status, including completed, failed, and in-progress jobs.
+
+### Integration and Workflow
+
+Here's a more detailed look at how these components work together in our infrastructure:
+
+1. **Microservices Deployment**:
+   - **Docker** containers are used to deploy each microservice ( API, Postgre Database, Redis, YOLO neural network, inference simulation), ensuring they run in isolated and consistent environments.
+   - **Docker Compose** orchestrates these microservices setting up the necessary networking and dependencies automatically.
+
+2. **Job Management**:
+   - Jobs (inference requests) are created and added to queues managed by **BullMQ**.
+   - **Redis** acts as the job database, storing details about each job, including its status, progress, and results.
+
+3. **Processing and Monitoring**:
+   - Microservices pull jobs from the queues, process them, and update the job status in Redis.
+   - BullMQ provides mechanisms to monitor job status and handle retries in case of failures, ensuring robustness and reliability.
+
+By combining these technologies, our infrastructure can dynamically scale, efficiently manage resources, and ensure reliable job processing. This setup allows us to focus on developing high-quality inference models without worrying about the underlying deployment and job management complexities.
+
 
 # Design
 
