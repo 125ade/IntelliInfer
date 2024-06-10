@@ -466,13 +466,546 @@ Also the Faster RCNN (Region-based Convolutional Neural Network) is a deep learn
 
 To implement inference on this architecture in our project, we relied on the resources found in the following GitHub repository: https://github.com/litcoderr/faster-rcnn-inference/blob/main/docker/Dockerfile
 
-## Authors
+# API Testing with Postman
+
+## Prerequisites
+
+Make sure you have Postman installed on your computer. You can download it from the [official Postman website](https://www.postman.com/downloads/).
+
+## Importing the Postman Collection
+
+1. **Download the Postman Collection**: Locate the Postman collection file (.json) included in the repository.
+2. **Import the Collection into Postman**:
+   - Open Postman.
+   - Click on `Import` in the top left menu.
+   - Select `File` and upload the downloaded collection file.
+3. **Environment (optional)**: If there is a Postman environment file (.json), import it following the same procedure.
+
+## Running the Tests
+
+1. **Select the Collection**: In the Postman sidebar, find the imported collection.
+2. **Configure the Environment (if necessary)**:
+   - Click on the environment dropdown in the top right corner.
+   - Select the imported environment or manually configure the necessary variables.
+3. **Run the Tests**:
+   - Expand the collection and select the request you want to test.
+   - Click on `Send` to send the request and view the response.
+   - To run all tests in the collection sequentially, click the `Run` button at the top of the collection and follow the instructions.
+
+## Test Automation
+
+If you want to run the tests automatically, you can use Postman's runner feature:
+
+1. **Open the Collection Runner**:
+   - Click on `Runner` in the top menu.
+2. **Select the Collection**:
+   - Choose the imported collection.
+3. **Configure the Options**:
+   - Select the environment (if applicable).
+   - Configure the number of iterations, delays between requests, etc.
+4. **Run the Tests**:
+   - Click on `Run` to start executing the tests.
+
+## Important Notes
+
+- **Authentication**: Ensure you correctly configure any authentication tokens or credentials required to execute the requests.
+- **Environment Variables**: Use environment variables to manage endpoints, credentials, and other configurations that may vary between different environments (development, testing, production).
+- **Expected Responses**: Verify that the API responses conform to the expectations defined in the Postman tests. Postman test scripts can be used to automate these verifications.
+
+## Testing single routes
+
+### Check Health
+
+**Endpoint**: `localhost:3000/check/health`
+
+**Method**: `GET`
+
+**Purpose**: This route is used to check if the system is ready.
+
+**Expected Output**:
+```json
+{
+    "system": "online"
+}
+```
+
+### Generate Token (user and admin)
+
+**Endpoint**: `localhost:3000/api/generate/token/4`
+
+**Method**: `GET`
+
+**Purpose**: This route is used to generate a token for users or admin.
+
+**Params**:
+   - userId
+
+**Expected Output**:
+```json
+{
+    "token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImEubm5hQGZpdC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3MTgwMTI0OTcsImV4cCI6MTcxODA5ODg5NywiaXNzIjoiSW50ZWxsaWluZmVyQXBpIn0.B1y55vZrwBJ3MJnZWFXLTF0A6_noco29fAp9tdZ5GUmoF7Cq9-sB8AjaKl1Lx-kq9RNfKNV19Ec8_5joLmB0uDix0OZT0Q4_cY0HqXGt0MFZH2n4JaEh8zW-lsSkEi5tYEmAY3jRmJahbXH13aFG8yLzrhd7HGYwTbZeNxnfmsQsPpv61MKNIk1LSvMJg7OhFWWrgbU7yenhnEHFIjBycxvWHPljRVP2aQhmzVrnFH8bZNWe5kBAuLMS9R4gsl7PTDPY-6L_S9HZJTcR0t334kptwGGRnJ4pbyl2bK4HDIHkYnq4uBBrAaWoaaaimMiiMA-ZQ_Ef--wINp3TISEUSw"
+}
+```
+
+### Route 404
+
+**Endpoint**: `localhost:3000/api/no_route`
+
+**Method**: `GET`
+
+**Purpose**: Check non existent route
+
+**Expected Output**:
+```json
+{
+    "success": false,
+    "message": "No route found."
+}
+```
+
+### List models
+
+**Endpoint**: `localhost:3000/api/model/list`
+
+**Method**: `GET`
+
+**Purpose**: Route used to display all available models
+
+**Expected Output**:
+```json
+{
+    "success": true,
+    "message": "Model list",
+    "obj": [
+        {
+            "id": 1,
+            "name": "Yolov5",
+            "description": "Yolov5 neural network for detection tasks",
+            "pathweights": "/primo/path/esempio",
+            "architecture": "yolo",
+            "created_at": "2024-06-10T09:18:17.514Z",
+            "updated_at": "2024-06-10T09:18:17.514Z"
+        },
+        {
+            "id": 2,
+            "name": "TestNN",
+            "description": "Test script to emulate a neural network..",
+            "pathweights": "/primo/path/esempio",
+            "architecture": "test",
+            "created_at": "2024-06-10T09:18:17.514Z",
+            "updated_at": "2024-06-10T09:18:17.514Z"
+        }
+    ]
+}
+```
+
+### Find model by id
+
+**Endpoint**: `localhost:3000/api/model/1`
+
+**Method**: `GET`
+
+**Purpose**: This route is used to find n AI model, given its id
+
+**Params**:
+   - modelId
+
+**Expected Output**:
+```json
+{
+    "success": true,
+    "message": "Model detail",
+    "obj": {
+        "id": 1,
+        "name": "Yolov5",
+        "description": "Yolov5 neural network for detection tasks",
+        "pathweights": "/primo/path/esempio",
+        "architecture": "yolo",
+        "created_at": "2024-06-10T09:18:17.514Z",
+        "updated_at": "2024-06-10T09:18:17.514Z"
+    }
+}
+```
+
+### Change model weights
+
+**Endpoint**: `localhost:3000/admin/model/1/change/weights`
+
+**Method**: `PUT`
+
+**Purpose**: This route is used to update weights' path of an AI model
+
+**Params**:
+- modelId
+
+**Body** (form-data):
+- `key` : weightsfile
+- `value`: best.pt file provided by project developers or any other .pt weights file
+
+**Expected Output**:
+```json
+{
+    "success": true,
+    "message": "Weights uploaded successfully"
+}
+```
+
+### Recharge Credit
+
+**Endpoint**: `localhost:3000/admin/credit/recharge`
+
+**Method**: `PUT`
+
+**Purpose**: This route is used by the admin to recharge user's credit
+
+**Body** (JSON):
+```json
+{
+    "email": "marco.cc@mio.com",
+    "tokensToAdd": 30
+}
+```
+
+**Expected Output**:
+```json
+{
+    "success": true,
+    "message": "Credit recharged successfully",
+    "obj": {
+        "id": 1,
+        "username": "Marco",
+        "email": "marco.cc@mio.com",
+        "token": 45,
+        "role": "user",
+        "created_at": "2024-06-10T09:18:17.510Z",
+        "updated_at": "2024-06-10T10:16:51.385Z"
+    }
+}
+```
+
+### Create Dataset
+
+**Endpoint**: `localhost:3000/api/dataset/create`
+
+**Method**: `POST`
+
+**Purpose**: This route is used by users to create a new dataset
+
+**Body** (JSON):
+```json
+{
+    "name": "Food",
+    "description": "Collection of images of various types of food",
+    "tags": ["fish", "chips", "pizza"]
+}
+```
+
+**Expected Output**:
+```json
+{
+    "success": true,
+    "message": "Dataset created successfully",
+    "obj": {
+        "isDeleted": false,
+        "id": 4,
+        "name": "Food",
+        "description": "Collection of images of various types of food",
+        "path": "/food",
+        "countElements": 0,
+        "countClasses": 3,
+        "userId": 1,
+        "updated_at": "2024-06-10T10:24:25.836Z",
+        "created_at": "2024-06-10T10:24:25.836Z",
+        "deleted_at": null
+    }
+}
+```
+
+### Get Dataset by id
+
+**Endpoint**: `localhost:3000/api/dataset/1`
+
+**Method**: `GET`
+
+**Purpose**: This route is used by user to find a dataset given its id
+
+**Params**:
+- datasetId
+
+**Body** (form-data):
+- `key` : weightsfile
+- `value`: best.pt file provided by project developers or any other .pt weights file
+
+**Expected Output**:
+```json
+{
+    "success": true,
+    "message": "Dataset detail",
+    "obj": {
+        "id": 1,
+        "userId": null,
+        "name": "Ships",
+        "path": "/ships",
+        "countElements": 100,
+        "countClasses": 5,
+        "description": "Dataset of Sar images for ships detection",
+        "isDeleted": false,
+        "created_at": "2024-06-10T09:18:17.518Z",
+        "updated_at": "2024-06-10T09:18:17.518Z",
+        "deleted_at": null
+    }
+}
+```
+
+### List datasets
+
+**Endpoint**: `localhost:3000/api/dataset/list`
+
+**Method**: `GET`
+
+**Purpose**: This route is used by user to display all of his datasets
+
+**Expected Output**:
+```json
+{
+    "success": true,
+    "message": "Dataset list",
+    "obj": [
+        {
+            "id": 4,
+            "userId": 1,
+            "name": "Food",
+            "path": "/food",
+            "countElements": 0,
+            "countClasses": 3,
+            "description": "Collection of images of various types of food",
+            "isDeleted": false,
+            "created_at": "2024-06-10T10:24:25.836Z",
+            "updated_at": "2024-06-10T10:24:25.836Z",
+            "deleted_at": null
+        }
+    ]
+}
+```
+
+### Update dataset's name
+
+**Endpoint**: `localhost:3000/api/dataset/update/4`
+
+**Method**: `PUT`
+
+**Purpose**: This route is used by users to change the name of one of their datasets, only if it isn't already used by others.
+
+**Params**:
+- datasetId
+
+**Body** (JSON):
+```json
+{
+    "name": "Flowers"
+}
+```
+
+**Expected Output**:
+```json
+{
+    "success": true,
+    "message": "Dataset updated successfully",
+    "obj": {
+        "id": 4,
+        "userId": 1,
+        "name": "Flowers",
+        "path": "/food",
+        "countElements": 0,
+        "countClasses": 3,
+        "description": "Collection of images of various types of food",
+        "isDeleted": false,
+        "created_at": "2024-06-10T10:24:25.836Z",
+        "updated_at": "2024-06-10T10:34:58.129Z",
+        "deleted_at": null
+    }
+}
+```
+
+### Logically delete dataset
+
+**Endpoint**: `localhost:3000/api/dataset/delete/1`
+
+**Method**: `DELETE`
+
+**Purpose**: This route is used by users to logically delete a dataset, setting "isDeleted" to true.
+
+**Params**:
+- datasetId
+
+**Expected Output**:
+```json
+{
+    "success": true,
+    "message": "Dataset deleted successfully.",
+    "obj": {
+        "success": true,
+        "message": "deleted successfully",
+        "obj": {
+            "id": 1,
+            "name": "Ships",
+            "path": "/ships",
+            "description": "Dataset of Sar images for ships detection",
+            "created_at": "2024-06-10T09:18:17.518Z",
+            "updated_at": "2024-06-10T10:38:14.962Z",
+            "deleted_at": null,
+            "userId": null,
+            "countElements": 100,
+            "countClasses": 5,
+            "isDeleted": true
+        }
+    }
+}
+```
+
+### Display user's credit
+
+**Endpoint**: `localhost:3000/api/display/credit`
+
+**Method**: `GET`
+
+**Purpose**: This route is used by users to check their remaining credit.
+
+**Expected Output**:
+```json
+{
+    "success": true,
+    "message": "Token credit",
+    "obj": {
+        "userEmail": "marco.cc@mio.com",
+        "token": 45
+    }
+}
+```
+
+### Upload file
+
+**Endpoint**: `localhost:3000/api/dataset/4/upload/file`
+
+**Method**: `POST`
+
+**Purpose**: This route is used by users to upload an image or a file zip on a dataset, if they have sufficient tokens.
+
+**Params**:
+- datasetId
+
+**Body** (form-data):
+- `key` : file
+- `value`: file .jpg, .png, .zip
+
+**Expected Output**:
+```json
+{
+    "success": true,
+    "message": "File uploaded successfully"
+}
+```
+
+### Init Inference
+
+**Endpoint**: `http://localhost:3000/api/inference/4/1/`
+
+**Method**: `GET`
+
+**Purpose**: This route is used by users to start the inference of a dataset on a specific AI model
+
+**Params**:
+- datasetId
+- modelId
+
+**Expected Output**:
+```json
+{
+    "success": true,
+    "message": "start inference on your dataset",
+    "obj": {
+        "jobId": "1",
+        "datasetName": "Flowers",
+        "architecture": "yolo"
+    }
+}
+```
+
+### Display Inference State
+
+**Endpoint**: `http://localhost:3000/api/inference/get/status/29`
+
+**Method**: `GET`
+
+**Purpose**: This route is used by users to check the state of an inference
+
+**Params**:
+- jobId
+
+**Expected Output**:
+```json
+{
+    "success": true,
+    "message": "COMPLETED",
+    "obj": {
+        "jobId": "2",
+        "results": [
+            {
+                "id": 2,
+                "imageId": 1,
+                "aiId": 1,
+                "data": {
+                    "box": [
+                        {
+                            "width": 80,
+                            "height": 80,
+                            "class_id": 2,
+                            "x_center": 63,
+                            "y_center": 93,
+                            "confidence": 0.08
+                        }
+                    ],
+                    "error": null,
+                    "start": false,
+                    "finish": true
+                },
+                "requestId": "0c55b4ac-7881-4904-a64f-6748ad74dd83",
+                "created_at": "2024-06-10T10:55:58.093Z",
+                "updated_at": "2024-06-10T10:55:58.807Z"
+            }
+        ]
+    }
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+# Authors
 This project is developed and maintained by the following authors:
 
 - **Zazzarini Micol** - [GitHub Profile](https://github.com/MicolZazzarini)
 - **Fiorani Andrea** - [GitHub Profile](https://github.com/125ade)
 
-## License
+# License
 This project is licensed under the [MIT License](LICENSE) - consulta il file [LICENSE](LICENSE) per ulteriori dettagli.
 
 
