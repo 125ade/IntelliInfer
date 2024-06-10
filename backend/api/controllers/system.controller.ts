@@ -279,14 +279,22 @@ export default class SystemController {
                         const y: number = (y_center - height / 2) * imgElement.height;
                         const w: number = width * imgElement.width;
                         const h: number = height * imgElement.height;
+                        
+                        // Assicurati che le coordinate X e Y siano all'interno dei limiti del canvas
+                        if (x >= 0 && x + w <= canvas.width && y >= 0 && y + h <= canvas.height) {
+                            // Disegna il bounding box
+                            ctx.strokeStyle = 'red';
+                            ctx.lineWidth = 2;
+                            ctx.strokeRect(x, y, w, h);
+                            // Aggiungi altri disegni o testo, se necessario
+                            ctx.fillStyle = 'red';
+                            ctx.font = '20px Arial';
+                            ctx.fillText(`Class: ${class_id}, Conf: ${(confidence * 100).toFixed(2)}%`, x + imgElement.width, y - 5);
+                        } else {
+                            // Il bounding box si estende oltre i limiti del canvas, gestisci questo caso adeguatamente
+                        }
 
-                        ctx.strokeStyle = 'red';
-                        ctx.lineWidth = 2;
-                        ctx.strokeRect(x + imgElement.width, y, w, h);
-
-                        ctx.fillStyle = 'red';
-                        ctx.font = '20px Arial';
-                        ctx.fillText(`Class: ${class_id}, Conf: ${(confidence * 100).toFixed(2)}%`, x + imgElement.width, y - 5);
+                        
                     });
                 }
             });
@@ -305,42 +313,6 @@ export default class SystemController {
             }
         }
     }
-
-    // Helper function per verificare se un valore è numerico
-    isNumeric(value: any): boolean {
-        return !isNaN(value - parseFloat(value));
-    }
-
-
-
-    //     try {
-    //         const resultUUID: string = req.params.resultUUID;
-    //
-    //         if (!resultUUID) {
-    //             throw new ConcreteErrorCreator().createBadRequestError().setNoResultUUID();
-    //         }
-    //
-    //         const resultData: ResultData | ConcreteErrorCreator = await this.repository.getResultData(resultUUID);
-    //
-    //         if (resultData instanceof ConcreteErrorCreator) {
-    //             throw resultData;
-    //         }
-    //
-    //         res.status(200).json({
-    //             success: true,
-    //             message: "Inference result retrieved successfully",
-    //             data: resultData
-    //         });
-    //
-    //     } catch (error) {
-    //         if (error instanceof ErrorCode) {
-    //             error.send(res);
-    //         } else {
-    //             new ConcreteErrorCreator().createServerError().setFailedRetrieveResult().send(res);
-    //         }
-    //     }
-    // }
-
-
-
+    
+          
 }
