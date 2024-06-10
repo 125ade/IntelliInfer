@@ -54,8 +54,7 @@ Download the .env file and place it in the root directory of the project. The .e
 
 ```plaintext
 DOCKER_HOST=unix:///var/run/docker.sock
-#tcp://localhost:2375
-#unix:///var/run/docker.sock
+
 CONTAINER_IMAGE_NAME=intelliinfer-test
 CONTAINER_TEST_NAME=working-test
 
@@ -67,29 +66,26 @@ POSTGRES_DB=db_inference
 
 API_PORT=3000
 API_HOST=api
-API_SECRET_KEY_NAME=test_purpose_private_key.pem
-API_PUBLIC_KEY_NAME=test_purpose_public_key.pem
+API_SECRET_KEY_NAME=test_purpose_private_key.pem    # to change for deploy
+API_PUBLIC_KEY_NAME=test_purpose_public_key.pem     # to change for deploy
 INFERENCE_COST=2.5
 TOKEN_EXPIRE=24h #12h
 TOKEN_ALGORITHM=RS256
 API_SERVICE_NAME=IntelliinferApi
 
-DESTINATION_PATH_WEIGHTS=/weights
+DESTINATION_PATH_WEIGHTS=/app/media/weights   # weights path 
 FILE_WEIGHTS_EXTENSION=.pt
 
 SEQUELIZE_DIALECT=postgres
-# visualizzare o meno i log di sequilize
 SEQUELIZE_LOGGING=false
 
 NODE_ENV=production
-# log output Può essere 'console' per mostrarli solo sulla console,
-# 'file' solo su file o 'both' in entrambi i casi
-LOG_OUTPUT=file
+LOG_OUTPUT=file   # file/both/console
 LOG_INTERVAL_ROTATION=1d
-LOG_PATH=/app/logs
-LOG_ACCESS_DIR=access
-LOG_ERRORS_DIR=errors
-LOG_SEQUELIZE_DIR=sequilize
+LOG_PATH=/app/logs    # logs path
+LOG_ACCESS_DIR=access  # logs directory
+LOG_ERRORS_DIR=errors   # error logs directory
+LOG_SEQUELIZE_DIR=sequilize   # seuelize logs directory
 
 REDIS_PORT=6379
 REDIS_HOST=redis
@@ -102,7 +98,7 @@ DOKER_QUEUE_NAME=dockerTaskQueue
 For security purposes, regenerate your public and private keys. This is essential for handling authentication and other security-related functionalities.
 
 - ```bash
-   openssl genrsa -des3 -out test_purpose_private_key.pem 2048
+   openssl genrsa -out test_purpose_private_key.pem 2048
 - ```bash
    openssl rsa -in test_purpose_private_key.pem -pubout -out test_purpose_public_key.pem
 
@@ -113,7 +109,7 @@ Place both private.pem and public.pem in a secure location, and ensure the path 
 Now that you have everything set up, use Docker Compose to start all the services defined in the docker-compose.yml file:
 
 ```bash
-docker-compose up
+docker-compose --env-file .env up --build
 ```
 
 This command will:
