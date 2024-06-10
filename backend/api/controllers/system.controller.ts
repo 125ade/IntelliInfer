@@ -227,17 +227,11 @@ export default class SystemController {
     async getInferenceResult(req: Request, res: Response, next: NextFunction) {
         try {
             const uuid: string = req.params.uuid;
-            const imageId: number | string = req.params.imageId;
+            const imageId = Number(req.params.imageId);
 
-            let inferenceResult: ConcreteErrorCreator | Result[] = [];
-            if (this.isNumeric(imageId)) {
-                inferenceResult = await this.repository.findResultByUuidAndImageId(uuid, Number(imageId));
-            } else if (imageId === "all") {
-                inferenceResult = await this.repository.findResult(uuid);
-            } else {
-                return res.status(400).json({ error: "Invalid imageId parameter" });
-            }
-
+            
+            const inferenceResult: ConcreteErrorCreator | Result[] = await this.repository.findResultByUuidAndImageId(uuid, Number(imageId));
+            
             // Verifica che `inferenceResult` sia un array valido prima di procedere
             if (!Array.isArray(inferenceResult) || inferenceResult.length === 0) {
                 return res.status(404).json({ error: "No results found for the given parameters" });
@@ -250,7 +244,7 @@ export default class SystemController {
             }
 
             // Carica l'immagine originale
-            const imageURL: string = `/path/to/volume/${imagePath}`;
+            const imageURL: string = `${imagePath}`;
             const imgElement = await loadImage(imageURL);
 
             // Crea un canvas e ottieni il contesto
@@ -300,7 +294,7 @@ export default class SystemController {
             if (error instanceof ErrorCode) {
                 error.send(res);
             } else {
-                new ConcreteErrorCreator().createServerError().setFailedRetrieveItem().send(res);
+                new ConcreteErrorCreator().createServerError().setFailedRetriveItem().send(res);
             }
         }
     }
