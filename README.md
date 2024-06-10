@@ -255,6 +255,11 @@ Route to check the state of an inference:
   <img src="documents/Get_inference_status.drawio.png" alt="Sequelize model" width="850" height="auto">
 </p>
 
+Route to display the result of the inference:
+
+<p align="center">
+  <img src="documents/GET_inference_result_image.drawio.png" alt="Sequelize model" width="850" height="auto">
+</p>
 
 # Database
 Let's now look at the structure of our database and the patterns we used to manage it.
