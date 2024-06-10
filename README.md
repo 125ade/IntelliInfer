@@ -184,6 +184,13 @@ Route to init a new inference operation:
   <img src="documents/GET_inference_datasetId_aiId.drawio.png" alt="Sequelize model" width="850" height="auto">
 </div>
 
+Route to check the state of an inference:
+
+<div style="text-align: center;">
+  <img src="documents/Get_inference_status.drawio.png" alt="Sequelize model" width="850" height="auto">
+</div>
+
+
 # Database
 Let's now look at the structure of our database and the patterns we used to manage it.
 
