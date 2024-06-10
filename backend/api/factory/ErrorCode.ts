@@ -1,3 +1,5 @@
+import {SuccessResponse} from "../utils/utils";
+
 export abstract class ErrorCode {
     abstract set(message: string): ErrorCode;
     abstract send(response: any): ErrorCode;
@@ -7,10 +9,13 @@ export abstract class ErrorCode {
 * Server Error Class
 */
 export class ServerError extends ErrorCode {
-    private message!: object;
+    private message!: SuccessResponse;
   
     set(message: string): ErrorCode {
-      this.message = { error: message };
+      this.message = {
+          success: false,
+          message: message,
+      };
       return this;
     }
   
@@ -81,7 +86,10 @@ export class AuthenticationError extends ErrorCode {
     private message!: object;
   
     set(message: string): ErrorCode {
-      this.message = { error: message };
+      this.message = {
+          success: false,
+          message: message,
+      };
       return this;
     }
   
@@ -129,7 +137,10 @@ export class BadRequestError extends ErrorCode {
     private message!: object;
   
     set(message: string): ErrorCode {
-      this.message = { error: message };
+      this.message = {
+          success: false,
+          message: message,
+      };
       return this;
     }
   
@@ -150,7 +161,7 @@ export class BadRequestError extends ErrorCode {
 
     // error given by absence of user's id
     setNoUserId(): ErrorCode {
-        return this.set("There was an error. UserId must be provided.");
+        return this.set("There was an error. User Id must be provided.");
     }
     
     // error given by absence of token
@@ -189,7 +200,10 @@ export class ForbiddenError extends ErrorCode {
     private message!: object;
   
     set(message: string): ErrorCode {
-      this.message = { error: message };
+      this.message = {
+          success: false,
+          message: message,
+      };
       return this;
     }
   
@@ -216,7 +230,10 @@ export class NotFoundError extends ErrorCode {
     private message!: object;
   
     set(message: string): ErrorCode {
-      this.message = { error: message };
+      this.message = {
+          success: false,
+          message: message,
+      };
       return this;
     }
   

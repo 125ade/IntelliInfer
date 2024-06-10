@@ -50,7 +50,12 @@ export default class UserController {
                     const user: ConcreteErrorCreator | User = await this.repository.getUserByEmail(decode.email);
                     if (user && user instanceof User) {
                         const datasetList:  ConcreteErrorCreator | Dataset[] = await this.repository.getDatasetListByUserId(user.id);
-                        res.status(200).json({list: datasetList});
+                        const resultJson: SuccessResponse = {
+                            success: true,
+                            message: "Dataset list",
+                            obj: datasetList
+                        }
+                        res.status(200).json(resultJson);
                     } else {
                         throw new ConcreteErrorCreator().createNotFoundError().setNoUser()
                     }
@@ -77,7 +82,12 @@ export default class UserController {
                 const datasetId:  number = Number(req.params.datasetId);
                 const dataset: ConcreteErrorCreator | Dataset = await this.repository.getDatasetDetail(datasetId);
                 if (dataset !== null && dataset !== undefined && !(dataset instanceof ErrorCode)){
-                    res.status(200).json(dataset);
+                    const resultJson: SuccessResponse = {
+                            success: true,
+                            message: "Dataset detail",
+                            obj: dataset
+                        }
+                    res.status(200).json(resultJson);
                 }else{
                     throw new ConcreteErrorCreator().createNotFoundError().setAbstentDataset();
                 }
@@ -100,7 +110,12 @@ export default class UserController {
         try {
             const modelId: number = Number(req.params.modelId);// todo ai model potrebbe ritornare null è da verificare
             const aiModel: ConcreteErrorCreator | Ai = await this.repository.findModel(modelId);
-            res.status(200).json(aiModel);
+            const resultJson: SuccessResponse = {
+                success: true,
+                message: "Model detail",
+                obj: aiModel
+            }
+            res.status(200).json(resultJson);
         } catch (error) {
             if (error instanceof ErrorCode) {
                 error.send(res);

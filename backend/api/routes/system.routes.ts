@@ -36,7 +36,7 @@ export default class SystemRoutes{
         this.router.get(
             "/inference/status/:uuid",
             AuthUser,
-            validateParamUUID("uuid"),
+            //validateParamUUID("uuid"),
             this.systemController.checkStatusInference.bind(this.systemController));
 
 

@@ -36,6 +36,10 @@ export class Queue {
         return this.queue.getJob(jobId);
     }
 
+    public getJobStatus(jobId: string) {
+        return this.queue.getJobState(jobId);
+    }
+
 
 
 }
