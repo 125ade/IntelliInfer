@@ -62,5 +62,4 @@ app.use(handleRouteNotFound);
 app.listen(port, () => {
     console.log("\t--> SERVER START")
     console.log(`\t--> UI Queue Management http://localhost:${port}/admin/queues/queue/${QUEUE_TASK_DOCKER}`);
-    console.log(`\t--> API docs page       http://localhost:${port}/admin/docs `);
 });

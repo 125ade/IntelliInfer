@@ -5,6 +5,7 @@ import { Queue as BullQueue,
     Job } from 'bullmq';
 import { RedisConnection } from "./RedisConnection";
 import Redis from "ioredis";
+import {ConcreteErrorCreator} from "../factory/ErrorCreator";
 
 
 export class Queue {
@@ -32,12 +33,44 @@ export class Queue {
         }
     }
 
-    public getJob(jobId: string) {
-        return this.queue.getJob(jobId);
+    public async getJob(jobId: string) {
+        try {
+            return await this.queue.getJob(jobId);
+        } catch (error) {
+
+            throw new ConcreteErrorCreator().createServerError().setFailedCheckStatus();
+        }
     }
 
-    public getJobStatus(jobId: string) {
-        return this.queue.getJobState(jobId);
+    public async getJobStatus(jobId: string): Promise<string | ConcreteErrorCreator> {
+        try {
+            const job = await this.queue.getJob(jobId);
+            if (!job) {
+                throw new ConcreteErrorCreator().createServerError().setFailedCheckStatus();
+            }
+            return await job.getState();
+        } catch (error) {
+            if (error instanceof ConcreteErrorCreator) {
+                throw error
+            }else{
+                throw new ConcreteErrorCreator().createServerError().setFailedCheckStatus();
+            }
+        }
+    }
+
+    public async getJobByName(jobName: string) {
+        try {
+            const jobs = await this.queue.getJobs(['waiting', 'active', 'completed', 'failed', 'delayed']);
+            for (const job of jobs) {
+                if (job.data.name === jobName) {
+                    return job;
+                }
+            }
+            return null;
+        } catch (error) {
+            console.error('Error getting job by name:', error);
+            throw error;
+        }
     }
 
 
