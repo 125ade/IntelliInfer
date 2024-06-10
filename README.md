@@ -569,7 +569,7 @@ If you want to run the tests automatically, you can use Postman's runner feature
 
 **Method**: `GET`
 
-**Purpose**: Route used to display all available models
+**Purpose**: Route used by users to display all available AI models
 
 **Expected Output**:
 ```json
@@ -605,7 +605,7 @@ If you want to run the tests automatically, you can use Postman's runner feature
 
 **Method**: `GET`
 
-**Purpose**: This route is used to find n AI model, given its id
+**Purpose**: This route is used by users to find n AI model, given its id
 
 **Params**:
    - modelId
@@ -633,7 +633,7 @@ If you want to run the tests automatically, you can use Postman's runner feature
 
 **Method**: `PUT`
 
-**Purpose**: This route is used to update weights' path of an AI model
+**Purpose**: This route is used by admin to update weights' path of an AI model
 
 **Params**:
 - modelId
@@ -727,7 +727,7 @@ If you want to run the tests automatically, you can use Postman's runner feature
 
 **Method**: `GET`
 
-**Purpose**: This route is used by user to find a dataset given its id
+**Purpose**: This route is used by users to find a dataset given its id
 
 **Params**:
 - datasetId
@@ -763,7 +763,7 @@ If you want to run the tests automatically, you can use Postman's runner feature
 
 **Method**: `GET`
 
-**Purpose**: This route is used by user to display all of his datasets
+**Purpose**: This route is used by users to display all of their datasets
 
 **Expected Output**:
 ```json
