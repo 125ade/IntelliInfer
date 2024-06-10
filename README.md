@@ -48,6 +48,11 @@ The main goal of IntelliInfer is to provide an API for loading datasets, managin
 
 IntelliInfer leverages several powerful technologies to ensure efficient and scalable deployment and job management, such as Docker, Docker Compose, BullMQ, and Redis.
 
+<div style="text-align: center;">
+  <img src="documents/InfrastructureScheme.jpeg" alt="Sequelize model" width="750" height="auto">
+</div>
+InfrastructureScheme.jpeg
+
 ## Docker
 
 Docker is a containerization platform that allows us to package applications and their dependencies into portable containers that can run consistently across various environments, ensuring that our microservices behave the same way in development, testing, and production.
