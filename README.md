@@ -7,9 +7,17 @@
 ## Table of Contents
 - [Introduction](#introduction)
 - [Project Goal](#projectgoal)
+- [Quick Start](#quickstart)
+- [Infrastructure](#infrastructure)
+  - [Docker](#docker)
+  - [Docker Compose](#dockercompose)
+  - [Redis](#redis)
+  - [BullMQ](#bullmq)
+  - [Integration and Workflow](#integrationandworkflow)
 - [Design](#design)
-  - [Rotte](#rotte)
+  - [Class Diagram](#classdiagram)
   - [Uses Case Diagram](#usescasediagram)
+  - [Routes](#routes)
   - [Sequence Diagrams](#sequencediagrams)
 - [Database](#database)
   - [ER Schema](#erschema)
@@ -23,7 +31,7 @@
 - [Proposed Neural Network models](#proposedneuralnetworkmodels)
   - [Overview](#overview)
   - [Yolov5](#yolov5)
-  - [Faster RCNN](#fasterrcnn)
+- [API Testing with Postman](#apitestingwithpostman)
 - [Authors](#authors)
 - [License](#license)
 
@@ -37,12 +45,96 @@ The main goal of IntelliInfer is to provide an API for loading datasets, managin
 
 # Quick start
 
-- env
-- modificare la chiave privata all'interno di ```secrets```
+Follow these steps to get the project up and running quickly.
+
+## Step 1: Clone the Repository
+
+First, clone the repository to your local machine using Git:
+
+```bash
+git clone https://github.com/125ade/IntelliInfer.git
+cd IntelliInfer
+```
+
+## Step 2: Download the .env File
+
+Download the .env file and place it in the root directory of the project. The .env file contains environment variables required for the project to run.  Below is an example of the .env file for a test:
+
+```plaintext
+DOCKER_HOST=unix:///var/run/docker.sock
+
+CONTAINER_IMAGE_NAME=intelliinfer-test
+CONTAINER_TEST_NAME=working-test
+
+POSTGRES_PORT=5432
+POSTGRES_USER=myuser
+POSTGRES_HOST=database
+POSTGRES_PASSWORD=mypassword
+POSTGRES_DB=db_inference
+
+API_PORT=3000
+API_HOST=api
+API_SECRET_KEY_NAME=test_purpose_private_key.pem    # to change for deploy
+API_PUBLIC_KEY_NAME=test_purpose_public_key.pem     # to change for deploy
+INFERENCE_COST=2.5
+TOKEN_EXPIRE=24h #12h
+TOKEN_ALGORITHM=RS256
+API_SERVICE_NAME=IntelliinferApi
+
+DESTINATION_PATH_WEIGHTS=/app/media/weights   # weights path 
+FILE_WEIGHTS_EXTENSION=.pt
+
+SEQUELIZE_DIALECT=postgres
+SEQUELIZE_LOGGING=false
+
+NODE_ENV=production
+LOG_OUTPUT=file   # file/both/console
+LOG_INTERVAL_ROTATION=1d
+LOG_PATH=/app/logs    # logs path
+LOG_ACCESS_DIR=access  # logs directory
+LOG_ERRORS_DIR=errors   # error logs directory
+LOG_SEQUELIZE_DIR=sequilize   # seuelize logs directory
+
+REDIS_PORT=6379
+REDIS_HOST=redis
+
+DOKER_QUEUE_NAME=dockerTaskQueue
+```
+
+## Step 3: Regenerate Public and Private Keys
+
+For security purposes, regenerate your public and private keys. This is essential for handling authentication and other security-related functionalities.
+
 - ```bash
-   openssl genrsa -des3 -out test_purpose_private_key.pem 2048
+   openssl genrsa -out test_purpose_private_key.pem 2048
 - ```bash
    openssl rsa -in test_purpose_private_key.pem -pubout -out test_purpose_public_key.pem
+
+Place both private.pem and public.pem in a secure location, and ensure the path to these keys is correctly referenced in your application configuration (usually set in the .env file).
+
+## Step 4: Start the Services with Docker Compose
+
+Now that you have everything set up, use Docker Compose to start all the services defined in the docker-compose.yml file:
+
+```bash
+docker-compose --env-file .env up --build
+```
+
+This command will:
+  - Build and start the Docker containers for all the microservices.
+  - Set up the networking between containers.
+  - Ensure that Redis, the API server, and other services are running correctly.
+
+## Additional Notes
+  - Docker and Docker Compose: Make sure Docker and Docker Compose are installed on your machine. You can download them from Docker's official site.
+
+  - Environment Variables: Adjust the values in the .env file as per your development and production needs.
+
+  - Logs: Check the logs for each service to ensure everything is running smoothly. You can view logs using the command:
+    
+    ```bash
+    docker-compose logs -f
+    ```
 
 # Infrastructure
 
@@ -127,7 +219,7 @@ The use case diagram represents which routes are intended for use by the user an
 </p>
 
 
-## Rotte
+## Routes
 
 | Auth | Function                                          | Role  |
 |-----|---------------------------------------------------|--------|
@@ -255,6 +347,11 @@ Route to check the state of an inference:
   <img src="documents/Get_inference_status.drawio.png" alt="Sequelize model" width="850" height="auto">
 </p>
 
+Route to display the result of the inference:
+
+<p align="center">
+  <img src="documents/GET_inference_result_image.drawio.png" alt="Sequelize model" width="850" height="auto">
+</p>
 
 # Database
 Let's now look at the structure of our database and the patterns we used to manage it.
@@ -504,10 +601,14 @@ The Factory pattern is used to define and manage exceptions. It is a creational 
   <img src="documents/FactoryPattern.drawio.png" alt="Sequelize model" width="400" height="auto">
 </p>
 
+## Model View Controller
+
+The Model View Controller (MVC) is an architectural pattern used to separate responsibilities and organize code in a modular and maintainable way. The model (our Sequelize models) represents the data structure of the application, the controllers act as intermediaries between the model and the view, while our view is the Success Response interface implemented for each standardized output of our routes, except for the health check route and the 404 error route.
+
 # Proposed Neural Network Models
 
 ## Overview
-In our application, users are able to perform inference on a variety of image datasets using different artificial intelligence models and various weight combinations. Specifically, they can execute inference on a YOLOv5 architecture and on a Faster RCNN. Furthermore, considering the possibility of having multiple models, we have introduced also a simulator of inference.
+In our application, we supposed users are able to perform inference on a variety of image datasets using different artificial intelligence models and various weight combinations. Specifically, in IntelliInfer,  we implemented inference on a YOLOv5 architecture. Furthermore, considering the possibility of having multiple models, we have introduced also a simulator of inference.
 
 ## YOLOv5
 YOLOv5 is an object detection model that builds upon the success of its predecessors. Developed by Ultralytics, YOLOv5 offers significant advancements in speed and accuracy compared to previous versions. It employs a single neural network to detect objects within images or video frames in real-time, providing bounding box coordinates and class probabilities for each detected object. YOLOv5 is highly versatile, capable of detecting a wide range of objects across various environments with remarkable efficiency.
@@ -522,14 +623,7 @@ What we did to implement inference on YOLOv5 in our project was to train a pre-e
   <img src="documents/boundingbox3.jpg" alt="Example result" style="max-width: 256 px; height: auto;">
 </p>
 
-## Faster RCNN
-Also the Faster RCNN (Region-based Convolutional Neural Network) is a deep learning model widely used for object detection tasks. It represents a significant advancement over previous R-CNN architectures by integrating region proposal networks (RPNs) directly into the network architecture, enabling end-to-end training. Faster R-CNN achieves impressive accuracy and efficiency by leveraging convolutional neural networks (CNNs) to extract features from an input image and using the RPN to propose candidate object bounding boxes. These proposals are then refined and classified by subsequent layers in the network, resulting in precise object detection with reduced computational overhead. Faster R-CNN has become a popular choice for various applications, including autonomous driving, surveillance, and image understanding tasks.
-
-<p align="center">
-  <img src="documents/FasterRCNN.png" alt="Faster RCNN" style="max-width: 256 px; height: auto;">
-</p>
-
-To implement inference on this architecture in our project, we relied on the resources found in the following GitHub repository: https://github.com/litcoderr/faster-rcnn-inference/blob/main/docker/Dockerfile
+To test the functionality on our Yolo for the detection of vessels, we have provided the weights 'best.pt' and a dataset of Sar images within the project 'files' folder.
 
 # API Testing with Postman
 
@@ -1040,26 +1134,6 @@ If you want to run the tests automatically, you can use Postman's runner feature
 ```
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
 # Authors
 This project is developed and maintained by the following authors:
 
