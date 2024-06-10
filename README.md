@@ -237,28 +237,27 @@ The use case diagram represents which routes are intended for use by the user an
 | Yes | check the state of the current inference operation| user   |
 | Yes | show inference results                            | user   |
 | Yes | check user’s remaining credit                     | user   |
-| Yes | save inference results                            | system |
 | No  | generate auth token                               | all    |
 | No  | check if the service is online                    | all    |
 
 
 | Type  | Route                                            |
 |-------|--------------------------------------------------|
-| PUT   | /credit/recharge/:userId                         |
-| PUT   | /model/:aiId/change/weights                      |
-| GET   | /model/list                                      |
-| GET   | /model/:modelId                                  |
-| GET   | /dataset/list                                    |
-| GET   | /dataset/:datasetId                              |
-| POST  | /dataset/create                                  |
-| PUT   | /dataset/:datasetId/update                       |
-| DELETE| /dataset/:datasetId/delete                       |
-| POST  | /dataset/:datasetId/upload  (zip & img)          |
-| POST  | /inference/:datasetId/:aiId/                     |
-| GET   | /inference/state/:resultId                       |
-| GET   | /inference/result/:resultId                      |
-| POST  | /inference/result/:resultId  (callback)          |
-| GET   | /generate/token/:userId                          |
+| PUT   | admin/credit/recharge/                           |
+| PUT   | admin/model/:aiId/change/weights                 |
+| GET   | api/model/list                                   |
+| GET   | api/model/:modelId                               |
+| GET   | api/dataset/list                                 |
+| GET   | api/dataset/:datasetId                           |
+| POST  | api/dataset/create                               |
+| PUT   | api/dataset/update/:datasetId                    |
+| DELETE| api/dataset/delete/:datasetId                    |
+| POST  | api/dataset/:datasetId/upload/file  (zip & img)  |
+| POST  | api/inference/:datasetId/:aiId/                  |
+| GET   | api/inference/get/status/:jobId                  |
+| GET   | api/inference/result/:jobId/:imgId               |
+| POST  | api/display/credit                               |
+| GET   | api/generate/token/:userId                       |
 | GET   | /check/health                                    |
 
 
