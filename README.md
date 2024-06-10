@@ -601,6 +601,10 @@ The Factory pattern is used to define and manage exceptions. It is a creational 
   <img src="documents/FactoryPattern.drawio.png" alt="Sequelize model" width="400" height="auto">
 </p>
 
+## Model View Controller
+
+The Model View Controller (MVC) is an architectural pattern used to separate responsibilities and organize code in a modular and maintainable way. The model (our Sequelize models) represents the data structure of the application, the controllers act as intermediaries between the model and the view, while our view is the Success Response interface implemented for each standardized output of our routes, except for the health check route and the 404 error route.
+
 # Proposed Neural Network Models
 
 ## Overview
