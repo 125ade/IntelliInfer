@@ -226,7 +226,7 @@ export default class UserController {
                 if( await this.repository.checkUserToken(user.id, totalCost)){
                     this.repository.updateUserTokenByCost(user, totalCost);
                 } else {
-                    throw new ConcreteErrorCreator().createForbiddenError().setInsufficientToken();
+                    throw new ConcreteErrorCreator().createAuthenticationError().setInsufficientToken();
                 }  
             }
 
