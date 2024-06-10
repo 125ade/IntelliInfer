@@ -32,6 +32,10 @@ export class Queue {
         }
     }
 
+    public getJob(jobId: string) {
+        return this.queue.getJob(jobId);
+    }
+
 
 
 }

@@ -1,6 +1,10 @@
 import {Router} from "express";
 import SystemController from "../controllers/system.controller";
-import {validateParamIntGreaterThanZero} from "../middleware/validation.middleware";
+import {
+    validateParamIntGreaterThanZero,
+    validateParamIntOrAll,
+    validateParamUUID
+} from "../middleware/validation.middleware";
 import {AuthUser} from "../middleware/auth.middleware";
 
 
@@ -20,16 +24,30 @@ export default class SystemRoutes{
             validateParamIntGreaterThanZero("userId"),
             this.systemController.generateTokenFromUserId.bind(this.systemController));
 
-
-        // todo post /inference/:datasetId/:aiId/
-        // autenticazione
-        // autorizzazione "user"
+        // start the inference
         this.router.get(
         "/inference/:datasetId/:aiId/",
             AuthUser,
             validateParamIntGreaterThanZero("datasetId"),
             validateParamIntGreaterThanZero("aiId"),
         this.systemController.startInference.bind(this.systemController));
+
+        // return the status of the inference or result json if completed
+        this.router.get(
+            "/inference/status/:uuid",
+            AuthUser,
+            validateParamUUID("uuid"),
+            this.systemController.checkStatusInference.bind(this.systemController));
+
+
+        // finds an inference result given its id
+        this.router.get(
+            "/inference/result/:uuid/:imageId",
+            AuthUser,
+            validateParamUUID("uuid"),
+            validateParamIntOrAll("imageId"),
+            this.systemController.getInferenceResult.bind(this.systemController)
+        );
 
 
 

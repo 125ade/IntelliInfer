@@ -3,14 +3,14 @@ import { Queue } from "./Queue";
 import { RedisConnection } from "./RedisConnection";
 import process from "node:process";
 import Docker from "dockerode";
-import {isJobReturnData, JobData, JobReturnData} from "./jobData";
+import {isJobReturnData, JobData, JobReturnData, JobStatus} from "./jobData";
 import {AiArchitecture} from "../static";
 import {Repository} from "../repository/repository";
-import {ErrorCode} from "bullmq";
 import {ConcreteErrorCreator} from "../factory/ErrorCreator";
+
+
 const doc_host = process.env.DOCKER_HOST || "unix:///var/run/docker.sock";
 const docker = new Docker({ socketPath: '/var/run/docker.sock' });
-
 const QUEUE_TASK_DOCKER: string = process.env.DOKER_QUEUE_NAME || 'dockerTaskQueue';
 const test_image_container_name: string = process.env.CONTAINER_IMAGE_NAME || 'intelliinfer-test';
 const containerName: string = process.env.CONTAINER_TEST_NAME || "working-test";
@@ -150,6 +150,18 @@ export class TaskQueue {
             TaskQueue.instance = new TaskQueue(concurrencyNum);
         }
         return TaskQueue.instance;
+    }
+
+    public async getJobStatus(jobId: string){
+        const job = await this.queue.getJob(jobId);
+        if (!job) {
+            throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
+        }
+        if (await job.getState() === "unknown"){
+            throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
+        }else{
+            return job.getState();
+        }
     }
 
     public getQueue(): Queue {

@@ -15,3 +15,4 @@ export const AiArchitecture = {
   RCNN: 'rcnn',
   TEST: 'test',
 }
+

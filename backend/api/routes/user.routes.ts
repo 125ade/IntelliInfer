@@ -56,15 +56,6 @@ export default class UserRoutes{
         );
 
 
-        // finds an inference result given its id
-        this.router.get(
-            "/inference/result/:resultId",
-            AuthUser,
-            validateParamIntGreaterThanZero('resultId'),
-            this.userController.findResultById.bind(this.userController)
-        );
-
-
         // upload of a file (zip or image)
         this.router.post(
             '/dataset/:datasetId/upload/file',

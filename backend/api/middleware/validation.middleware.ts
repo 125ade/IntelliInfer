@@ -22,6 +22,53 @@ export function validateParamIntGreaterThanZero(param_id: string) {
     ];
 }
 
+export function validateParamIntOrAll(param_id: string) {
+    return [
+        param(param_id)
+            .custom(value => {
+                if (typeof value === 'string' && value.toLowerCase() === 'all') {
+                    return true;
+                }
+                if (!isNaN(value) && Number(value) >= 0) {
+                    return true;
+                }
+                throw new ConcreteErrorCreator().createBadRequestError().setNoImageId();
+            }),
+        (req: Request, res: Response, next: NextFunction) => {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+               next( new ConcreteErrorCreator()
+                    .createBadRequestError()
+                    .setNoUserId()
+                    .send(res));
+            } else {
+                next();
+            }
+        }
+    ];
+}
+
+
+// middleware used when giving a parameter to a request that must be a valid UUID string
+export function validateParamUUID(param_id: string) {
+    return [
+        param(param_id)
+            .isString().withMessage('Value must be a valid string'),
+        (req: Request, res: Response, next: NextFunction) => {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                next(
+                    new ConcreteErrorCreator()
+                    .createBadRequestError()
+                    .setNoJobId()
+                    .send(res)
+                );
+            } else {
+                next();
+            }
+        }
+    ];
+}
 
 // middleware to validate the body of the route to create a dataset
 export const validateCreateDataset = [
@@ -44,10 +91,10 @@ export const validateCreateDataset = [
     (req: Request, res: Response, next: NextFunction) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            new ConcreteErrorCreator()
+            next(new ConcreteErrorCreator()
                 .createBadRequestError()
                 .setNoUserId()
-                .send(res);
+                .send(res));
         } else {
             next();
         }
@@ -58,12 +105,12 @@ export const validateCreateDataset = [
 // middleware to validate the mimetype of a file uploaded
 export function validateFileUpload(req: Request, res: Response, next: NextFunction) {
     if (!req.file) {
-        return res.status(400).json({ error: 'File must be provided' });
+        return  new ConcreteErrorCreator().createBadRequestError().setAbsentFile().send(res);
     }
 
     const mimeType = req.file.mimetype;
     if (!mimeType.startsWith('image/') && !mimeType.startsWith('application/zip')) {
-        return res.status(400).json({ error: 'File format not supported' });
+        return  new ConcreteErrorCreator().createBadRequestError().setAbsentFile().send(res);
     }
 
     next();
