@@ -22,8 +22,8 @@ export default class AdminController {
     }
     
 
-    // update the weights' path of an ai model
-    async updateWeights(req: Request, res: Response) {
+    // update the weights' path of an AI model
+    async updateWeights(req: Request, res: Response): Promise<void> {
         try{
             if (!req.file) {
                 throw new ConcreteErrorCreator().createBadRequestError().setAbsentFile();
@@ -54,10 +54,8 @@ export default class AdminController {
         }
     }
 
-            
-
     // recharges user credit 
-    async rechargeTokens(req: Request, res: Response) {
+    async rechargeTokens(req: Request, res: Response): Promise<void> {
         try {
             const { email, tokensToAdd } = req.body;
 

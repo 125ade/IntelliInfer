@@ -27,6 +27,7 @@ export default class SystemController {
         this.repository = new Repository();
     }
 
+    // generate the token for the auth route of the api
     async generateTokenFromUserId(req: Request, res: Response): Promise<void> {
         try {
             const userId: number = Number(req.params.userId);
@@ -50,7 +51,8 @@ export default class SystemController {
         }
     }
 
-    async startInference(req: Request, res: Response, next: NextFunction): Promise<void> {
+    // start inference put the job in the queue
+    async startInference(req: Request, res: Response): Promise<void> {
         try {
             const costoInferenza: number = Number(process.env.INFERENCE_COST || '2.5');
             const datasetId: number = Number(req.params.datasetId);
@@ -156,6 +158,7 @@ export default class SystemController {
         }
     }
 
+    // status of the inference job
     async getStatusJob(req: Request, res: Response): Promise<void>{
         const jobId = req.params.jobId;
         try {
@@ -217,8 +220,8 @@ export default class SystemController {
         }
     }
 
-
-    async getInferenceResult(req: Request, res: Response, next: NextFunction): Promise<void> {
+    // inference result
+    async getInferenceResult(req: Request, res: Response): Promise<void> {
         try {
             const jobId: string = req.params.jobId;
             const imageId = Number(req.params.imageId);

@@ -34,7 +34,7 @@ export default class UserRoutes{
             "/model/:modelId",
             AuthUser,
             validateParamIntGreaterThanZero('modelId'),
-            this.userController.findModelById.bind(this.userController)
+            this.userController.modelDetail.bind(this.userController)
         );
         
 

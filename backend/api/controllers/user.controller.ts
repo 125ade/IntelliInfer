@@ -22,7 +22,8 @@ export default class UserController {
         this.repository = new Repository();
     }
 
-    async modelList(req: Request, res: Response) {
+    // model list
+    async modelList(req: Request, res: Response): Promise<void> {
         try {
             const aiModels: Ai[] | ConcreteErrorCreator = await this.repository.listAiModels();
             sendSuccessResponse(res,"Model list", StatusCode.ok, aiModels);
@@ -35,6 +36,7 @@ export default class UserController {
         }
     }
 
+    // dataset list of the owner
     async datasetListByUserId(req: Request, res: Response): Promise<void> {
         try {
             const token: string | undefined = req.headers.authorization
@@ -66,6 +68,7 @@ export default class UserController {
         }
     }
 
+    // dataset detail by dataset id
     async datasetDetail(req: Request, res: Response): Promise<void> {
         try{
             if (req.params.datasetId !== undefined){
@@ -90,8 +93,8 @@ export default class UserController {
 
     }
 
-
-    async findModelById(req: Request, res: Response) {
+    // find detail by dataset id
+    async modelDetail(req: Request, res: Response): Promise<void> {
         try {
             const modelId: number = Number(req.params.modelId);
             if (modelId === undefined || modelId === null) {
@@ -108,8 +111,8 @@ export default class UserController {
         }
     }
 
-
-    async createDataset(req: Request, res: Response) {
+    // create dataset
+    async createDataset(req: Request, res: Response): Promise<void> {
         try{
             const token: string | undefined = req.headers.authorization
             if (token !== undefined){
@@ -142,7 +145,7 @@ export default class UserController {
     }
 
     // delete dataset by id
-    async deleteDatasetById(req: Request, res: Response) {
+    async deleteDatasetById(req: Request, res: Response): Promise<void> {
         try{
             const result: Dataset | ConcreteErrorCreator = await this.repository.logicallyDelete(Number(req.params.datasetId));
             if(result instanceof ConcreteErrorCreator){
@@ -159,7 +162,7 @@ export default class UserController {
     }
 
     // route to upload an image or a file zip on volume and on database
-    async uploadFile(req: Request, res: Response){
+    async uploadFile(req: Request, res: Response): Promise<void>{
         try{
             if (!req.file) {
                 throw new ConcreteErrorCreator().createBadRequestError().setAbsentFile();
@@ -238,7 +241,7 @@ export default class UserController {
     }
 
     // show user credit
-    async displayResidualCredit(req: Request, res: Response){
+    async displayResidualCredit(req: Request, res: Response): Promise<void>{
         try {
             const userEmail: string | undefined = req.userEmail;
 
@@ -265,7 +268,7 @@ export default class UserController {
     }
     
     // changes the name of a user's dataset, if he hasn't others datasets with the same name
-    async updateDatasetName(req: Request, res: Response) {
+    async updateDatasetName(req: Request, res: Response): Promise<void> {
         try{
             const userEmail: string | undefined = req.userEmail; 
             if( !userEmail ){

@@ -58,8 +58,6 @@ export const validateCreateDataset = [
             }
             return true;
         }),
-
-    
     (req: Request, res: Response, next: NextFunction) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
