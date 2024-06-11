@@ -290,12 +290,6 @@ export default class SystemController {
             for (const bb of box) {
                 let { x_center, y_center, width, height, class_id, confidence } = bb;
 
-                // const canvasWidth = imgElement.width * 2;
-                // const canvasHeight = imgElement.height;
-                //
-                // // Centrare il bounding box nell'immagine di destra
-                //  x_center = (canvasWidth / 4) * 3; // posizione centrale dell'immagine di destra
-                //  y_center = canvasHeight / 2;
 
                 let x: number = x_center
                 let y: number = y_center
