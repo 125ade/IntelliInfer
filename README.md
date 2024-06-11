@@ -64,7 +64,9 @@ Download the .env file and place it in the root directory of the project. The .e
 DOCKER_HOST=unix:///var/run/docker.sock
 
 CONTAINER_IMAGE_NAME=intelliinfer-test
+CONTAINER_IMAGE_YOLO_NAME=intelliinfer-yolo
 CONTAINER_TEST_NAME=working-test
+CONTAINER_YOLO_NAME=working-yolo
 
 POSTGRES_PORT=5432
 POSTGRES_USER=myuser
@@ -237,28 +239,27 @@ The use case diagram represents which routes are intended for use by the user an
 | Yes | check the state of the current inference operation| user   |
 | Yes | show inference results                            | user   |
 | Yes | check user’s remaining credit                     | user   |
-| Yes | save inference results                            | system |
 | No  | generate auth token                               | all    |
 | No  | check if the service is online                    | all    |
 
 
 | Type  | Route                                            |
 |-------|--------------------------------------------------|
-| PUT   | /credit/recharge/:userId                         |
-| PUT   | /model/:aiId/change/weights                      |
-| GET   | /model/list                                      |
-| GET   | /model/:modelId                                  |
-| GET   | /dataset/list                                    |
-| GET   | /dataset/:datasetId                              |
-| POST  | /dataset/create                                  |
-| PUT   | /dataset/:datasetId/update                       |
-| DELETE| /dataset/:datasetId/delete                       |
-| POST  | /dataset/:datasetId/upload  (zip & img)          |
-| POST  | /inference/:datasetId/:aiId/                     |
-| GET   | /inference/state/:resultId                       |
-| GET   | /inference/result/:resultId                      |
-| POST  | /inference/result/:resultId  (callback)          |
-| GET   | /generate/token/:userId                          |
+| PUT   | admin/credit/recharge/                           |
+| PUT   | admin/model/:aiId/change/weights                 |
+| GET   | api/model/list                                   |
+| GET   | api/model/:modelId                               |
+| GET   | api/dataset/list                                 |
+| GET   | api/dataset/:datasetId                           |
+| POST  | api/dataset/create                               |
+| PUT   | api/dataset/update/:datasetId                    |
+| DELETE| api/dataset/delete/:datasetId                    |
+| POST  | api/dataset/:datasetId/upload/file  (zip & img)  |
+| POST  | api/inference/:datasetId/:aiId/                  |
+| GET   | api/inference/get/status/:jobId                  |
+| GET   | api/inference/result/:jobId/:imgId               |
+| POST  | api/display/credit                               |
+| GET   | api/generate/token/:userId                       |
 | GET   | /check/health                                    |
 
 
@@ -600,6 +601,10 @@ The Factory pattern is used to define and manage exceptions. It is a creational 
 <p align="center">
   <img src="documents/FactoryPattern.drawio.png" alt="Sequelize model" width="400" height="auto">
 </p>
+
+## Model View Controller
+
+The Model View Controller (MVC) is an architectural pattern used to separate responsibilities and organize code in a modular and maintainable way. The model (our Sequelize models) represents the data structure of the application, the controllers act as intermediaries between the model and the view, while our view is the Success Response interface implemented for each standardized output of our routes, except for the health check route and the 404 error route.
 
 # Proposed Neural Network Models
 
@@ -1128,7 +1133,9 @@ If you want to run the tests automatically, you can use Postman's runner feature
     }
 }
 ```
-
+# link postman
+[user test collection](https://intelliinfer.postman.co/workspace/intelliinfer-Workspace~6d22ccce-2074-441d-bce4-90ed7aec9ce6/collection/36008018-a4b11de5-f567-4c38-bfb5-ac28b7b2f1c5?action=share&creator=36008018)
+[admin test collection](https://intelliinfer.postman.co/workspace/intelliinfer-Workspace~6d22ccce-2074-441d-bce4-90ed7aec9ce6/collection/36008018-f0a1f0e4-22d6-42b3-8578-d92cef2508a6?action=share&creator=36008018)
 
 # Authors
 This project is developed and maintained by the following authors:

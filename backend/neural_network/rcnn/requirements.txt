@@ -1,7 +1,0 @@
-tqdm
-pytorch-lightning
-git+https://github.com/katsura-jp/pytorch-cosine-annealing-with-warmup
-hydra-core
-transformers
-holoviews[recommended]
-jupyter

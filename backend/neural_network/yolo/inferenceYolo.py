@@ -4,6 +4,7 @@ import os
 import random
 import glob
 import subprocess
+import time
 
 
 def process_image(image_path, weight_path):
@@ -13,11 +14,11 @@ def process_image(image_path, weight_path):
         "finish": False,
         "box": []
     }
-    
+
     try:
         if not os.path.exists(image_path):
             raise FileNotFoundError(f"Image not found: {image_path}")
-        
+
         # Esegui l'inferenza
         command = f"python yolov5/detect.py --weights {weight_path} --img 640 --conf 0.25 --source {image_path} --save-txt --save-conf"
         process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -32,6 +33,7 @@ def process_image(image_path, weight_path):
         txt_files = glob.glob(os.path.join(inference_dir, 'labels', '*.txt'))
 
         # Estrai le informazioni dei bounding box dai file di testo
+
         if txt_files:
             txt_file = txt_files[0]
             with open(txt_file, 'r') as f:
@@ -48,20 +50,20 @@ def process_image(image_path, weight_path):
             result["finish"] = True
         else:
             raise Exception("No bounding box files found.")
-        
+
     except Exception as e:
         result["error"] = str(e)
         result["finish"] = False
-    
+
     return result
 
 
-def main(job_data, weight_path):
+def main(job_data):
     job_data = json.loads(job_data)
 
     for image in job_data['images']:
         image_path = image['path']
-        result = process_image(image_path, weight_path)
+        result = process_image(image_path, job_data['model']['pathweights'])
         for res in job_data['results']:
             if res['imageId'] == image['id']:
                 res['data'].update(result)
@@ -70,12 +72,12 @@ def main(job_data, weight_path):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Usage: python script.py '<job_data>' '<weight_path>'")
+    if len(sys.argv) != 2:
+        print("Usage: python script.py '<job_data>'")
         sys.exit(1)
 
     job_data = sys.argv[1]
-    weight_path = sys.argv[2]
-    main(job_data, weight_path)
+    main(job_data)
+
 
 
