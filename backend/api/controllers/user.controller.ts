@@ -8,11 +8,10 @@ import AdmZip, { IZipEntry }  from 'adm-zip';
 import User from "../models/user";
 import {decodeToken} from "../token";
 import mime from 'mime-types';
-import {SuccessResponse} from "../utils/utils";
+import {sendSuccessResponse, SuccessResponse} from "../utils/utils";
 import Dataset from "../models/dataset";
 import Ai from "../models/ai";
-import Result from "../models/result";
-
+import {StatusCode} from "../static";
 
 
 export default class UserController {
@@ -26,12 +25,7 @@ export default class UserController {
     async modelList(req: Request, res: Response) {
         try {
             const aiModels: Ai[] | ConcreteErrorCreator = await this.repository.listAiModels();
-            const resultJson: SuccessResponse = {
-                success: true,
-                message: "Model list",
-                obj: aiModels
-            }
-            res.status(200).json(resultJson);
+            sendSuccessResponse(res,"Model list", StatusCode.ok, aiModels);
         } catch (error) {
             if (error instanceof ErrorCode) {
                 error.send(res);
@@ -50,12 +44,10 @@ export default class UserController {
                     const user: ConcreteErrorCreator | User = await this.repository.getUserByEmail(decode.email);
                     if (user && user instanceof User) {
                         const datasetList:  ConcreteErrorCreator | Dataset[] = await this.repository.getDatasetListByUserId(user.id);
-                        const resultJson: SuccessResponse = {
-                            success: true,
-                            message: "Dataset list",
-                            obj: datasetList
+                        if (datasetList instanceof ConcreteErrorCreator){
+                            throw datasetList;
                         }
-                        res.status(200).json(resultJson);
+                        sendSuccessResponse(res,"Dataset list", StatusCode.ok, datasetList);
                     } else {
                         throw new ConcreteErrorCreator().createNotFoundError().setNoUser()
                     }
@@ -81,13 +73,8 @@ export default class UserController {
             if (req.params.datasetId !== undefined){
                 const datasetId:  number = Number(req.params.datasetId);
                 const dataset: ConcreteErrorCreator | Dataset = await this.repository.getDatasetDetail(datasetId);
-                if (dataset !== null && dataset !== undefined && !(dataset instanceof ErrorCode)){
-                    const resultJson: SuccessResponse = {
-                            success: true,
-                            message: "Dataset detail",
-                            obj: dataset
-                        }
-                    res.status(200).json(resultJson);
+                if (dataset !== null && dataset !== undefined && !(dataset instanceof ConcreteErrorCreator)){
+                    sendSuccessResponse(res, "Dataset detail", StatusCode.ok, dataset);
                 }else{
                     throw new ConcreteErrorCreator().createNotFoundError().setAbstentDataset();
                 }
@@ -108,19 +95,16 @@ export default class UserController {
 
     async findModelById(req: Request, res: Response) {
         try {
-            const modelId: number = Number(req.params.modelId);// todo ai model potrebbe ritornare null è da verificare
-            const aiModel: ConcreteErrorCreator | Ai = await this.repository.findModel(modelId);
-            const resultJson: SuccessResponse = {
-                success: true,
-                message: "Model detail",
-                obj: aiModel
+            const modelId: number = Number(req.params.modelId);
+            if (modelId === undefined || modelId === null) {
+                throw new ConcreteErrorCreator().createBadRequestError().setNoModelId();
             }
-            res.status(200).json(resultJson);
+            const aiModel: ConcreteErrorCreator | Ai = await this.repository.findModel(modelId);
+            sendSuccessResponse(res, "Model detail", StatusCode.ok, aiModel);
         } catch (error) {
             if (error instanceof ErrorCode) {
                 error.send(res);
             } else {
-                // console.log(error);
                 throw new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
             }
         }
@@ -139,12 +123,7 @@ export default class UserController {
                         if(dataset instanceof ConcreteErrorCreator){
                             throw dataset;
                         }
-                        const resultJson: SuccessResponse = {
-                            success: true,
-                            message: "Dataset created successfully",
-                            obj: dataset
-                        }
-                        return res.status(201).json(resultJson);
+                        sendSuccessResponse(res,"Dataset created successfully", StatusCode.created, dataset);
                     }else{
                         throw new ConcreteErrorCreator().createNotFoundError().setNoUser();
                     }
@@ -164,28 +143,22 @@ export default class UserController {
         }
     }
 
+    // delete dataset by id
     async deleteDatasetById(req: Request, res: Response) {
         try{
             const result: Dataset | ConcreteErrorCreator = await this.repository.logicallyDelete(Number(req.params.datasetId));
             if(result instanceof ConcreteErrorCreator){
                 throw result;
-            }else{
-                const resultJson : SuccessResponse = {
-                    success: true,
-                    message: 'Dataset deleted successfully.',
-                    obj: result
-                }
-                return res.status(201).json(resultJson);
             }
+            sendSuccessResponse(res,"Dataset deleted successfully.",StatusCode.ok, result);
         } catch (error) {
             if (error instanceof ErrorCode) {
                 error.send(res);
             } else {
-                throw new ConcreteErrorCreator().createServerError().set("Internal Server Error").send(res);
+                throw new ConcreteErrorCreator().createServerError().setFailedDeleteItem().send(res);
             }
         }
     }
-
 
     // route to upload an image or a file zip on volume and on database
     async uploadFile(req: Request, res: Response){
@@ -254,11 +227,8 @@ export default class UserController {
                 }
 
                 await this.repository.updateCountDataset(Number(req.params.datasetId), totalNumber);
-                const result: SuccessResponse = {
-                    success: true,
-                    message: 'File uploaded successfully'
-                }
-                res.status(200).json( result);
+
+                sendSuccessResponse(res, "File uploaded successfully",StatusCode.created)
             }
         } catch(error){
             if( error instanceof ErrorCode){
@@ -269,7 +239,7 @@ export default class UserController {
         }
     }
 
-
+    // show user credit
     async displayResidualCredit(req: Request, res: Response){
         try {
             const userEmail: string | undefined = req.userEmail;
@@ -279,20 +249,14 @@ export default class UserController {
             }
             
             const user: User | ConcreteErrorCreator = await this.repository.getUserByEmail(userEmail);
-
-            if( user instanceof User){
-                const result : SuccessResponse = {
-                    success: true,
-                    message: 'Token credit',
-                    obj: {
-                        userEmail: user.email,
-                        token: Number(user.token)
-                    }
-                }
-                res.status(200).json(result);
-            }else{
-                throw user;
+            if (user instanceof ConcreteErrorCreator) {
+                throw user
             }
+
+            sendSuccessResponse(res, "Token credit", StatusCode.ok, {
+                userEmail: user.email,
+                token: Number(user.token)})
+
         } catch (error) {
             if( error instanceof ErrorCode){
                 error.send(res);
@@ -310,21 +274,18 @@ export default class UserController {
                 throw new ConcreteErrorCreator().createAuthenticationError().setFailAuthUser();
             }
             const user: ConcreteErrorCreator | User = await this.repository.getUserByEmail(userEmail);
-            
-            if(user instanceof User) {
-                if( await this.repository.checkNames(user.id, req.body.name)) {
-                    const dataset: Dataset | ConcreteErrorCreator = await this.repository.updateDatasetName(Number(req.params.datasetId), req.body.name);
-                    if( dataset instanceof ConcreteErrorCreator){
-                        throw dataset;
-                    }
-                    const result: SuccessResponse = {
-                        success: true,
-                        message: 'Dataset updated successfully',
-                        obj: dataset
-                    }
-                    res.status(200).json(result);
-                }
+            if(user instanceof ConcreteErrorCreator) {
+                throw user;
             }
+
+            if( await this.repository.checkNames(user.id, req.body.name)) {
+                const dataset: Dataset | ConcreteErrorCreator = await this.repository.updateDatasetName(Number(req.params.datasetId), req.body.name);
+                if( dataset instanceof ConcreteErrorCreator){
+                    throw dataset;
+                }
+                sendSuccessResponse(res, "Dataset updated successfully", StatusCode.ok, dataset)
+            }
+
         } catch( error ) {
             if( error instanceof ErrorCode){
                 error.send(res);
