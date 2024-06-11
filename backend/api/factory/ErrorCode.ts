@@ -200,6 +200,10 @@ export class BadRequestError extends ErrorCode {
     setNoImageId() {
         return this.set("Value must be a number greater than or equal to 0 or the string \"all\" for see all the frame");
     }
+
+    setNotSupportedElement() {
+        return this.set("Element in the request is not supported.")
+    }
 }
 
 /**

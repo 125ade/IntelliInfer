@@ -1,0 +1,1559 @@
+# IntelliInfer API test
+
+###
+# group: No Auth
+# @name health
+GET localhost:3000/check/health
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // pm.test("Response should be {\"system\":\"online\"}", function () {
+
+    //     var expectedResponse = {
+
+    //         "system": "online"
+
+    //     };
+
+    // 
+
+    //     var jsonData = pm.response.json();
+
+    //     pm.expect(jsonData).to.eql(expectedResponse);
+
+    // });
+
+    //
+%}
+
+###
+# group: No Auth
+# @name route 404
+GET localhost:3000/api/no_route
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // pm.test("Response should be {\"error\":\"No route found.\"}", function () {
+
+    //     var expectedResponse = {
+
+    //     "success": false,
+
+    //     "message": "No route found."
+
+    // };
+
+    // 
+
+    //     var jsonData = pm.response.json();
+
+    //     pm.expect(jsonData).to.eql(expectedResponse);
+
+    // });
+%}
+
+###
+# group: No Auth
+# @name token admin
+GET localhost:3000/api/generate/token/4
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // // Verifica se la risposta è in formato JSON
+
+    // if (pm.response.headers.get('Content-Type').includes('application/json')) {
+
+    //     try {
+
+    //         // Ottieni il body della risposta come oggetto JSON
+
+    //         var responseJson = pm.response.json();
+
+    // 
+
+    //         // Controlla se il token è presente nel JSON di risposta
+
+    //         if (responseJson.token) {
+
+    //             // Imposta il token come variabile di ambiente
+
+    //             pm.environment.set('token', responseJson.token);
+
+    //             console.log('Token impostato come variabile di ambiente:', responseJson.token);
+
+    //         } else {
+
+    //             console.log('Token non trovato nel JSON di risposta.');
+
+    //         }
+
+    //     } catch (e) {
+
+    //         console.log('Errore nel parsing del JSON di risposta:', e);
+
+    //     }
+
+    // } else {
+
+    //     console.log('La risposta non è in formato JSON.');
+
+    // }
+
+    // 
+
+    // pm.test("Response is successful", function () {
+
+    //     pm.response.to.have.status(200);
+
+    // });
+
+    // 
+
+    // pm.test("Check response structure", function () {
+
+    //     const responseJson = pm.response.json();
+
+    // 
+
+    //     // Controlla la presenza del token
+
+    //     pm.expect(responseJson).to.have.property("token");
+
+    // 
+
+    //     // Verifica che il token sia un JWT
+
+    //     const token = responseJson.token;
+
+    //     const parts = token.split('.');
+
+    //     pm.expect(parts.length).to.eql(3);
+
+    //     pm.expect(parts[0]).to.be.a('string');
+
+    //     pm.expect(parts[1]).to.be.a('string');
+
+    //     pm.expect(parts[2]).to.be.a('string');
+
+    // 
+
+    // });
+
+    //
+%}
+
+###
+# group: No Auth
+# @name token user
+GET localhost:3000/api/generate/token/{{userId}}
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // pm.test("Response is successful", function () {
+
+    //     pm.response.to.have.status(200);
+
+    // });
+
+    // 
+
+    // pm.test("Check response structure", function () {
+
+    //     const responseJson = pm.response.json();
+
+    // 
+
+    //     // Controlla la presenza del token
+
+    //     pm.expect(responseJson).to.have.property("token");
+
+    // 
+
+    //     // Verifica che il token sia un JWT
+
+    //     const token = responseJson.token;
+
+    //     const parts = token.split('.');
+
+    //     pm.expect(parts.length).to.eql(3);
+
+    //     pm.expect(parts[0]).to.be.a('string');
+
+    //     pm.expect(parts[1]).to.be.a('string');
+
+    //     pm.expect(parts[2]).to.be.a('string');
+
+    // 
+
+    // });
+%}
+
+###
+# group: Admin
+# @name change weights
+//< {%
+    // TODO: migrate to HTTP Client Pre-request handler API
+    // // Controlla se il token è presente nelle variabili di ambiente
+    
+    // if (pm.environment.get('admin_token')) {
+    
+    //     // Imposta l'intestazione di autorizzazione per la richiesta
+    
+    //     pm.request.headers.add({
+    
+    //         key: 'Authorization',
+    
+    //         value: 'Bearer ' + pm.environment.get('token')
+    
+    //     });
+    
+    // }
+//%}
+PUT localhost:3000/admin/model/{{aiId}}/change/weights
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="weightsfile"; filename="/D:/prog_avanzata/IntelliInfer/files/best.pt"
+
+< /D:/prog_avanzata/IntelliInfer/files/best.pt
+--WebAppBoundary
+
+###
+# group: Admin
+# @name recharge credit
+//< {%
+    // TODO: migrate to HTTP Client Pre-request handler API
+    // // Controlla se il token è presente nelle variabili di ambiente
+    
+    // if (pm.environment.get('admin_token')) {
+    
+    //     // Imposta l'intestazione di autorizzazione per la richiesta
+    
+    //     pm.request.headers.add({
+    
+    //         key: 'Authorization',
+    
+    //         value: 'Bearer ' + pm.environment.get('token')
+    
+    //     });
+    
+    // }
+//%}
+PUT localhost:3000/admin/credit/recharge
+Content-Type: application/json
+
+{
+  "email": "marco.cc@mio.com",
+  "tokensToAdd": 30
+}
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // pm.test("Response is successful", function () {
+
+    //     pm.response.to.have.status(200);
+
+    // });
+
+    // 
+
+    // pm.test("Check response structure", function () {
+
+    //     const responseJson = pm.response.json();
+
+    // 
+
+    //     // Controlla il successo della risposta
+
+    //     pm.expect(responseJson).to.have.property("success", true);
+
+    //     pm.expect(responseJson).to.have.property("message", "Credit recharged successfully");
+
+    // 
+
+    //     // Controlla la presenza dell'oggetto
+
+    //     pm.expect(responseJson).to.have.property("obj");
+
+    // 
+
+    //     // Controlla i campi specifici nell'oggetto
+
+    //     const obj = responseJson.obj;
+
+    //     pm.expect(obj).to.have.property("id", 1);
+
+    //     pm.expect(obj).to.have.property("username", "Marco");
+
+    //     pm.expect(obj).to.have.property("email", "marco.cc@mio.com");
+
+    //     pm.expect(obj).to.have.property("role", "user");
+
+    // 
+
+    //     // Controlla che il token sia un numero valido
+
+    //     pm.expect(obj).to.have.property("token").that.is.a("number");
+
+    // 
+
+    //     // Non controllare created_at e updated_at
+
+    // });
+
+    //
+%}
+
+###
+# group: User
+# @name model list
+//< {%
+    // TODO: migrate to HTTP Client Pre-request handler API
+    // // Controlla se il token è presente nelle variabili di ambiente
+    
+    // if (pm.environment.get('token')) {
+    
+    //     // Imposta l'intestazione di autorizzazione per la richiesta
+    
+    //     pm.request.headers.add({
+    
+    //         key: 'Authorization',
+    
+    //         value: 'Bearer ' + pm.environment.get('token')
+    
+    //     });
+    
+    // }
+    
+    //
+//%}
+GET localhost:3000/api/model/list
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // const expectedResponse = {
+
+    //     "success": true,
+
+    //     "message": "Model list",
+
+    //     "obj": [
+
+    //         {
+
+    //             "id": 1,
+
+    //             "name": "Yolov5",
+
+    //             "description": "Yolov5 neural network for detection tasks",
+
+    //             "pathweights": "/primo/path/esempio",
+
+    //             "architecture": "yolo",
+
+    //         },
+
+    //         {
+
+    //             "id": 2,
+
+    //             "name": "TestNN",
+
+    //             "description": "Test script to emulate a neural network..",
+
+    //             "pathweights": "/primo/path/esempio",
+
+    //             "architecture": "test",
+
+    //         }
+
+    //     ]
+
+    // };
+
+    // 
+
+    // // Parse the response body
+
+    // const response = pm.response.json();
+
+    // 
+
+    // // Remove created_at and updated_at fields from each object in the response
+
+    // response.obj.forEach(item => {
+
+    //     delete item.created_at;
+
+    //     delete item.updated_at;
+
+    // });
+
+    // 
+
+    // // Check if the modified response matches the expected response
+
+    // pm.test("Response matches expected structure", function () {
+
+    //     pm.expect(response).to.eql(expectedResponse);
+
+    // });
+
+    //
+%}
+
+###
+# group: User
+# @name model by id
+//< {%
+    // TODO: migrate to HTTP Client Pre-request handler API
+    // // Controlla se il token è presente nelle variabili di ambiente
+    
+    // if (pm.environment.get('token')) {
+    
+    //     // Imposta l'intestazione di autorizzazione per la richiesta
+    
+    //     pm.request.headers.add({
+    
+    //         key: 'Authorization',
+    
+    //         value: 'Bearer ' + pm.environment.get('token')
+    
+    //     });
+    
+    // }
+    
+    //
+//%}
+GET localhost:3000/api/model/{{aiId_1}}
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // pm.test("Response structure is valid", function () {
+
+    //     var jsonData = pm.response.json();
+
+    // 
+
+    //     // Check that the response has the keys 'success', 'message', and 'obj'
+
+    //     pm.expect(jsonData).to.have.property("success");
+
+    //     pm.expect(jsonData).to.have.property("message");
+
+    //     pm.expect(jsonData).to.have.property("obj");
+
+    // 
+
+    //     // Check the types of 'success' and 'message'
+
+    //     pm.expect(jsonData.success).to.be.a("boolean");
+
+    //     pm.expect(jsonData.message).to.be.a("string");
+
+    // 
+
+    //     // Check that 'obj' is an object
+
+    //     pm.expect(jsonData.obj).to.be.an("object");
+
+    // 
+
+    //     // Check the keys and types inside 'obj'
+
+    //     pm.expect(jsonData.obj).to.have.property("id");
+
+    //     pm.expect(jsonData.obj.id).to.be.a("number");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("name");
+
+    //     pm.expect(jsonData.obj.name).to.be.a("string");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("description");
+
+    //     pm.expect(jsonData.obj.description).to.be.a("string");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("pathweights");
+
+    //     pm.expect(jsonData.obj.pathweights).to.be.a("string");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("architecture");
+
+    //     pm.expect(jsonData.obj.architecture).to.be.a("string");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("created_at");
+
+    //     pm.expect(jsonData.obj.created_at).to.be.a("string");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("updated_at");
+
+    //     pm.expect(jsonData.obj.updated_at).to.be.a("string");
+
+    // });
+
+    //
+%}
+
+###
+# group: User
+# @name create dataset
+//< {%
+    // TODO: migrate to HTTP Client Pre-request handler API
+    // // Controlla se il token è presente nelle variabili di ambiente
+    
+    // if (pm.environment.get('token')) {
+    
+    //     // Imposta l'intestazione di autorizzazione per la richiesta
+    
+    //     pm.request.headers.add({
+    
+    //         key: 'Authorization',
+    
+    //         value: 'Bearer ' + pm.environment.get('token')
+    
+    //     });
+    
+    // }
+    
+    //
+//%}
+POST localhost:3000/api/dataset/create
+Content-Type: application/json
+
+{
+  "name": "test",
+  "description": "Collection of images of various types of food",
+  "tags": [
+    "ko",
+    "eee",
+    "eea"
+  ]
+}
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // pm.test("Response structure is valid", function () {
+
+    //     var jsonData = pm.response.json();
+
+    // 
+
+    //     // Check that the response has the keys 'success', 'message', and 'obj'
+
+    //     pm.expect(jsonData).to.have.property("success");
+
+    //     pm.expect(jsonData).to.have.property("message");
+
+    //     pm.expect(jsonData).to.have.property("obj");
+
+    // 
+
+    //     // Check the types of 'success' and 'message'
+
+    //     pm.expect(jsonData.success).to.be.a("boolean");
+
+    //     pm.expect(jsonData.message).to.be.a("string");
+
+    // 
+
+    //     // Check that 'obj' is an object
+
+    //     pm.expect(jsonData.obj).to.be.an("object");
+
+    // 
+
+    //     // Check the keys and types inside 'obj'
+
+    //     pm.expect(jsonData.obj).to.have.property("isDeleted");
+
+    //     pm.expect(jsonData.obj.isDeleted).to.be.a("boolean");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("id");
+
+    //     pm.expect(jsonData.obj.id).to.be.a("number");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("name");
+
+    //     pm.expect(jsonData.obj.name).to.be.a("string");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("description");
+
+    //     pm.expect(jsonData.obj.description).to.be.a("string");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("path");
+
+    //     pm.expect(jsonData.obj.path).to.be.a("string");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("countElements");
+
+    //     pm.expect(jsonData.obj.countElements).to.be.a("number");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("countClasses");
+
+    //     pm.expect(jsonData.obj.countClasses).to.be.a("number");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("userId");
+
+    //     pm.expect(jsonData.obj.userId).to.be.a("number");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("updated_at");
+
+    //     pm.expect(jsonData.obj.updated_at).to.be.a("string");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("created_at");
+
+    //     pm.expect(jsonData.obj.created_at).to.be.a("string");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("deleted_at");
+
+    //     pm.expect(jsonData.obj.deleted_at).to.be.null;
+
+    // });
+
+    //
+%}
+
+###
+# group: User
+# @name dataset by id
+//< {%
+    // TODO: migrate to HTTP Client Pre-request handler API
+    // // Controlla se il token è presente nelle variabili di ambiente
+    
+    // if (pm.environment.get('token')) {
+    
+    //     // Imposta l'intestazione di autorizzazione per la richiesta
+    
+    //     pm.request.headers.add({
+    
+    //         key: 'Authorization',
+    
+    //         value: 'Bearer ' + pm.environment.get('token')
+    
+    //     });
+    
+    // }
+    
+    //
+//%}
+GET localhost:3000/api/dataset/{{datasetId}}
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // const expectedResponse = {
+
+    //     "success": true,
+
+    //     "message": "Dataset detail",
+
+    //     "obj": {
+
+    //         "id": 1,
+
+    //         "userId": null,
+
+    //         "name": "Ships",
+
+    //         "path": "/ships",
+
+    //         "countElements": 100,
+
+    //         "countClasses": 5,
+
+    //         "description": "Dataset of Sar images for ships detection",
+
+    //         "isDeleted": false,
+
+    //         "deleted_at": null
+
+    //     }
+
+    // };
+
+    // 
+
+    // // Parse the response body
+
+    // const response = pm.response.json();
+
+    // 
+
+    // // Remove created_at and updated_at fields from the response
+
+    // delete response.obj.created_at;
+
+    // delete response.obj.updated_at;
+
+    // 
+
+    // // Check if the modified response matches the expected response
+
+    // pm.test("Response matches expected structure", function () {
+
+    //     pm.expect(response).to.eql(expectedResponse);
+
+    // });
+%}
+
+###
+# group: User
+# @name dataset list
+//< {%
+    // TODO: migrate to HTTP Client Pre-request handler API
+    // // Controlla se il token è presente nelle variabili di ambiente
+    
+    // if (pm.environment.get('token')) {
+    
+    //     // Imposta l'intestazione di autorizzazione per la richiesta
+    
+    //     pm.request.headers.add({
+    
+    //         key: 'Authorization',
+    
+    //         value: 'Bearer ' + pm.environment.get('token')
+    
+    //     });
+    
+    // }
+    
+    //
+//%}
+GET localhost:3000/api/dataset/list
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // pm.test("Response structure is valid", function () {
+
+    //     var jsonData = pm.response.json();
+
+    // 
+
+    //     // Check that the response has the keys 'success', 'message', and 'obj'
+
+    //     pm.expect(jsonData).to.have.property("success");
+
+    //     pm.expect(jsonData).to.have.property("message");
+
+    //     pm.expect(jsonData).to.have.property("obj");
+
+    // 
+
+    //     // Check the types of 'success' and 'message'
+
+    //     pm.expect(jsonData.success).to.be.a("boolean");
+
+    //     pm.expect(jsonData.message).to.be.a("string");
+
+    // 
+
+    //     // Check that 'obj' is an array
+
+    //     pm.expect(jsonData.obj).to.be.an("array");
+
+    // 
+
+    //     // Check the keys and types inside each object in the 'obj' array, if not empty
+
+    //     jsonData.obj.forEach(function(item) {
+
+    //         pm.expect(item).to.have.property("id");
+
+    //         pm.expect(item.id).to.be.a("number");
+
+    // 
+
+    //         pm.expect(item).to.have.property("userId");
+
+    //         pm.expect(item.userId).to.be.a("number");
+
+    // 
+
+    //         pm.expect(item).to.have.property("name");
+
+    //         pm.expect(item.name).to.be.a("string");
+
+    // 
+
+    //         pm.expect(item).to.have.property("path");
+
+    //         pm.expect(item.path).to.be.a("string");
+
+    // 
+
+    //         pm.expect(item).to.have.property("countElements");
+
+    //         pm.expect(item.countElements).to.be.a("number");
+
+    // 
+
+    //         pm.expect(item).to.have.property("countClasses");
+
+    //         pm.expect(item.countClasses).to.be.a("number");
+
+    // 
+
+    //         pm.expect(item).to.have.property("description");
+
+    //         pm.expect(item.description).to.be.a("string");
+
+    // 
+
+    //         pm.expect(item).to.have.property("isDeleted");
+
+    //         pm.expect(item.isDeleted).to.be.a("boolean");
+
+    // 
+
+    //         pm.expect(item).to.have.property("created_at");
+
+    //         pm.expect(item.created_at).to.be.a("string");
+
+    // 
+
+    //         pm.expect(item).to.have.property("updated_at");
+
+    //         pm.expect(item.updated_at).to.be.a("string");
+
+    // 
+
+    //         pm.expect(item).to.have.property("deleted_at");
+
+    //         pm.expect(item.deleted_at).to.be.null;
+
+    //     });
+
+    // });
+
+    //
+%}
+
+###
+# group: User
+# @name update dataset
+//< {%
+    // TODO: migrate to HTTP Client Pre-request handler API
+    // // Controlla se il token è presente nelle variabili di ambiente
+    
+    // if (pm.environment.get('token')) {
+    
+    //     // Imposta l'intestazione di autorizzazione per la richiesta
+    
+    //     pm.request.headers.add({
+    
+    //         key: 'Authorization',
+    
+    //         value: 'Bearer ' + pm.environment.get('token')
+    
+    //     });
+    
+    // }
+    
+    //
+//%}
+PUT localhost:3000/api/dataset/update/{{datasetId_1}}
+Content-Type: application/json
+
+{
+  "name": "Flowers"
+}
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // pm.test("Status code is 200", function () {
+
+    //     pm.response.to.have.status(200);
+
+    // });
+
+    // 
+
+    // pm.test("Response is JSON", function () {
+
+    //     pm.response.to.be.json;
+
+    // });
+
+    // pm.test("Response structure is valid", function () {
+
+    //     var jsonData = pm.response.json();
+
+    // 
+
+    //     // Check that the response has the keys 'success', 'message', and 'obj'
+
+    //     pm.expect(jsonData).to.have.property("success");
+
+    //     pm.expect(jsonData).to.have.property("message");
+
+    //     pm.expect(jsonData).to.have.property("obj");
+
+    // 
+
+    //     // Check the types of 'success' and 'message'
+
+    //     pm.expect(jsonData.success).to.be.a("boolean");
+
+    //     pm.expect(jsonData.message).to.be.a("string");
+
+    // 
+
+    //     // Check that 'obj' is an object
+
+    //     pm.expect(jsonData.obj).to.be.an("object");
+
+    // 
+
+    //     // Check the keys and types inside 'obj'
+
+    //     pm.expect(jsonData.obj).to.have.property("id");
+
+    //     pm.expect(jsonData.obj.id).to.be.a("number");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("userId");
+
+    //     pm.expect(jsonData.obj.userId).to.be.a("number");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("name");
+
+    //     pm.expect(jsonData.obj.name).to.be.a("string");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("path");
+
+    //     pm.expect(jsonData.obj.path).to.be.a("string");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("countElements");
+
+    //     pm.expect(jsonData.obj.countElements).to.be.a("number");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("countClasses");
+
+    //     pm.expect(jsonData.obj.countClasses).to.be.a("number");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("description");
+
+    //     pm.expect(jsonData.obj.description).to.be.a("string");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("isDeleted");
+
+    //     pm.expect(jsonData.obj.isDeleted).to.be.a("boolean");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("created_at");
+
+    //     pm.expect(jsonData.obj.created_at).to.be.a("string");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("updated_at");
+
+    //     pm.expect(jsonData.obj.updated_at).to.be.a("string");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("deleted_at");
+
+    //     pm.expect(jsonData.obj.deleted_at).to.be.null;
+
+    // });
+
+    //
+%}
+
+###
+# group: User
+# @name dataset delete logically
+//< {%
+    // TODO: migrate to HTTP Client Pre-request handler API
+    // // Controlla se il token è presente nelle variabili di ambiente
+    
+    // if (pm.environment.get('token')) {
+    
+    //     // Imposta l'intestazione di autorizzazione per la richiesta
+    
+    //     pm.request.headers.add({
+    
+    //         key: 'Authorization',
+    
+    //         value: 'Bearer ' + pm.environment.get('token')
+    
+    //     });
+    
+    // }
+    
+    //
+//%}
+DELETE localhost:3000/api/dataset/delete/{{datasetId_2}}
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // pm.test("Response structure is valid", function () {
+
+    //     var jsonData = pm.response.json();
+
+    // 
+
+    //     // Check that the response has the keys 'success', 'message', and 'obj'
+
+    //     pm.expect(jsonData).to.have.property("success");
+
+    //     pm.expect(jsonData).to.have.property("message");
+
+    //     pm.expect(jsonData).to.have.property("obj");
+
+    // 
+
+    //     // Check the types of 'success' and 'message'
+
+    //     pm.expect(jsonData.success).to.be.a("boolean");
+
+    //     pm.expect(jsonData.message).to.be.a("string");
+
+    // 
+
+    //     // Check that 'obj' is an object
+
+    //     pm.expect(jsonData.obj).to.be.an("object");
+
+    // 
+
+    //     // Check the keys and types inside 'obj'
+
+    //     pm.expect(jsonData.obj).to.have.property("id");
+
+    //     pm.expect(jsonData.obj.id).to.be.a("number");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("name");
+
+    //     pm.expect(jsonData.obj.name).to.be.a("string");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("path");
+
+    //     pm.expect(jsonData.obj.path).to.be.a("string");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("description");
+
+    //     pm.expect(jsonData.obj.description).to.be.a("string");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("created_at");
+
+    //     pm.expect(jsonData.obj.created_at).to.be.a("string");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("updated_at");
+
+    //     pm.expect(jsonData.obj.updated_at).to.be.a("string");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("deleted_at");
+
+    //     pm.expect(jsonData.obj.deleted_at).to.be.null;
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("userId");
+
+    //     pm.expect(jsonData.obj.userId).to.be.a("number");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("countElements");
+
+    //     pm.expect(jsonData.obj.countElements).to.be.a("number");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("countClasses");
+
+    //     pm.expect(jsonData.obj.countClasses).to.be.a("number");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("isDeleted");
+
+    //     pm.expect(jsonData.obj.isDeleted).to.be.a("boolean");
+
+    // });
+
+    // 
+
+    //
+%}
+
+###
+# group: User
+# @name credit
+//< {%
+    // TODO: migrate to HTTP Client Pre-request handler API
+    // // Controlla se il token è presente nelle variabili di ambiente
+    
+    // if (pm.environment.get('token')) {
+    
+    //     // Imposta l'intestazione di autorizzazione per la richiesta
+    
+    //     pm.request.headers.add({
+    
+    //         key: 'Authorization',
+    
+    //         value: 'Bearer ' + pm.environment.get('token')
+    
+    //     });
+    
+    // }
+    
+    //
+//%}
+GET localhost:3000/api/display/credit
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // pm.test("Response structure is valid", function () {
+
+    //     var jsonData = pm.response.json();
+
+    // 
+
+    //     // Check that the response has the keys 'success', 'message', and 'obj'
+
+    //     pm.expect(jsonData).to.have.property("success");
+
+    //     pm.expect(jsonData).to.have.property("message");
+
+    //     pm.expect(jsonData).to.have.property("obj");
+
+    // 
+
+    //     // Check the types of 'success' and 'message'
+
+    //     pm.expect(jsonData.success).to.be.a("boolean");
+
+    //     pm.expect(jsonData.message).to.be.a("string");
+
+    // 
+
+    //     // Check that 'obj' is an object
+
+    //     pm.expect(jsonData.obj).to.be.an("object");
+
+    // 
+
+    //     // Check the keys and types inside 'obj'
+
+    //     pm.expect(jsonData.obj).to.have.property("userEmail");
+
+    //     pm.expect(jsonData.obj.userEmail).to.be.a("string");
+
+    // 
+
+    //     pm.expect(jsonData.obj).to.have.property("token");
+
+    //     pm.expect(jsonData.obj.token).to.be.a("number");
+
+    // });
+
+    // 
+
+    //
+%}
+
+###
+# group: User
+# @name upload file
+//< {%
+    // TODO: migrate to HTTP Client Pre-request handler API
+    // // Controlla se il token è presente nelle variabili di ambiente
+    
+    // if (pm.environment.get('token')) {
+    
+    //     // Imposta l'intestazione di autorizzazione per la richiesta
+    
+    //     pm.request.headers.add({
+    
+    //         key: 'Authorization',
+    
+    //         value: 'Bearer ' + pm.environment.get('token')
+    
+    //     });
+    
+    // }
+    
+    //
+//%}
+POST localhost:3000/api/dataset/{{datasetId_3}}/upload/file
+Authorization: Bearer <eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1hcmNvLmNjQG1pby5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTcxNzcxMDA5NywiZXhwIjoxNzE3Nzk2NDk3LCJpc3MiOiJJbnRlbGxpaW5mZXJBcGkifQ.LQ-11eY3dq7lN12vWglO3g85HA7RVsuGzTi3I8Vw8QWMaPP3TBi83DMlLd7ogpZ9WiUfKLo2gjGB-kawoY2ewHcJWxjuRLw2rA3jpdgE-LAa5KdrI9AEMDUqgrsUlU5Eot198-58T1151OWHWSj4GK0hHYLFcfWA8qJTxZCKcIBazKbcieitw9OmbXyOGmyyavJrATN-2dvAZq2qyw9BkGTABlMENZXnUQHcL8gv1jfuJ62n30XTfxhxrTmXKwZK8d6POPcKAtomfu7YpIyxdqDiaxbGiUsSDYClgV4D_sJqaVBF59fPJabmLvmqdquJryKACO4bgh4KmiDilWZ-Yg>
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="postman-cloud:///1ef240d5-9149-42b0-9fe5-247d5ba2b1f3"
+
+< postman-cloud:///1ef240d5-9149-42b0-9fe5-247d5ba2b1f3
+--WebAppBoundary
+Content-Disposition: form-data; name="description"
+
+'image of a dog'
+--WebAppBoundary
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // pm.test("Status code is 200", function () {
+
+    //     pm.response.to.have.status(200);
+
+    // });
+
+    // 
+
+    // pm.test("Response contains 'File uploaded successfully.'", function () {
+
+    //     var jsonData = pm.response.json();
+
+    //     pm.expect(jsonData.success).to.eql(true);
+
+    //     pm.expect(jsonData.message).to.eql("File uploaded successfully");
+
+    // });
+%}
+
+###
+# group: User
+# @name inference
+//< {%
+    // TODO: migrate to HTTP Client Pre-request handler API
+    // // Controlla se il token è presente nelle variabili di ambiente
+    
+    // if (pm.environment.get('token')) {
+    
+    //     // Imposta l'intestazione di autorizzazione per la richiesta
+    
+    //     pm.request.headers.add({
+    
+    //         key: 'Authorization',
+    
+    //         value: 'Bearer ' + pm.environment.get('token')
+    
+    //     });
+    
+    // }
+    
+    //
+//%}
+GET http://localhost:3000/api/inference/{{datasetId_4}}/{{aiId_2}}/
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // pm.test("Response structure is valid", function () {
+
+    //     var jsonData = pm.response.json();
+
+    // 
+
+    //     // Check that the response has the keys 'success', 'message', and 'obj'
+
+    //     pm.expect(jsonData).to.have.property("success");
+
+    //     pm.expect(jsonData).to.have.property("message");
+
+    //     pm.expect(jsonData).to.have.property("obj");
+
+    // 
+
+    //     // Check the types of 'success' and 'message'
+
+    //     pm.expect(jsonData.success).to.be.a("boolean");
+
+    //     pm.expect(jsonData.message).to.be.a("string");
+
+    // 
+
+    //     // Check that 'obj' is an object
+
+    //     pm.expect(jsonData.obj).to.be.an("object");
+
+    // 
+
+    //     // Check that 'obj' has the keys 'jobId', 'datasetName', and 'architecture'
+
+    //     pm.expect(jsonData.obj).to.have.property("jobId");
+
+    //     pm.expect(jsonData.obj).to.have.property("datasetName");
+
+    //     pm.expect(jsonData.obj).to.have.property("architecture");
+
+    // 
+
+    //     // Check the types of 'obj' properties
+
+    //     pm.expect(jsonData.obj.jobId).to.be.a("string");
+
+    //     pm.expect(jsonData.obj.datasetName).to.be.a("string");
+
+    //     pm.expect(jsonData.obj.architecture).to.be.a("string");
+
+    // });
+%}
+
+###
+# group: User
+# @name inference status
+//< {%
+    // TODO: migrate to HTTP Client Pre-request handler API
+    // // Controlla se il token è presente nelle variabili di ambiente
+    
+    // if (pm.environment.get('token')) {
+    
+    //     // Imposta l'intestazione di autorizzazione per la richiesta
+    
+    //     pm.request.headers.add({
+    
+    //         key: 'Authorization',
+    
+    //         value: 'Bearer ' + pm.environment.get('token')
+    
+    //     });
+    
+    // }
+    
+    //
+//%}
+GET http://localhost:3000/api/inference/get/status/{{jobId}}
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // pm.test("Response structure is valid", function () {
+
+    //     var jsonData = pm.response.json();
+
+    // 
+
+    //     // Check that the response has the keys 'success', 'message', and 'obj'
+
+    //     pm.expect(jsonData).to.have.property("success");
+
+    //     pm.expect(jsonData).to.have.property("message");
+
+    //     pm.expect(jsonData).to.have.property("obj");
+
+    // 
+
+    //     // Check the types of 'success' and 'message'
+
+    //     pm.expect(jsonData.success).to.be.a("boolean");
+
+    //     pm.expect(jsonData.message).to.be.a("string");
+
+    // 
+
+    //     // Check that 'obj' is an object
+
+    //     pm.expect(jsonData.obj).to.be.an("object");
+
+    // 
+
+    //     // Check that 'obj' has the key 'jobId'
+
+    //     pm.expect(jsonData.obj).to.have.property("jobId");
+
+    //     pm.expect(jsonData.obj.jobId).to.be.a("string");
+
+    // 
+
+    //     // If message is "COMPLETED", check the structure of 'results' array
+
+    //     if (jsonData.message === "COMPLETED") {
+
+    //         pm.expect(jsonData.obj).to.have.property("results");
+
+    //         pm.expect(jsonData.obj.results).to.be.an("array");
+
+    // 
+
+    //         jsonData.obj.results.forEach(function(result) {
+
+    //             pm.expect(result).to.have.property("id");
+
+    //             pm.expect(result).to.have.property("imageId");
+
+    //             pm.expect(result).to.have.property("aiId");
+
+    //             pm.expect(result).to.have.property("data");
+
+    //             pm.expect(result).to.have.property("requestId");
+
+    //             pm.expect(result).to.have.property("created_at");
+
+    //             pm.expect(result).to.have.property("updated_at");
+
+    // 
+
+    //             pm.expect(result.id).to.be.a("number");
+
+    //             pm.expect(result.imageId).to.be.a("number");
+
+    //             pm.expect(result.aiId).to.be.a("number");
+
+    //             pm.expect(result.requestId).to.be.a("string");
+
+    //             pm.expect(result.created_at).to.be.a("string");
+
+    //             pm.expect(result.updated_at).to.be.a("string");
+
+    // 
+
+    //             pm.expect(result.data).to.be.an("object");
+
+    //             pm.expect(result.data).to.have.property("box");
+
+    //             pm.expect(result.data).to.have.property("error");
+
+    //             pm.expect(result.data).to.have.property("start");
+
+    //             pm.expect(result.data).to.have.property("finish");
+
+    // 
+
+    //             pm.expect(result.data.box).to.be.an("array");
+
+    //             result.data.box.forEach(function(box) {
+
+    //                 pm.expect(box).to.have.property("width");
+
+    //                 pm.expect(box).to.have.property("height");
+
+    //                 pm.expect(box).to.have.property("class_id");
+
+    //                 pm.expect(box).to.have.property("x_center");
+
+    //                 pm.expect(box).to.have.property("y_center");
+
+    //                 pm.expect(box).to.have.property("confidence");
+
+    // 
+
+    //                 pm.expect(box.width).to.be.a("number");
+
+    //                 pm.expect(box.height).to.be.a("number");
+
+    //                 pm.expect(box.class_id).to.be.a("number");
+
+    //                 pm.expect(box.x_center).to.be.a("number");
+
+    //                 pm.expect(box.y_center).to.be.a("number");
+
+    //                 pm.expect(box.confidence).to.be.a("number");
+
+    //             });
+
+    // 
+
+    //             pm.expect(result.data.error).to.be.null;
+
+    //             pm.expect(result.data.start).to.be.a("boolean");
+
+    //             pm.expect(result.data.finish).to.be.a("boolean");
+
+    //         });
+
+    //     } else {
+
+    //         // If message is not "COMPLETED", check that 'obj' does not have 'results'
+
+    //         pm.expect(jsonData.obj).to.not.have.property("results");
+
+    //     }
+
+    // });
+
+    //
+%}
+
+###
+# group: User
+# @name inference frame
+//< {%
+    // TODO: migrate to HTTP Client Pre-request handler API
+    // // Controlla se il token è presente nelle variabili di ambiente
+    
+    // if (pm.environment.get('token')) {
+    
+    //     // Imposta l'intestazione di autorizzazione per la richiesta
+    
+    //     pm.request.headers.add({
+    
+    //         key: 'Authorization',
+    
+    //         value: 'Bearer ' + pm.environment.get('token')
+    
+    //     });
+    
+    // }
+    
+    //
+//%}
+GET localhost:3000/api/inference/result/{{jobId_1}}/{{imageId}}
+
+> {%
+    // TODO: migrate to HTTP Client Response handler API
+    // pm.test("Status code is 200", function () {
+
+    //     pm.response.to.have.status(200);
+
+    // });
+
+    //
+%}

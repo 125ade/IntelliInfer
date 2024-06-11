@@ -5,8 +5,10 @@ import { ErrorCode } from "../factory/ErrorCode";
 import User from "../models/user";
 import fs from 'fs';
 import path from 'path';
-import {SuccessResponse} from "../utils/utils";
+import {sendSuccessResponse} from "../utils/utils";
 import process from "node:process";
+import {StatusCode} from "../static";
+import {isNumeric} from "validator";
 
 const destination: string = process.env.DESTINATION_PATH_WEIGHTS || "/app/media/weights";
 const file_extension: string = process.env.FILE_WEIGHTS_EXTENSION || ".pt";
@@ -20,8 +22,8 @@ export default class AdminController {
     }
     
 
-    // update the weights' path of an ai model
-    async updateWeights(req: Request, res: Response) {
+    // update the weights' path of an AI model
+    async updateWeights(req: Request, res: Response): Promise<void> {
         try{
             if (!req.file) {
                 throw new ConcreteErrorCreator().createBadRequestError().setAbsentFile();
@@ -38,11 +40,7 @@ export default class AdminController {
 
                 await this.repository.updateModelWeights(Number(req.params.aiId), filePath);
 
-                const dataResult: SuccessResponse = {
-                    success: true,
-                    message: 'Weights uploaded successfully',
-                }
-                res.status(200).json( dataResult);
+                sendSuccessResponse(res, "Weights uploaded successfully",StatusCode.created);
             } else {
                 throw new ConcreteErrorCreator().createBadRequestError().setNotSupportedFile();
             }
@@ -56,29 +54,25 @@ export default class AdminController {
         }
     }
 
-            
-
     // recharges user credit 
-    async rechargeTokens(req: Request, res: Response) {
+    async rechargeTokens(req: Request, res: Response): Promise<void> {
         try {
             const { email, tokensToAdd } = req.body;
 
-            const user: User|ConcreteErrorCreator = await this.repository.getUserByEmail(email);
+            if (isNumeric(tokensToAdd)){
+                throw new ConcreteErrorCreator().createBadRequestError().setNotSupportedElement();
+            }
+
+            const user: User | ConcreteErrorCreator = await this.repository.getUserByEmail(email);
 
             if( user instanceof ConcreteErrorCreator){
                 throw user;
-            }else{
-                // Update user's credit by adding tokensToAdd
-                user.token = Number(user.token) + Number(tokensToAdd);
-                await user.save();
-                const dataResult: SuccessResponse = {
-                    success: true,
-                    message: 'Credit recharged successfully',
-                    obj: user
-                }
-                return res.status(200).json(dataResult);
             }
+            // Update user's credit by adding tokensToAdd
+            user.token = Number(user.token) + Number(tokensToAdd);
+            await user.save();
 
+            sendSuccessResponse(res, "Credit recharged successfully", StatusCode.created, user);
         } catch (error) {
             if( error instanceof ErrorCode){
                 error.send(res);

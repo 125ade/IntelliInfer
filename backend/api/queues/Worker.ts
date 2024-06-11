@@ -26,6 +26,8 @@ const test_image_container_name: string = process.env.CONTAINER_IMAGE_NAME || 'i
 const yolo_image_container_name: string = process.env.CONTAINER_IMAGE_YOLO_NAME || 'intelliinfer-yolo';
 const containerNameTest: string = process.env.CONTAINER_TEST_NAME || "working-test";
 const containerNameYolo: string = process.env.CONTAINER_YOLO_NAME || "working-yolo";
+const volume_media_data: string = process.env.CONTAINER_VOLUME_MEDIA_DATA_NAME || "intelliinfer_media_data";
+const path_media_data: string = process.env.DESTINATION_PATH_MEDIA_DATA || "/app/media";
 
 const extractData = (input: string): string => {
   const regex = /\{\"userEmail\".*$/;
@@ -63,25 +65,25 @@ export class TaskQueue {
             let containerOptions: {};
             switch (jobData.model.architecture ){
                 case AiArchitecture.YOLO:
-                    containerOptions = containerOptions = {
+                    containerOptions = {
                         Image: yolo_image_container_name,
                         Cmd: ['python', 'inferenceYolo.py', jobDataString],
                         Tty: false,
                         name: containerNameYolo,
                         HostConfig: {
-                            Binds: ['intelliinfer_media_data:/app/media']
+                            Binds: [`${volume_media_data}:${path_media_data}`]
                         }
                     };
                     break;
                 case AiArchitecture.TEST:
                 default:
-                    containerOptions = containerOptions = {
+                    containerOptions = {
                         Image: test_image_container_name,
                         Cmd: ['python', 'inferenceSimulator.py', jobDataString],
                         Tty: false,
                         name: containerNameTest,
                         HostConfig: {
-                            Binds: ['intelliinfer_media_data:/app/media']
+                            Binds: [`${volume_media_data}:${path_media_data}`]
                         }
                     };
             }
@@ -92,14 +94,12 @@ export class TaskQueue {
                 const container: Docker.Container = await docker.createContainer(containerOptions);
                 await job.log(`[log] Container creato: ${container.id}`);
 
-
-
                 // Avvio del container
                 await job.updateProgress(40);
                 await container.start();
                 await job.log('[log] Container avviato');
 
-                // Recupero dei log
+                // setup stream dati
                 const logStream: NodeJS.ReadableStream = await container.logs({
                     follow: true,
                     stdout: true,
@@ -125,9 +125,7 @@ export class TaskQueue {
                                             throw val;
                                         }
                                     });
-
                             }
-
                         } catch (error) {
                             if (error instanceof ConcreteErrorCreator) {
                                 throw error
@@ -137,7 +135,7 @@ export class TaskQueue {
                 });
 
                 // Attendere che il container finisca di eseguire
-                const data = await container.wait();
+                await container.wait();
                 await job.log('[log] Container ha completato il lavoro');
                 await job.updateProgress(80);
 
@@ -157,40 +155,31 @@ export class TaskQueue {
     }
 
     private async updateTokenCredit(jsonLog: JobReturnData) {
-    try {
-        const val = await this.repository.updateListResult(jsonLog.results);
-        if (val instanceof ConcreteErrorCreator) {
-            throw val;
-        } else {
-            const utente = await this.repository.getUserByEmail(jsonLog.userEmail);
-            if (utente instanceof ConcreteErrorCreator) {
-                throw utente;
+        try {
+            const val = await this.repository.updateListResult(jsonLog.results);
+            if (val instanceof ConcreteErrorCreator) {
+                throw val;
+            } else {
+                const utente = await this.repository.getUserByEmail(jsonLog.userEmail);
+                if (utente instanceof ConcreteErrorCreator) {
+                    throw utente;
+                }
+                await this.repository.updateUserTokenByCost(utente, jsonLog.callCost);
             }
-            await this.repository.updateUserTokenByCost(utente, jsonLog.callCost);
-        }
-    } catch (val) {
-        if (val instanceof ConcreteErrorCreator) {
-            throw val;
-        }else{
-            throw new ConcreteErrorCreator().createServerError().setFailedCreationResult();
+        } catch (val) {
+            if (val instanceof ConcreteErrorCreator) {
+                throw val;
+            }else{
+                throw new ConcreteErrorCreator().createServerError().setFailedCreationResult();
+            }
         }
     }
-}
 
     public static getInstance(concurrencyNum: number = 1): TaskQueue {
         if (!TaskQueue.instance) {
             TaskQueue.instance = new TaskQueue(concurrencyNum);
         }
         return TaskQueue.instance;
-    }
-
-    public async getJobStatus(jobId: string){
-        const job = await this.queue.getJobStatus(jobId)
-
-        if (!job) {
-            throw new ConcreteErrorCreator().createNotFoundError().setAbsentItems();
-        }
-        console.log(job)
     }
 
     public getQueue(): Queue {

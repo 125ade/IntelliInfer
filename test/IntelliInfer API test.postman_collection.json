@@ -1,0 +1,1559 @@
+{
+	"info": {
+		"_postman_id": "d3ab87de-7296-4454-a01b-d01de4289239",
+		"name": "IntelliInfer API test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "36008018",
+		"_collection_link": "https://intelliinfer.postman.co/workspace/intelliinfer-Workspace~6d22ccce-2074-441d-bce4-90ed7aec9ce6/collection/36008018-d3ab87de-7296-4454-a01b-d01de4289239?action=share&source=collection_link&creator=36008018"
+	},
+	"item": [
+		{
+			"name": "No Auth",
+			"item": [
+				{
+					"name": "health",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response should be {\\\"system\\\":\\\"online\\\"}\", function () {\r",
+									"    var expectedResponse = {\r",
+									"        \"system\": \"online\"\r",
+									"    };\r",
+									"\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.eql(expectedResponse);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/check/health",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"check",
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "route 404",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response should be {\\\"error\\\":\\\"No route found.\\\"}\", function () {\r",
+									"    var expectedResponse = {\r",
+									"    \"success\": false,\r",
+									"    \"message\": \"No route found.\"\r",
+									"};\r",
+									"\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.eql(expectedResponse);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/api/no_route",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"no_route"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "token admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verifica se la risposta è in formato JSON\r",
+									"if (pm.response.headers.get('Content-Type').includes('application/json')) {\r",
+									"    try {\r",
+									"        // Ottieni il body della risposta come oggetto JSON\r",
+									"        var responseJson = pm.response.json();\r",
+									"\r",
+									"        // Controlla se il token è presente nel JSON di risposta\r",
+									"        if (responseJson.token) {\r",
+									"            // Imposta il token come variabile di ambiente\r",
+									"            pm.environment.set('token', responseJson.token);\r",
+									"            console.log('Token impostato come variabile di ambiente:', responseJson.token);\r",
+									"        } else {\r",
+									"            console.log('Token non trovato nel JSON di risposta.');\r",
+									"        }\r",
+									"    } catch (e) {\r",
+									"        console.log('Errore nel parsing del JSON di risposta:', e);\r",
+									"    }\r",
+									"} else {\r",
+									"    console.log('La risposta non è in formato JSON.');\r",
+									"}\r",
+									"\r",
+									"pm.test(\"Response is successful\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check response structure\", function () {\r",
+									"    const responseJson = pm.response.json();\r",
+									"\r",
+									"    // Controlla la presenza del token\r",
+									"    pm.expect(responseJson).to.have.property(\"token\");\r",
+									"\r",
+									"    // Verifica che il token sia un JWT\r",
+									"    const token = responseJson.token;\r",
+									"    const parts = token.split('.');\r",
+									"    pm.expect(parts.length).to.eql(3);\r",
+									"    pm.expect(parts[0]).to.be.a('string');\r",
+									"    pm.expect(parts[1]).to.be.a('string');\r",
+									"    pm.expect(parts[2]).to.be.a('string');\r",
+									"\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/api/generate/token/4",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"generate",
+								"token",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "token user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response is successful\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check response structure\", function () {\r",
+									"    const responseJson = pm.response.json();\r",
+									"\r",
+									"    // Controlla la presenza del token\r",
+									"    pm.expect(responseJson).to.have.property(\"token\");\r",
+									"\r",
+									"    // Verifica che il token sia un JWT\r",
+									"    const token = responseJson.token;\r",
+									"    const parts = token.split('.');\r",
+									"    pm.expect(parts.length).to.eql(3);\r",
+									"    pm.expect(parts[0]).to.be.a('string');\r",
+									"    pm.expect(parts[1]).to.be.a('string');\r",
+									"    pm.expect(parts[2]).to.be.a('string');\r",
+									"\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/api/generate/token/:userId",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"generate",
+								"token",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "change weights",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Controlla se il token è presente nelle variabili di ambiente\r",
+									"if (pm.environment.get('admin_token')) {\r",
+									"    // Imposta l'intestazione di autorizzazione per la richiesta\r",
+									"    pm.request.headers.add({\r",
+									"        key: 'Authorization',\r",
+									"        value: 'Bearer ' + pm.environment.get('token')\r",
+									"    });\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "weightsfile",
+									"type": "file",
+									"src": "/D:/prog_avanzata/IntelliInfer/files/best.pt"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:3000/admin/model/:aiId/change/weights",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"admin",
+								"model",
+								":aiId",
+								"change",
+								"weights"
+							],
+							"variable": [
+								{
+									"key": "aiId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "recharge credit",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response is successful\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check response structure\", function () {\r",
+									"    const responseJson = pm.response.json();\r",
+									"\r",
+									"    // Controlla il successo della risposta\r",
+									"    pm.expect(responseJson).to.have.property(\"success\", true);\r",
+									"    pm.expect(responseJson).to.have.property(\"message\", \"Credit recharged successfully\");\r",
+									"\r",
+									"    // Controlla la presenza dell'oggetto\r",
+									"    pm.expect(responseJson).to.have.property(\"obj\");\r",
+									"\r",
+									"    // Controlla i campi specifici nell'oggetto\r",
+									"    const obj = responseJson.obj;\r",
+									"    pm.expect(obj).to.have.property(\"id\", 1);\r",
+									"    pm.expect(obj).to.have.property(\"username\", \"Marco\");\r",
+									"    pm.expect(obj).to.have.property(\"email\", \"marco.cc@mio.com\");\r",
+									"    pm.expect(obj).to.have.property(\"role\", \"user\");\r",
+									"\r",
+									"    // Controlla che il token sia un numero valido\r",
+									"    pm.expect(obj).to.have.property(\"token\").that.is.a(\"number\");\r",
+									"\r",
+									"    // Non controllare created_at e updated_at\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Controlla se il token è presente nelle variabili di ambiente\r",
+									"if (pm.environment.get('admin_token')) {\r",
+									"    // Imposta l'intestazione di autorizzazione per la richiesta\r",
+									"    pm.request.headers.add({\r",
+									"        key: 'Authorization',\r",
+									"        value: 'Bearer ' + pm.environment.get('token')\r",
+									"    });\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"marco.cc@mio.com\",\r\n    \"tokensToAdd\": 30\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/admin/credit/recharge",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"admin",
+								"credit",
+								"recharge"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "model list",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const expectedResponse = {\r",
+									"    \"success\": true,\r",
+									"    \"message\": \"Model list\",\r",
+									"    \"obj\": [\r",
+									"        {\r",
+									"            \"id\": 1,\r",
+									"            \"name\": \"Yolov5\",\r",
+									"            \"description\": \"Yolov5 neural network for detection tasks\",\r",
+									"            \"pathweights\": \"/primo/path/esempio\",\r",
+									"            \"architecture\": \"yolo\",\r",
+									"        },\r",
+									"        {\r",
+									"            \"id\": 2,\r",
+									"            \"name\": \"TestNN\",\r",
+									"            \"description\": \"Test script to emulate a neural network..\",\r",
+									"            \"pathweights\": \"/primo/path/esempio\",\r",
+									"            \"architecture\": \"test\",\r",
+									"        }\r",
+									"    ]\r",
+									"};\r",
+									"\r",
+									"// Parse the response body\r",
+									"const response = pm.response.json();\r",
+									"\r",
+									"// Remove created_at and updated_at fields from each object in the response\r",
+									"response.obj.forEach(item => {\r",
+									"    delete item.created_at;\r",
+									"    delete item.updated_at;\r",
+									"});\r",
+									"\r",
+									"// Check if the modified response matches the expected response\r",
+									"pm.test(\"Response matches expected structure\", function () {\r",
+									"    pm.expect(response).to.eql(expectedResponse);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Controlla se il token è presente nelle variabili di ambiente\r",
+									"if (pm.environment.get('token')) {\r",
+									"    // Imposta l'intestazione di autorizzazione per la richiesta\r",
+									"    pm.request.headers.add({\r",
+									"        key: 'Authorization',\r",
+									"        value: 'Bearer ' + pm.environment.get('token')\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/api/model/list",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"model",
+								"list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "model by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response structure is valid\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    // Check that the response has the keys 'success', 'message', and 'obj'\r",
+									"    pm.expect(jsonData).to.have.property(\"success\");\r",
+									"    pm.expect(jsonData).to.have.property(\"message\");\r",
+									"    pm.expect(jsonData).to.have.property(\"obj\");\r",
+									"\r",
+									"    // Check the types of 'success' and 'message'\r",
+									"    pm.expect(jsonData.success).to.be.a(\"boolean\");\r",
+									"    pm.expect(jsonData.message).to.be.a(\"string\");\r",
+									"\r",
+									"    // Check that 'obj' is an object\r",
+									"    pm.expect(jsonData.obj).to.be.an(\"object\");\r",
+									"\r",
+									"    // Check the keys and types inside 'obj'\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"id\");\r",
+									"    pm.expect(jsonData.obj.id).to.be.a(\"number\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"name\");\r",
+									"    pm.expect(jsonData.obj.name).to.be.a(\"string\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"description\");\r",
+									"    pm.expect(jsonData.obj.description).to.be.a(\"string\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"pathweights\");\r",
+									"    pm.expect(jsonData.obj.pathweights).to.be.a(\"string\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"architecture\");\r",
+									"    pm.expect(jsonData.obj.architecture).to.be.a(\"string\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"created_at\");\r",
+									"    pm.expect(jsonData.obj.created_at).to.be.a(\"string\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"updated_at\");\r",
+									"    pm.expect(jsonData.obj.updated_at).to.be.a(\"string\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Controlla se il token è presente nelle variabili di ambiente\r",
+									"if (pm.environment.get('token')) {\r",
+									"    // Imposta l'intestazione di autorizzazione per la richiesta\r",
+									"    pm.request.headers.add({\r",
+									"        key: 'Authorization',\r",
+									"        value: 'Bearer ' + pm.environment.get('token')\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/api/model/:aiId",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"model",
+								":aiId"
+							],
+							"variable": [
+								{
+									"key": "aiId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create dataset",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response structure is valid\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    // Check that the response has the keys 'success', 'message', and 'obj'\r",
+									"    pm.expect(jsonData).to.have.property(\"success\");\r",
+									"    pm.expect(jsonData).to.have.property(\"message\");\r",
+									"    pm.expect(jsonData).to.have.property(\"obj\");\r",
+									"\r",
+									"    // Check the types of 'success' and 'message'\r",
+									"    pm.expect(jsonData.success).to.be.a(\"boolean\");\r",
+									"    pm.expect(jsonData.message).to.be.a(\"string\");\r",
+									"\r",
+									"    // Check that 'obj' is an object\r",
+									"    pm.expect(jsonData.obj).to.be.an(\"object\");\r",
+									"\r",
+									"    // Check the keys and types inside 'obj'\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"isDeleted\");\r",
+									"    pm.expect(jsonData.obj.isDeleted).to.be.a(\"boolean\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"id\");\r",
+									"    pm.expect(jsonData.obj.id).to.be.a(\"number\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"name\");\r",
+									"    pm.expect(jsonData.obj.name).to.be.a(\"string\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"description\");\r",
+									"    pm.expect(jsonData.obj.description).to.be.a(\"string\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"path\");\r",
+									"    pm.expect(jsonData.obj.path).to.be.a(\"string\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"countElements\");\r",
+									"    pm.expect(jsonData.obj.countElements).to.be.a(\"number\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"countClasses\");\r",
+									"    pm.expect(jsonData.obj.countClasses).to.be.a(\"number\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"userId\");\r",
+									"    pm.expect(jsonData.obj.userId).to.be.a(\"number\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"updated_at\");\r",
+									"    pm.expect(jsonData.obj.updated_at).to.be.a(\"string\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"created_at\");\r",
+									"    pm.expect(jsonData.obj.created_at).to.be.a(\"string\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"deleted_at\");\r",
+									"    pm.expect(jsonData.obj.deleted_at).to.be.null;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Controlla se il token è presente nelle variabili di ambiente\r",
+									"if (pm.environment.get('token')) {\r",
+									"    // Imposta l'intestazione di autorizzazione per la richiesta\r",
+									"    pm.request.headers.add({\r",
+									"        key: 'Authorization',\r",
+									"        value: 'Bearer ' + pm.environment.get('token')\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"test\",\r\n    \"description\": \"Collection of images of various types of food\",\r\n    \"tags\": [\"ko\", \"eee\", \"eea\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/api/dataset/create",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"dataset",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "dataset by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const expectedResponse = {\r",
+									"    \"success\": true,\r",
+									"    \"message\": \"Dataset detail\",\r",
+									"    \"obj\": {\r",
+									"        \"id\": 1,\r",
+									"        \"userId\": null,\r",
+									"        \"name\": \"Ships\",\r",
+									"        \"path\": \"/ships\",\r",
+									"        \"countElements\": 100,\r",
+									"        \"countClasses\": 5,\r",
+									"        \"description\": \"Dataset of Sar images for ships detection\",\r",
+									"        \"isDeleted\": false,\r",
+									"        \"deleted_at\": null\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"// Parse the response body\r",
+									"const response = pm.response.json();\r",
+									"\r",
+									"// Remove created_at and updated_at fields from the response\r",
+									"delete response.obj.created_at;\r",
+									"delete response.obj.updated_at;\r",
+									"\r",
+									"// Check if the modified response matches the expected response\r",
+									"pm.test(\"Response matches expected structure\", function () {\r",
+									"    pm.expect(response).to.eql(expectedResponse);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Controlla se il token è presente nelle variabili di ambiente\r",
+									"if (pm.environment.get('token')) {\r",
+									"    // Imposta l'intestazione di autorizzazione per la richiesta\r",
+									"    pm.request.headers.add({\r",
+									"        key: 'Authorization',\r",
+									"        value: 'Bearer ' + pm.environment.get('token')\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/api/dataset/:datasetId",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"dataset",
+								":datasetId"
+							],
+							"variable": [
+								{
+									"key": "datasetId",
+									"value": "11"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "dataset list",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response structure is valid\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    // Check that the response has the keys 'success', 'message', and 'obj'\r",
+									"    pm.expect(jsonData).to.have.property(\"success\");\r",
+									"    pm.expect(jsonData).to.have.property(\"message\");\r",
+									"    pm.expect(jsonData).to.have.property(\"obj\");\r",
+									"\r",
+									"    // Check the types of 'success' and 'message'\r",
+									"    pm.expect(jsonData.success).to.be.a(\"boolean\");\r",
+									"    pm.expect(jsonData.message).to.be.a(\"string\");\r",
+									"\r",
+									"    // Check that 'obj' is an array\r",
+									"    pm.expect(jsonData.obj).to.be.an(\"array\");\r",
+									"\r",
+									"    // Check the keys and types inside each object in the 'obj' array, if not empty\r",
+									"    jsonData.obj.forEach(function(item) {\r",
+									"        pm.expect(item).to.have.property(\"id\");\r",
+									"        pm.expect(item.id).to.be.a(\"number\");\r",
+									"\r",
+									"        pm.expect(item).to.have.property(\"userId\");\r",
+									"        pm.expect(item.userId).to.be.a(\"number\");\r",
+									"\r",
+									"        pm.expect(item).to.have.property(\"name\");\r",
+									"        pm.expect(item.name).to.be.a(\"string\");\r",
+									"\r",
+									"        pm.expect(item).to.have.property(\"path\");\r",
+									"        pm.expect(item.path).to.be.a(\"string\");\r",
+									"\r",
+									"        pm.expect(item).to.have.property(\"countElements\");\r",
+									"        pm.expect(item.countElements).to.be.a(\"number\");\r",
+									"\r",
+									"        pm.expect(item).to.have.property(\"countClasses\");\r",
+									"        pm.expect(item.countClasses).to.be.a(\"number\");\r",
+									"\r",
+									"        pm.expect(item).to.have.property(\"description\");\r",
+									"        pm.expect(item.description).to.be.a(\"string\");\r",
+									"\r",
+									"        pm.expect(item).to.have.property(\"isDeleted\");\r",
+									"        pm.expect(item.isDeleted).to.be.a(\"boolean\");\r",
+									"\r",
+									"        pm.expect(item).to.have.property(\"created_at\");\r",
+									"        pm.expect(item.created_at).to.be.a(\"string\");\r",
+									"\r",
+									"        pm.expect(item).to.have.property(\"updated_at\");\r",
+									"        pm.expect(item.updated_at).to.be.a(\"string\");\r",
+									"\r",
+									"        pm.expect(item).to.have.property(\"deleted_at\");\r",
+									"        pm.expect(item.deleted_at).to.be.null;\r",
+									"    });\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Controlla se il token è presente nelle variabili di ambiente\r",
+									"if (pm.environment.get('token')) {\r",
+									"    // Imposta l'intestazione di autorizzazione per la richiesta\r",
+									"    pm.request.headers.add({\r",
+									"        key: 'Authorization',\r",
+									"        value: 'Bearer ' + pm.environment.get('token')\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/api/dataset/list",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"dataset",
+								"list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update dataset",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is JSON\", function () {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"pm.test(\"Response structure is valid\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    // Check that the response has the keys 'success', 'message', and 'obj'\r",
+									"    pm.expect(jsonData).to.have.property(\"success\");\r",
+									"    pm.expect(jsonData).to.have.property(\"message\");\r",
+									"    pm.expect(jsonData).to.have.property(\"obj\");\r",
+									"\r",
+									"    // Check the types of 'success' and 'message'\r",
+									"    pm.expect(jsonData.success).to.be.a(\"boolean\");\r",
+									"    pm.expect(jsonData.message).to.be.a(\"string\");\r",
+									"\r",
+									"    // Check that 'obj' is an object\r",
+									"    pm.expect(jsonData.obj).to.be.an(\"object\");\r",
+									"\r",
+									"    // Check the keys and types inside 'obj'\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"id\");\r",
+									"    pm.expect(jsonData.obj.id).to.be.a(\"number\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"userId\");\r",
+									"    pm.expect(jsonData.obj.userId).to.be.a(\"number\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"name\");\r",
+									"    pm.expect(jsonData.obj.name).to.be.a(\"string\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"path\");\r",
+									"    pm.expect(jsonData.obj.path).to.be.a(\"string\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"countElements\");\r",
+									"    pm.expect(jsonData.obj.countElements).to.be.a(\"number\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"countClasses\");\r",
+									"    pm.expect(jsonData.obj.countClasses).to.be.a(\"number\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"description\");\r",
+									"    pm.expect(jsonData.obj.description).to.be.a(\"string\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"isDeleted\");\r",
+									"    pm.expect(jsonData.obj.isDeleted).to.be.a(\"boolean\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"created_at\");\r",
+									"    pm.expect(jsonData.obj.created_at).to.be.a(\"string\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"updated_at\");\r",
+									"    pm.expect(jsonData.obj.updated_at).to.be.a(\"string\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"deleted_at\");\r",
+									"    pm.expect(jsonData.obj.deleted_at).to.be.null;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Controlla se il token è presente nelle variabili di ambiente\r",
+									"if (pm.environment.get('token')) {\r",
+									"    // Imposta l'intestazione di autorizzazione per la richiesta\r",
+									"    pm.request.headers.add({\r",
+									"        key: 'Authorization',\r",
+									"        value: 'Bearer ' + pm.environment.get('token')\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Flowers\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/api/dataset/update/:datasetId",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"dataset",
+								"update",
+								":datasetId"
+							],
+							"variable": [
+								{
+									"key": "datasetId",
+									"value": "4"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "dataset delete logically",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response structure is valid\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    // Check that the response has the keys 'success', 'message', and 'obj'\r",
+									"    pm.expect(jsonData).to.have.property(\"success\");\r",
+									"    pm.expect(jsonData).to.have.property(\"message\");\r",
+									"    pm.expect(jsonData).to.have.property(\"obj\");\r",
+									"\r",
+									"    // Check the types of 'success' and 'message'\r",
+									"    pm.expect(jsonData.success).to.be.a(\"boolean\");\r",
+									"    pm.expect(jsonData.message).to.be.a(\"string\");\r",
+									"\r",
+									"    // Check that 'obj' is an object\r",
+									"    pm.expect(jsonData.obj).to.be.an(\"object\");\r",
+									"\r",
+									"    // Check the keys and types inside 'obj'\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"id\");\r",
+									"    pm.expect(jsonData.obj.id).to.be.a(\"number\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"name\");\r",
+									"    pm.expect(jsonData.obj.name).to.be.a(\"string\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"path\");\r",
+									"    pm.expect(jsonData.obj.path).to.be.a(\"string\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"description\");\r",
+									"    pm.expect(jsonData.obj.description).to.be.a(\"string\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"created_at\");\r",
+									"    pm.expect(jsonData.obj.created_at).to.be.a(\"string\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"updated_at\");\r",
+									"    pm.expect(jsonData.obj.updated_at).to.be.a(\"string\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"deleted_at\");\r",
+									"    pm.expect(jsonData.obj.deleted_at).to.be.null;\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"userId\");\r",
+									"    pm.expect(jsonData.obj.userId).to.be.a(\"number\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"countElements\");\r",
+									"    pm.expect(jsonData.obj.countElements).to.be.a(\"number\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"countClasses\");\r",
+									"    pm.expect(jsonData.obj.countClasses).to.be.a(\"number\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"isDeleted\");\r",
+									"    pm.expect(jsonData.obj.isDeleted).to.be.a(\"boolean\");\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Controlla se il token è presente nelle variabili di ambiente\r",
+									"if (pm.environment.get('token')) {\r",
+									"    // Imposta l'intestazione di autorizzazione per la richiesta\r",
+									"    pm.request.headers.add({\r",
+									"        key: 'Authorization',\r",
+									"        value: 'Bearer ' + pm.environment.get('token')\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/api/dataset/delete/:datasetId",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"dataset",
+								"delete",
+								":datasetId"
+							],
+							"variable": [
+								{
+									"key": "datasetId",
+									"value": "7"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "credit",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response structure is valid\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    // Check that the response has the keys 'success', 'message', and 'obj'\r",
+									"    pm.expect(jsonData).to.have.property(\"success\");\r",
+									"    pm.expect(jsonData).to.have.property(\"message\");\r",
+									"    pm.expect(jsonData).to.have.property(\"obj\");\r",
+									"\r",
+									"    // Check the types of 'success' and 'message'\r",
+									"    pm.expect(jsonData.success).to.be.a(\"boolean\");\r",
+									"    pm.expect(jsonData.message).to.be.a(\"string\");\r",
+									"\r",
+									"    // Check that 'obj' is an object\r",
+									"    pm.expect(jsonData.obj).to.be.an(\"object\");\r",
+									"\r",
+									"    // Check the keys and types inside 'obj'\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"userEmail\");\r",
+									"    pm.expect(jsonData.obj.userEmail).to.be.a(\"string\");\r",
+									"\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"token\");\r",
+									"    pm.expect(jsonData.obj.token).to.be.a(\"number\");\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Controlla se il token è presente nelle variabili di ambiente\r",
+									"if (pm.environment.get('token')) {\r",
+									"    // Imposta l'intestazione di autorizzazione per la richiesta\r",
+									"    pm.request.headers.add({\r",
+									"        key: 'Authorization',\r",
+									"        value: 'Bearer ' + pm.environment.get('token')\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/api/display/credit",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"display",
+								"credit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "upload file",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response contains 'File uploaded successfully.'\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"    pm.expect(jsonData.message).to.eql(\"File uploaded successfully\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Controlla se il token è presente nelle variabili di ambiente\r",
+									"if (pm.environment.get('token')) {\r",
+									"    // Imposta l'intestazione di autorizzazione per la richiesta\r",
+									"    pm.request.headers.add({\r",
+									"        key: 'Authorization',\r",
+									"        value: 'Bearer ' + pm.environment.get('token')\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer <eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1hcmNvLmNjQG1pby5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTcxNzcxMDA5NywiZXhwIjoxNzE3Nzk2NDk3LCJpc3MiOiJJbnRlbGxpaW5mZXJBcGkifQ.LQ-11eY3dq7lN12vWglO3g85HA7RVsuGzTi3I8Vw8QWMaPP3TBi83DMlLd7ogpZ9WiUfKLo2gjGB-kawoY2ewHcJWxjuRLw2rA3jpdgE-LAa5KdrI9AEMDUqgrsUlU5Eot198-58T1151OWHWSj4GK0hHYLFcfWA8qJTxZCKcIBazKbcieitw9OmbXyOGmyyavJrATN-2dvAZq2qyw9BkGTABlMENZXnUQHcL8gv1jfuJ62n30XTfxhxrTmXKwZK8d6POPcKAtomfu7YpIyxdqDiaxbGiUsSDYClgV4D_sJqaVBF59fPJabmLvmqdquJryKACO4bgh4KmiDilWZ-Yg>"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "postman-cloud:///1ef240d5-9149-42b0-9fe5-247d5ba2b1f3"
+								},
+								{
+									"key": "description",
+									"value": "'image of a dog'",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:3000/api/dataset/:datasetId/upload/file",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"dataset",
+								":datasetId",
+								"upload",
+								"file"
+							],
+							"variable": [
+								{
+									"key": "datasetId",
+									"value": "5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "inference",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response structure is valid\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    // Check that the response has the keys 'success', 'message', and 'obj'\r",
+									"    pm.expect(jsonData).to.have.property(\"success\");\r",
+									"    pm.expect(jsonData).to.have.property(\"message\");\r",
+									"    pm.expect(jsonData).to.have.property(\"obj\");\r",
+									"\r",
+									"    // Check the types of 'success' and 'message'\r",
+									"    pm.expect(jsonData.success).to.be.a(\"boolean\");\r",
+									"    pm.expect(jsonData.message).to.be.a(\"string\");\r",
+									"\r",
+									"    // Check that 'obj' is an object\r",
+									"    pm.expect(jsonData.obj).to.be.an(\"object\");\r",
+									"\r",
+									"    // Check that 'obj' has the keys 'jobId', 'datasetName', and 'architecture'\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"jobId\");\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"datasetName\");\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"architecture\");\r",
+									"\r",
+									"    // Check the types of 'obj' properties\r",
+									"    pm.expect(jsonData.obj.jobId).to.be.a(\"string\");\r",
+									"    pm.expect(jsonData.obj.datasetName).to.be.a(\"string\");\r",
+									"    pm.expect(jsonData.obj.architecture).to.be.a(\"string\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Controlla se il token è presente nelle variabili di ambiente\r",
+									"if (pm.environment.get('token')) {\r",
+									"    // Imposta l'intestazione di autorizzazione per la richiesta\r",
+									"    pm.request.headers.add({\r",
+									"        key: 'Authorization',\r",
+									"        value: 'Bearer ' + pm.environment.get('token')\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/inference/:datasetId/:aiId/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"inference",
+								":datasetId",
+								":aiId",
+								""
+							],
+							"variable": [
+								{
+									"key": "datasetId",
+									"value": "5"
+								},
+								{
+									"key": "aiId",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "inference status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response structure is valid\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    // Check that the response has the keys 'success', 'message', and 'obj'\r",
+									"    pm.expect(jsonData).to.have.property(\"success\");\r",
+									"    pm.expect(jsonData).to.have.property(\"message\");\r",
+									"    pm.expect(jsonData).to.have.property(\"obj\");\r",
+									"\r",
+									"    // Check the types of 'success' and 'message'\r",
+									"    pm.expect(jsonData.success).to.be.a(\"boolean\");\r",
+									"    pm.expect(jsonData.message).to.be.a(\"string\");\r",
+									"\r",
+									"    // Check that 'obj' is an object\r",
+									"    pm.expect(jsonData.obj).to.be.an(\"object\");\r",
+									"\r",
+									"    // Check that 'obj' has the key 'jobId'\r",
+									"    pm.expect(jsonData.obj).to.have.property(\"jobId\");\r",
+									"    pm.expect(jsonData.obj.jobId).to.be.a(\"string\");\r",
+									"\r",
+									"    // If message is \"COMPLETED\", check the structure of 'results' array\r",
+									"    if (jsonData.message === \"COMPLETED\") {\r",
+									"        pm.expect(jsonData.obj).to.have.property(\"results\");\r",
+									"        pm.expect(jsonData.obj.results).to.be.an(\"array\");\r",
+									"\r",
+									"        jsonData.obj.results.forEach(function(result) {\r",
+									"            pm.expect(result).to.have.property(\"id\");\r",
+									"            pm.expect(result).to.have.property(\"imageId\");\r",
+									"            pm.expect(result).to.have.property(\"aiId\");\r",
+									"            pm.expect(result).to.have.property(\"data\");\r",
+									"            pm.expect(result).to.have.property(\"requestId\");\r",
+									"            pm.expect(result).to.have.property(\"created_at\");\r",
+									"            pm.expect(result).to.have.property(\"updated_at\");\r",
+									"\r",
+									"            pm.expect(result.id).to.be.a(\"number\");\r",
+									"            pm.expect(result.imageId).to.be.a(\"number\");\r",
+									"            pm.expect(result.aiId).to.be.a(\"number\");\r",
+									"            pm.expect(result.requestId).to.be.a(\"string\");\r",
+									"            pm.expect(result.created_at).to.be.a(\"string\");\r",
+									"            pm.expect(result.updated_at).to.be.a(\"string\");\r",
+									"\r",
+									"            pm.expect(result.data).to.be.an(\"object\");\r",
+									"            pm.expect(result.data).to.have.property(\"box\");\r",
+									"            pm.expect(result.data).to.have.property(\"error\");\r",
+									"            pm.expect(result.data).to.have.property(\"start\");\r",
+									"            pm.expect(result.data).to.have.property(\"finish\");\r",
+									"\r",
+									"            pm.expect(result.data.box).to.be.an(\"array\");\r",
+									"            result.data.box.forEach(function(box) {\r",
+									"                pm.expect(box).to.have.property(\"width\");\r",
+									"                pm.expect(box).to.have.property(\"height\");\r",
+									"                pm.expect(box).to.have.property(\"class_id\");\r",
+									"                pm.expect(box).to.have.property(\"x_center\");\r",
+									"                pm.expect(box).to.have.property(\"y_center\");\r",
+									"                pm.expect(box).to.have.property(\"confidence\");\r",
+									"\r",
+									"                pm.expect(box.width).to.be.a(\"number\");\r",
+									"                pm.expect(box.height).to.be.a(\"number\");\r",
+									"                pm.expect(box.class_id).to.be.a(\"number\");\r",
+									"                pm.expect(box.x_center).to.be.a(\"number\");\r",
+									"                pm.expect(box.y_center).to.be.a(\"number\");\r",
+									"                pm.expect(box.confidence).to.be.a(\"number\");\r",
+									"            });\r",
+									"\r",
+									"            pm.expect(result.data.error).to.be.null;\r",
+									"            pm.expect(result.data.start).to.be.a(\"boolean\");\r",
+									"            pm.expect(result.data.finish).to.be.a(\"boolean\");\r",
+									"        });\r",
+									"    } else {\r",
+									"        // If message is not \"COMPLETED\", check that 'obj' does not have 'results'\r",
+									"        pm.expect(jsonData.obj).to.not.have.property(\"results\");\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Controlla se il token è presente nelle variabili di ambiente\r",
+									"if (pm.environment.get('token')) {\r",
+									"    // Imposta l'intestazione di autorizzazione per la richiesta\r",
+									"    pm.request.headers.add({\r",
+									"        key: 'Authorization',\r",
+									"        value: 'Bearer ' + pm.environment.get('token')\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/inference/get/status/:jobId",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"inference",
+								"get",
+								"status",
+								":jobId"
+							],
+							"variable": [
+								{
+									"key": "jobId",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "inference frame",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Controlla se il token è presente nelle variabili di ambiente\r",
+									"if (pm.environment.get('token')) {\r",
+									"    // Imposta l'intestazione di autorizzazione per la richiesta\r",
+									"    pm.request.headers.add({\r",
+									"        key: 'Authorization',\r",
+									"        value: 'Bearer ' + pm.environment.get('token')\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/api/inference/result/:jobId/:imageId",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"inference",
+								"result",
+								":jobId",
+								":imageId"
+							],
+							"variable": [
+								{
+									"key": "jobId",
+									"value": "3"
+								},
+								{
+									"key": "imageId",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

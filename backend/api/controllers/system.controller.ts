@@ -8,16 +8,14 @@ import Dataset from "../models/dataset";
 import Ai from "../models/ai";
 import process from "node:process";
 import {TaskQueue} from "../queues/Worker";
-import {FinishData, FinishResult, JobData} from "../queues/jobData";
+import {FinishData, JobData} from "../queues/jobData";
 import Image from "../models/image";
 import Result from "../models/result";
-import {SuccessResponse} from "../utils/utils";
-import {isNumeric} from "validator";
-import {JobState} from "bullmq";
+import {sendSuccessResponse} from "../utils/utils";
 import { Canvas, createCanvas, loadImage } from 'canvas';
-import { DataResultInterface } from "../queues/jobData";
 import { BoundingBox } from "../queues/jobData";
 import { Image as LoadedImage } from "canvas";
+import {StatusCode} from "../static";
 
 
 
@@ -29,6 +27,7 @@ export default class SystemController {
         this.repository = new Repository();
     }
 
+    // generate the token for the auth route of the api
     async generateTokenFromUserId(req: Request, res: Response): Promise<void> {
         try {
             const userId: number = Number(req.params.userId);
@@ -52,7 +51,8 @@ export default class SystemController {
         }
     }
 
-    async startInference(req: Request, res: Response, next: NextFunction) {
+    // start inference put the job in the queue
+    async startInference(req: Request, res: Response): Promise<void> {
         try {
             const costoInferenza: number = Number(process.env.INFERENCE_COST || '2.5');
             const datasetId: number = Number(req.params.datasetId);
@@ -138,18 +138,13 @@ export default class SystemController {
 
 
             try {
-                const j = await TaskQueue.getInstance().getQueue().addJob(dataJob.resultUUID, dataJob);
-                const successResult: SuccessResponse = {
-                    success: true,
-                    message: "start inference on your dataset",
-                    obj: {
-                        jobId: j.id,
-                        // resultId: newUuid,
+                const job = await TaskQueue.getInstance().getQueue().addJob(dataJob.resultUUID, dataJob);
+                sendSuccessResponse(res,"Start inference on your dataset", StatusCode.accepted,
+                    {
+                        jobId: job.id,
                         datasetName: dataset.name,
                         architecture: ai.architecture,
-                    }
-                };
-                res.status(200).json(successResult);
+                    });
             } catch (err) {
                 throw new ConcreteErrorCreator().createServerError().setFailedStartInference();
             }
@@ -163,7 +158,8 @@ export default class SystemController {
         }
     }
 
-    async getStatusJob(req: Request, res: Response){
+    // status of the inference job
+    async getStatusJob(req: Request, res: Response): Promise<void>{
         const jobId = req.params.jobId;
         try {
             const taskQueue = TaskQueue.getInstance();
@@ -172,69 +168,60 @@ export default class SystemController {
                 throw new ConcreteErrorCreator().createServerError().setFailedCheckStatus().send(res);
             }
             const status = await job.getState();
-            let resultJson : SuccessResponse;
+            let resultJson : {message: string, jobId: string | undefined, results?: object };
             switch (status){
                 case "active": // RUNNING
-                    resultJson = {
-                        success: true,
-                        message: "RUNNING",
-                        obj: {
-                            jobId: job.id,
-                        }
-                    }
+                    sendSuccessResponse(res, "RUNNING", StatusCode.accepted,
+                        {
+                            jobId:job.id 
+                        });
                     break;
                 case "waiting": // PENDING
                 case "delayed":
-                    resultJson = {
-                        success: true,
-                        message: "PENDING",
-                        obj: {
-                            jobId: job.id,
-                        }
-                    }
+                    sendSuccessResponse(res, "PENDING", StatusCode.accepted,
+                        {
+                            jobId:job.id
+                        });
                     break;
                 case "completed": // COMPLETED
                     resultJson = {
-                        success: true,
                         message: "COMPLETED",
-                        obj: {
-                            jobId: job.id,
-                            results: await this.repository.findResult(job.name)
-                        }
+                        jobId: job.id,
+                        results: await this.repository.findResult(job.name)
                     }
+                    sendSuccessResponse(res, "COMPLETED", StatusCode.ok,
+                        {
+                            jobId:job.id,
+                            results: await this.repository.findResult(job.name)
+                        });
                     break;
                 case "failed": // FAILED
                     const { failedReason } = job;
                     if (failedReason === 'insufficient token' && job.stacktrace.includes('ABORTED')) {
-                        resultJson = {
-                            success: true,
-                            message: "ABORTED",
-                            obj: {
-                                jobId: job.id,
-                            }
-                        }
+                        sendSuccessResponse(res, "ABORTED", StatusCode.noContent,
+                            {
+                                jobId:job.id
+                            });
                         break;
                     }
                 case "unknown":
                 default:
-                    resultJson = {
-                        success: true,
-                        message: "FAILED",
-                        obj: {
-                            jobId: job.id,
-                        }
-                    }
+                    sendSuccessResponse(res, "FAILED", StatusCode.noContent,
+                        {
+                            jobId:job.id
+                        });
+
             }
-            res.status(200).json(resultJson);
-        } catch (err) {
-            if (!(err instanceof ConcreteErrorCreator)) {
-                new ConcreteErrorCreator().createServerError().setFailedCheckStatus().send(res);
+        } catch (error) {
+            if (error instanceof ErrorCode) {
+                error.send(res);
             }
+            new ConcreteErrorCreator().createServerError().setFailedCheckStatus().send(res);
         }
     }
 
-
-    async getInferenceResult(req: Request, res: Response, next: NextFunction) {
+    // inference result
+    async getInferenceResult(req: Request, res: Response): Promise<void> {
         try {
             const jobId: string = req.params.jobId;
             const imageId = Number(req.params.imageId);
@@ -290,12 +277,6 @@ export default class SystemController {
             for (const bb of box) {
                 let { x_center, y_center, width, height, class_id, confidence } = bb;
 
-                // const canvasWidth = imgElement.width * 2;
-                // const canvasHeight = imgElement.height;
-                //
-                // // Centrare il bounding box nell'immagine di destra
-                //  x_center = (canvasWidth / 4) * 3; // posizione centrale dell'immagine di destra
-                //  y_center = canvasHeight / 2;
 
                 let x: number = x_center
                 let y: number = y_center

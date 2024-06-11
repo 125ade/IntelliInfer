@@ -11,13 +11,14 @@ export function validateParamIntGreaterThanZero(param_id: string) {
         (req: Request, res: Response, next: NextFunction) => {
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
-                new ConcreteErrorCreator()
+                return new ConcreteErrorCreator()
                     .createBadRequestError()
                     .setNoUserId()
                     .send(res);
-            } else {
-                next();
             }
+
+            next();
+
         }
     ];
 }
@@ -29,35 +30,14 @@ export function validateParamIntFromZero(paramId: string) {
         (req: Request, res: Response, next: NextFunction) => {
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
-                next(new ConcreteErrorCreator()
+                return new ConcreteErrorCreator()
                     .createBadRequestError()
                     .setNoImageId()
-                    .send(res));
-            } else {
-                next();
+                    .send(res);
             }
-        }
-    ];
-}
 
+            next();
 
-// middleware used when giving a parameter to a request that must be a valid UUID string
-export function validateParamUUID(param_id: string) {
-    return [
-        param(param_id)
-            .isString().withMessage('Value must be a valid string'),
-        (req: Request, res: Response, next: NextFunction) => {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                next(
-                    new ConcreteErrorCreator()
-                    .createBadRequestError()
-                    .setNoJobId()
-                    .send(res)
-                );
-            } else {
-                next();
-            }
         }
     ];
 }
@@ -78,18 +58,17 @@ export const validateCreateDataset = [
             }
             return true;
         }),
-
-    
     (req: Request, res: Response, next: NextFunction) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            next(new ConcreteErrorCreator()
+            return new ConcreteErrorCreator()
                 .createBadRequestError()
-                .setNoUserId()
-                .send(res));
-        } else {
-            next();
+                .setNotSupportedElement()
+                .send(res);
         }
+
+        next();
+
     }
 ];
 
@@ -111,8 +90,21 @@ export function validateFileUpload(req: Request, res: Response, next: NextFuncti
 
 // middleware to validate the body of the route to recharge user's credit
 export const validateRechargeRequest = [
-    body('email').isEmail().normalizeEmail(),
-    body('tokensToAdd').isInt({ min: 1 }).toInt()
+    body('email')
+        .trim()
+        .escape()
+        .isEmail()
+        .normalizeEmail(),
+    body('tokensToAdd')
+        .toInt()
+        .isInt({ min: 1 }),
+    (req: Request, res: Response, next: NextFunction) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return new ConcreteErrorCreator().createBadRequestError().setNotSupportedElement().send(res);
+        }
+        next();
+    }
 ];
 
 
@@ -124,7 +116,7 @@ export const validateName = [
     (req: Request, res: Response, next: NextFunction) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
+            return new ConcreteErrorCreator().createBadRequestError().setNotSupportedElement().send(res);
         }
         next();
     }

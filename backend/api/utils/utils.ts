@@ -1,3 +1,7 @@
+import {Response} from "express";
+import {StatusCode} from "../static";
+
+
 export interface SuccessResponse {
     success: boolean;
     message?: string;
@@ -12,6 +16,18 @@ export function generatePath(name: string): string {
         return path;
 }
 
+export function sendSuccessResponse(res: Response, message: string, statusCode: number = 200, obj?: any ):void {
+    const resultJson: SuccessResponse = {
+        success: true,
+        message,
+    };
+
+    if (obj !== undefined && obj !== null) {
+        resultJson.obj = obj;
+    }
+
+    res.status(statusCode).json(resultJson);
+}
 
  
 
