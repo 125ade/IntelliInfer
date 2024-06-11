@@ -156,7 +156,7 @@ export default class SystemController {
         }
     }
 
-    async getStatusJob(req: Request, res: Response){
+    async getStatusJob(req: Request, res: Response): Promise<void>{
         const jobId = req.params.jobId;
         try {
             const taskQueue = TaskQueue.getInstance();

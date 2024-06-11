@@ -8,7 +8,7 @@ import AdmZip, { IZipEntry }  from 'adm-zip';
 import User from "../models/user";
 import {decodeToken} from "../token";
 import mime from 'mime-types';
-import {sendSuccessResponse, SuccessResponse} from "../utils/utils";
+import {sendSuccessResponse} from "../utils/utils";
 import Dataset from "../models/dataset";
 import Ai from "../models/ai";
 import {StatusCode} from "../static";
@@ -65,8 +65,6 @@ export default class UserController {
             new ConcreteErrorCreator().createServerError().setFailedDeleteItem().send(res)
         }
     }
-
-
 
     async datasetDetail(req: Request, res: Response): Promise<void> {
         try{

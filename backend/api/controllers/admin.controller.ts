@@ -5,7 +5,7 @@ import { ErrorCode } from "../factory/ErrorCode";
 import User from "../models/user";
 import fs from 'fs';
 import path from 'path';
-import {sendSuccessResponse, SuccessResponse} from "../utils/utils";
+import {sendSuccessResponse} from "../utils/utils";
 import process from "node:process";
 import {StatusCode} from "../static";
 import {isNumeric} from "validator";
