@@ -1,8 +1,8 @@
-<div style="text-align: center;">
-  <img src="documents/logoIntelliInfer.jpg" alt="Logo IntelliInfer" style="max-width: 256 px; height: auto;">
+<div align="center">
+  <img src="documents/logoIntelliInfer.jpg" alt="Logo IntelliInfer" width="200" height="200"/>
 </div>
 
-# IntelliInfer
+<h1 align="center">IntelliInfer</h1>
 
 ## Table of Contents
 - [Introduction](#introduction)
